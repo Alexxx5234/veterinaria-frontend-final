@@ -1,568 +1,794 @@
+
+/* ==========================================================
+   VETERINARIA AREVALO
+   ADMINISTRACIÓN DE USUARIOS
+
+   FUNCIONES:
+   - Consultar todos los usuarios.
+   - Consultar usuarios pendientes.
+   - Buscar por nombre o correo.
+   - Filtrar por estado.
+   - Mostrar estadísticas generales.
+   - Aprobar, rechazar, bloquear y activar cuentas.
+   - Eliminar usuarios con confirmación.
+   - Evitar solicitudes duplicadas.
+   - Enviar avisos a las notificaciones globales.
+
+   IMPORTANTE:
+   Solo ADMIN puede acceder a este módulo.
+   Los permisos también deben aplicarse en Spring Boot.
+   ========================================================== */
+
+
 // ==========================================================
-// IMPORTACIONES
+// IMPORTACIONES ANGULAR
 // ==========================================================
 
-// Component permite crear el componente.
-// OnInit permite ejecutar código cuando se abre la página.
-// ChangeDetectorRef nos ayuda a actualizar la vista
-// después de recibir respuestas de Spring Boot.
 import {
   Component,
   OnInit,
   ChangeDetectorRef
 } from '@angular/core';
 
-// CommonModule permite utilizar *ngIf y *ngFor.
 import { CommonModule } from '@angular/common';
 
-// Router permite regresar al dashboard ADMIN.
+// Permite utilizar ngModel en el buscador y filtros.
+import { FormsModule } from '@angular/forms';
+
+// Navegación hacia el Dashboard.
 import { Router } from '@angular/router';
 
-// Servicio encargado de consumir los endpoints
-// del AdminController de Spring Boot.
+// Permite consultar varios endpoints.
+import {
+  forkJoin,
+  Observable,
+  of
+} from 'rxjs';
+
+
+// ==========================================================
+// SERVICIOS
+// ==========================================================
+
+// Servicio original de Administración de Usuarios.
 import { AdminUsuarioServicio }
   from '../../../Servicios/admin-usuario-servicio';
 
+// Servicio compartido con la campana de notificaciones.
+import { NotificacionesServicio }
+  from '../../../Servicios/notificaciones-servicio';
+
+
+// ==========================================================
+// ESTRUCTURA DE LOS USUARIOS
+// ==========================================================
+
+interface UsuarioAdmin {
+
+  id: number;
+
+  nombre: string;
+
+  correo: string;
+
+  rol: string;
+
+  estado: string;
+
+  activo: boolean;
+
+  verificado: boolean;
+
+}
+
+
+// ==========================================================
+// COMPONENTE
+// ==========================================================
 
 @Component({
 
-  // Nombre interno del componente.
   selector: 'app-admin-usuarios',
 
-  // Componente standalone.
   standalone: true,
 
-  // CommonModule permite usar
-  // *ngIf y *ngFor en el HTML.
   imports: [
-    CommonModule
+    CommonModule,
+    FormsModule
   ],
 
-  // Archivo HTML.
   templateUrl: './admin-usuarios.html',
 
-  // Archivo SCSS.
   styleUrl: './admin-usuarios.scss'
 
 })
 export class AdminUsuarios implements OnInit {
 
 
-  // ==========================================================
-  // LISTA DE USUARIOS
-  // ==========================================================
+  // ========================================================
+  // LISTAS DE USUARIOS
+  // ========================================================
 
-  usuarios: any[] = [];
+  // Usuarios que aparecen en la vista seleccionada.
+  usuarios: UsuarioAdmin[] = [];
+
+  // Lista completa para calcular las estadísticas.
+  todosUsuarios: UsuarioAdmin[] = [];
 
 
-  // ==========================================================
+  // ========================================================
   // VISTA ACTUAL
-  // ==========================================================
-  // Permite cambiar entre:
-  //
-  // - Todos los usuarios
-  // - Usuarios pendientes
-  // ==========================================================
+  // ========================================================
 
-  vistaActual:
-    'todos' | 'pendientes' = 'todos';
+  // Conservamos las dos opciones originales:
+  // Todos los usuarios y Usuarios pendientes.
+  vistaActual: 'todos' | 'pendientes' = 'todos';
 
 
-  // ==========================================================
-  // VARIABLES DE ESTADO
-  // ==========================================================
+  // ========================================================
+  // ESTADOS DE LA INTERFAZ
+  // ========================================================
 
   cargando: boolean = false;
+
+  errorCarga: boolean = false;
 
   mensajeError: string = '';
 
   mensajeExito: string = '';
 
+  // Identifica al usuario sobre el que se ejecuta
+  // una operación administrativa.
+  accionEnCursoId: number | null = null;
 
-  // ==========================================================
+
+  // ========================================================
+  // BUSCADOR Y FILTRO POR ESTADO
+  // ========================================================
+
+  busqueda: string = '';
+
+  filtroEstado: string = 'TODOS';
+
+
+  // ========================================================
   // CONSTRUCTOR
-  // ==========================================================
+  // ========================================================
 
   constructor(
 
-    // Servicio que se comunica con AdminController.
     private adminUsuarioServicio: AdminUsuarioServicio,
 
-    // Router para navegar.
+    private notificacionesServicio: NotificacionesServicio,
+
     private router: Router,
 
-    // Permite actualizar manualmente la pantalla.
     private cd: ChangeDetectorRef
 
   ) {}
 
 
-  // ==========================================================
+  // ========================================================
   // AL ABRIR LA PÁGINA
-  // ==========================================================
+  // ========================================================
 
   ngOnInit(): void {
 
-    // Por defecto mostramos todos los usuarios.
     this.cargarUsuarios();
 
   }
 
 
-  // ==========================================================
-  // CARGAR TODOS LOS USUARIOS
-  // ==========================================================
+  // ========================================================
+  // NORMALIZAR TEXTO DE BÚSQUEDA
+  // ========================================================
+
+  // Permite buscar sin distinguir mayúsculas o tildes.
+  private normalizarTexto(valor: unknown): string {
+
+    return String(valor ?? '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim()
+      .toLowerCase();
+
+  }
+
+
+  // ========================================================
+  // CAMBIAR A TODOS LOS USUARIOS
+  // ========================================================
 
   cargarUsuarios(): void {
 
+    if (this.cargando || this.accionEnCursoId !== null) {
+      return;
+    }
+
     this.vistaActual = 'todos';
 
-    this.cargando = true;
+    this.limpiarFiltros();
 
-    this.mensajeError = '';
-
-
-    // GET /api/admin/usuarios
-    this.adminUsuarioServicio
-      .listarUsuarios()
-      .subscribe({
-
-
-        // RESPUESTA CORRECTA
-        next: (respuesta) => {
-
-          this.usuarios = respuesta;
-
-          this.cargando = false;
-
-
-          console.log(
-            'Usuarios:',
-            respuesta
-          );
-
-
-          this.cd.detectChanges();
-
-        },
-
-
-        // ERROR
-        error: (error) => {
-
-          console.error(
-            'Error al cargar usuarios:',
-            error
-          );
-
-
-          this.mensajeError =
-            'No se pudieron cargar los usuarios.';
-
-
-          this.cargando = false;
-
-
-          this.cd.detectChanges();
-
-        }
-
-      });
+    this.consultarVista();
 
   }
 
 
-  // ==========================================================
-  // CARGAR USUARIOS PENDIENTES
-  // ==========================================================
+  // ========================================================
+  // CAMBIAR A USUARIOS PENDIENTES
+  // ========================================================
 
   cargarPendientes(): void {
 
+    if (this.cargando || this.accionEnCursoId !== null) {
+      return;
+    }
+
     this.vistaActual = 'pendientes';
 
+    this.limpiarFiltros();
+
+    this.consultarVista();
+
+  }
+
+
+  // ========================================================
+  // CONSULTAR LA VISTA ACTUAL
+  // ========================================================
+
+  private consultarVista(): void {
+
     this.cargando = true;
+
+    this.errorCarga = false;
 
     this.mensajeError = '';
 
 
-    // GET /api/admin/usuarios-pendientes
-    this.adminUsuarioServicio
-      .listarPendientes()
-      .subscribe({
+    // ======================================================
+    // CONSULTAR LOS ENDPOINTS EXISTENTES
+    // ======================================================
+
+    // Siempre consultamos la lista completa
+    // para mantener actualizadas las estadísticas.
+    //
+    // Si estamos en Pendientes, también consultamos:
+    // GET /api/admin/usuarios-pendientes.
+    //
+    // No modificamos los servicios existentes.
+
+    forkJoin({
+
+      todos:
+        this.adminUsuarioServicio.listarUsuarios(),
+
+      pendientes:
+        this.vistaActual === 'pendientes'
+          ? this.adminUsuarioServicio.listarPendientes()
+          : of(null)
+
+    }).subscribe({
 
 
-        next: (respuesta) => {
+      // ====================================================
+      // RESPUESTA CORRECTA
+      // ====================================================
 
-          this.usuarios = respuesta;
+      next: (respuesta) => {
 
-          this.cargando = false;
+        this.todosUsuarios = Array.isArray(respuesta.todos)
+          ? respuesta.todos
+          : [];
 
+        if (this.vistaActual === 'pendientes') {
 
-          console.log(
-            'Usuarios pendientes:',
-            respuesta
-          );
+          this.usuarios = Array.isArray(respuesta.pendientes)
+            ? respuesta.pendientes
+            : [];
 
+        } else {
 
-          this.cd.detectChanges();
-
-        },
-
-
-        error: (error) => {
-
-          console.error(
-            'Error al cargar pendientes:',
-            error
-          );
-
-
-          this.mensajeError =
-            'No se pudieron cargar los usuarios pendientes.';
-
-
-          this.cargando = false;
-
-
-          this.cd.detectChanges();
+          this.usuarios = this.todosUsuarios;
 
         }
 
-      });
+        this.cargando = false;
+
+        this.errorCarga = false;
+
+        this.cd.detectChanges();
+
+      },
+
+
+      // ====================================================
+      // ERROR DE CONSULTA
+      // ====================================================
+
+      error: (error) => {
+
+        console.error(
+          'Error al consultar usuarios:',
+          error
+        );
+
+        this.cargando = false;
+
+        this.errorCarga = true;
+
+        this.mensajeError =
+          error?.status === 0
+            ? 'No se pudo conectar con el servidor. Comprueba que Spring Boot esté funcionando.'
+            : 'No se pudieron cargar los usuarios. Intenta nuevamente.';
+
+        this.notificacionesServicio.agregar(
+          'Error al consultar usuarios',
+          'No se pudo recuperar la información del sistema.',
+          'error'
+        );
+
+        this.cd.detectChanges();
+
+      }
+
+    });
 
   }
 
 
-  // ==========================================================
-  // APROBAR USUARIO
-  // ==========================================================
+  // ========================================================
+  // ACTUALIZAR LISTADO MANUALMENTE
+  // ========================================================
 
-  aprobarUsuario(
-    usuario: any
-  ): void {
+  actualizarUsuarios(): void {
 
-
-    const confirmar = window.confirm(
-      `¿Deseas aprobar al usuario ${usuario.nombre}?`
-    );
-
-
-    if (!confirmar) {
+    if (this.cargando || this.accionEnCursoId !== null) {
       return;
     }
 
-
-    // PUT /api/admin/aprobar/{id}
-    this.adminUsuarioServicio
-      .aprobarUsuario(usuario.id)
-      .subscribe({
-
-
-        next: () => {
-
-          this.mensajeExito =
-            'Usuario aprobado correctamente.';
-
-
-          this.recargarVistaActual();
-
-        },
-
-
-        error: (error) => {
-
-          console.error(
-            'Error al aprobar usuario:',
-            error
-          );
-
-
-          this.mensajeError =
-            'No se pudo aprobar el usuario.';
-
-
-          this.cd.detectChanges();
-
-        }
-
-      });
+    this.consultarVista();
 
   }
 
 
-  // ==========================================================
-  // RECHAZAR USUARIO
-  // ==========================================================
+  // ========================================================
+  // ESTADÍSTICAS GENERALES
+  // ========================================================
 
-  rechazarUsuario(
-    usuario: any
-  ): void {
+  get totalUsuarios(): number {
 
-
-    const confirmar = window.confirm(
-      `¿Deseas rechazar la solicitud de ${usuario.nombre}?`
-    );
-
-
-    if (!confirmar) {
-      return;
-    }
-
-
-    // PUT /api/admin/rechazar/{id}
-    this.adminUsuarioServicio
-      .rechazarUsuario(usuario.id)
-      .subscribe({
-
-
-        next: () => {
-
-          this.mensajeExito =
-            'Usuario rechazado correctamente.';
-
-
-          this.recargarVistaActual();
-
-        },
-
-
-        error: (error) => {
-
-          console.error(
-            'Error al rechazar usuario:',
-            error
-          );
-
-
-          this.mensajeError =
-            'No se pudo rechazar el usuario.';
-
-
-          this.cd.detectChanges();
-
-        }
-
-      });
+    return this.todosUsuarios.length;
 
   }
 
 
-  // ==========================================================
-  // BLOQUEAR USUARIO
-  // ==========================================================
+  get totalAprobados(): number {
 
-  bloquearUsuario(
-    usuario: any
-  ): void {
-
-
-    const confirmar = window.confirm(
-      `¿Deseas bloquear la cuenta de ${usuario.nombre}?`
-    );
-
-
-    if (!confirmar) {
-      return;
-    }
-
-
-    // PUT /api/admin/bloquear/{id}
-    this.adminUsuarioServicio
-      .bloquearUsuario(usuario.id)
-      .subscribe({
-
-
-        next: () => {
-
-          this.mensajeExito =
-            'Usuario bloqueado correctamente.';
-
-
-          this.recargarVistaActual();
-
-        },
-
-
-        error: (error) => {
-
-          console.error(
-            'Error al bloquear usuario:',
-            error
-          );
-
-
-          this.mensajeError =
-            'No se pudo bloquear el usuario.';
-
-
-          this.cd.detectChanges();
-
-        }
-
-      });
+    return this.todosUsuarios.filter(usuario =>
+      usuario.estado === 'APROBADA'
+    ).length;
 
   }
 
 
-  // ==========================================================
-  // ACTIVAR USUARIO
-  // ==========================================================
+  get totalPendientes(): number {
 
-  activarUsuario(
-    usuario: any
-  ): void {
-
-
-    const confirmar = window.confirm(
-      `¿Deseas activar nuevamente la cuenta de ${usuario.nombre}?`
-    );
-
-
-    if (!confirmar) {
-      return;
-    }
-
-
-    // PUT /api/admin/activar/{id}
-    this.adminUsuarioServicio
-      .activarUsuario(usuario.id)
-      .subscribe({
-
-
-        next: () => {
-
-          this.mensajeExito =
-            'Usuario activado correctamente.';
-
-
-          this.recargarVistaActual();
-
-        },
-
-
-        error: (error) => {
-
-          console.error(
-            'Error al activar usuario:',
-            error
-          );
-
-
-          this.mensajeError =
-            'No se pudo activar el usuario.';
-
-
-          this.cd.detectChanges();
-
-        }
-
-      });
+    return this.todosUsuarios.filter(usuario =>
+      usuario.estado === 'PENDIENTE'
+    ).length;
 
   }
 
 
-  // ==========================================================
-  // ELIMINAR USUARIO
-  // ==========================================================
+  get totalBloqueados(): number {
 
-  eliminarUsuario(
-    usuario: any
-  ): void {
-
-
-    const confirmar = window.confirm(
-      `¿Estás seguro de eliminar permanentemente a ${usuario.nombre}?`
-    );
-
-
-    if (!confirmar) {
-      return;
-    }
-
-
-    // DELETE /api/admin/usuarios/{id}
-    this.adminUsuarioServicio
-      .eliminarUsuario(usuario.id)
-      .subscribe({
-
-
-        next: () => {
-
-          this.mensajeExito =
-            'Usuario eliminado correctamente.';
-
-
-          this.recargarVistaActual();
-
-        },
-
-
-        error: (error) => {
-
-          console.error(
-            'Error al eliminar usuario:',
-            error
-          );
-
-
-          this.mensajeError =
-            'No se pudo eliminar el usuario.';
-
-
-          this.cd.detectChanges();
-
-        }
-
-      });
+    return this.todosUsuarios.filter(usuario =>
+      usuario.estado === 'BLOQUEADA'
+    ).length;
 
   }
 
 
-  // ==========================================================
-  // RECARGAR LA VISTA ACTUAL
-  // ==========================================================
-  // Después de aprobar, bloquear, etc.,
-  // actualizamos la lista que el ADMIN estaba observando.
-  // ==========================================================
+  // ========================================================
+  // ESTADOS DISPONIBLES PARA EL FILTRO
+  // ========================================================
 
-  recargarVistaActual(): void {
+  // Obtenemos los estados que realmente existen
+  // en el listado actual, sin inventar valores.
+  get estadosDisponibles(): string[] {
 
-    if (this.vistaActual === 'pendientes') {
-
-      this.cargarPendientes();
-
-    } else {
-
-      this.cargarUsuarios();
-
-    }
+    return Array.from(
+      new Set(
+        this.usuarios
+          .map(usuario => usuario.estado)
+          .filter(estado => !!estado)
+      )
+    ).sort();
 
   }
 
 
-  // ==========================================================
+  // ========================================================
+  // FILTRAR USUARIOS
+  // ========================================================
+
+  get usuariosFiltrados(): UsuarioAdmin[] {
+
+    const texto =
+      this.normalizarTexto(this.busqueda);
+
+    return this.usuarios.filter(usuario => {
+
+      // Buscar por nombre o correo.
+      const contenido = this.normalizarTexto(
+        `${usuario.nombre} ${usuario.correo} ${usuario.id}`
+      );
+
+      const coincideBusqueda =
+        contenido.includes(texto);
+
+      // Filtrar por estado.
+      const coincideEstado =
+        this.filtroEstado === 'TODOS' ||
+        usuario.estado === this.filtroEstado;
+
+      return coincideBusqueda && coincideEstado;
+
+    });
+
+  }
+
+
+  // ========================================================
+  // LIMPIAR FILTROS
+  // ========================================================
+
+  limpiarFiltros(): void {
+
+    this.busqueda = '';
+
+    this.filtroEstado = 'TODOS';
+
+  }
+
+
+  // ========================================================
   // COMPROBAR SI ES ADMIN
-  // ==========================================================
-  // Nos servirá en el HTML para evitar mostrar botones
-  // administrativos peligrosos sobre otra cuenta ADMIN.
-  // ==========================================================
+  // ========================================================
 
-  esAdmin(
-    usuario: any
-  ): boolean {
+  esAdmin(usuario: UsuarioAdmin): boolean {
 
     return usuario.rol === 'ADMIN';
 
   }
 
 
-  // ==========================================================
+  // ========================================================
+  // COMPROBAR SI HAY UNA OPERACIÓN EN CURSO
+  // ========================================================
+
+  get hayAccionEnCurso(): boolean {
+
+    return this.accionEnCursoId !== null;
+
+  }
+
+
+  // ========================================================
+  // MÉTODO COMPARTIDO DE ACCIONES
+  // ========================================================
+
+  /*
+    Este método se utiliza para:
+
+    - Aprobar.
+    - Rechazar.
+    - Bloquear.
+    - Activar.
+    - Eliminar.
+
+    Así evitamos repetir la misma lógica
+    de confirmación y manejo de errores.
+  */
+
+  private ejecutarAccion(
+
+    usuario: UsuarioAdmin,
+
+    pregunta: string,
+
+    tituloNotificacion: string,
+
+    mensajeCorrecto: string,
+
+    peticion: Observable<any>
+
+  ): void {
+
+
+    // ======================================================
+    // PROTEGER CUENTAS ADMIN
+    // ======================================================
+
+    // Evita ejecutar acciones desde la interfaz
+    // sobre cuentas con rol ADMIN.
+    if (this.esAdmin(usuario)) {
+      return;
+    }
+
+
+    // ======================================================
+    // EVITAR SOLICITUDES DUPLICADAS
+    // ======================================================
+
+    if (this.hayAccionEnCurso || this.cargando) {
+      return;
+    }
+
+
+    // ======================================================
+    // CONFIRMACIÓN DEL ADMINISTRADOR
+    // ======================================================
+
+    if (!window.confirm(pregunta)) {
+      return;
+    }
+
+
+    // ======================================================
+    // INICIAR LA OPERACIÓN
+    // ======================================================
+
+    this.accionEnCursoId = usuario.id;
+
+    this.mensajeError = '';
+
+    this.mensajeExito = '';
+
+
+    // ======================================================
+    // PETICIÓN AL BACKEND
+    // ======================================================
+
+    peticion.subscribe({
+
+
+      // ====================================================
+      // OPERACIÓN CORRECTA
+      // ====================================================
+
+      next: () => {
+
+        this.accionEnCursoId = null;
+
+        this.mensajeExito = mensajeCorrecto;
+
+
+        // Enviar aviso a la campana superior.
+        this.notificacionesServicio.agregar(
+          tituloNotificacion,
+          `${mensajeCorrecto} Usuario: ${usuario.nombre}.`,
+          'exito'
+        );
+
+
+        // Actualizar la vista sin recargar toda la web.
+        this.recargarVistaActual();
+
+      },
+
+
+      // ====================================================
+      // ERROR DE OPERACIÓN
+      // ====================================================
+
+      error: (error) => {
+
+        console.error(
+          `Error administrativo sobre ${usuario.nombre}:`,
+          error
+        );
+
+        this.accionEnCursoId = null;
+
+        this.mensajeError =
+          error?.error?.mensaje ||
+          error?.error?.message ||
+          'No se pudo completar la operación. Intenta nuevamente.';
+
+
+        this.notificacionesServicio.agregar(
+          'Operación no completada',
+          `No fue posible realizar la acción sobre ${usuario.nombre}.`,
+          'error'
+        );
+
+        this.cd.detectChanges();
+
+      }
+
+    });
+
+  }
+
+
+  // ========================================================
+  // APROBAR USUARIO
+  // ========================================================
+
+  aprobarUsuario(usuario: UsuarioAdmin): void {
+
+    if (usuario.estado !== 'PENDIENTE') {
+      return;
+    }
+
+    this.ejecutarAccion(
+
+      usuario,
+
+      `¿Deseas aprobar al usuario ${usuario.nombre}?`,
+
+      'Usuario aprobado',
+
+      'Usuario aprobado correctamente.',
+
+      this.adminUsuarioServicio.aprobarUsuario(usuario.id)
+
+    );
+
+  }
+
+
+  // ========================================================
+  // RECHAZAR USUARIO
+  // ========================================================
+
+  rechazarUsuario(usuario: UsuarioAdmin): void {
+
+    if (usuario.estado !== 'PENDIENTE') {
+      return;
+    }
+
+    this.ejecutarAccion(
+
+      usuario,
+
+      `¿Deseas rechazar la solicitud de ${usuario.nombre}?`,
+
+      'Solicitud rechazada',
+
+      'Usuario rechazado correctamente.',
+
+      this.adminUsuarioServicio.rechazarUsuario(usuario.id)
+
+    );
+
+  }
+
+
+  // ========================================================
+  // BLOQUEAR USUARIO
+  // ========================================================
+
+  bloquearUsuario(usuario: UsuarioAdmin): void {
+
+    if (
+      usuario.estado !== 'APROBADA' ||
+      !usuario.activo
+    ) {
+      return;
+    }
+
+    this.ejecutarAccion(
+
+      usuario,
+
+      `¿Deseas bloquear la cuenta de ${usuario.nombre}?`,
+
+      'Usuario bloqueado',
+
+      'Usuario bloqueado correctamente.',
+
+      this.adminUsuarioServicio.bloquearUsuario(usuario.id)
+
+    );
+
+  }
+
+
+  // ========================================================
+  // ACTIVAR USUARIO
+  // ========================================================
+
+  activarUsuario(usuario: UsuarioAdmin): void {
+
+    if (
+      usuario.estado !== 'BLOQUEADA' &&
+      usuario.activo
+    ) {
+      return;
+    }
+
+    this.ejecutarAccion(
+
+      usuario,
+
+      `¿Deseas activar nuevamente la cuenta de ${usuario.nombre}?`,
+
+      'Usuario activado',
+
+      'Usuario activado correctamente.',
+
+      this.adminUsuarioServicio.activarUsuario(usuario.id)
+
+    );
+
+  }
+
+
+  // ========================================================
+  // ELIMINAR USUARIO
+  // ========================================================
+
+  eliminarUsuario(usuario: UsuarioAdmin): void {
+
+    this.ejecutarAccion(
+
+      usuario,
+
+      `ATENCIÓN: ¿Estás seguro de eliminar permanentemente a ${usuario.nombre}? Esta acción no se puede deshacer.`,
+
+      'Usuario eliminado',
+
+      'Usuario eliminado correctamente.',
+
+      this.adminUsuarioServicio.eliminarUsuario(usuario.id)
+
+    );
+
+  }
+
+
+  // ========================================================
+  // RECARGAR LA VISTA ACTUAL
+  // ========================================================
+
+  /*
+    Conserva la pestaña seleccionada.
+
+    Si el administrador estaba viendo Pendientes,
+    seguirá en Pendientes después de aprobar.
+  */
+
+  recargarVistaActual(): void {
+
+    this.consultarVista();
+
+  }
+
+
+  // ========================================================
+  // IDENTIFICAR REGISTROS EN EL HTML
+  // ========================================================
+
+  trackByUsuario(
+    index: number,
+    usuario: UsuarioAdmin
+  ): number {
+
+    return usuario.id ?? index;
+
+  }
+
+
+  // ========================================================
   // VOLVER AL DASHBOARD ADMIN
-  // ==========================================================
+  // ========================================================
 
   volverDashboard(): void {
 
-    this.router.navigate([
+    void this.router.navigate([
       '/admin/dashboard'
     ]);
 

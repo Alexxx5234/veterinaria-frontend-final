@@ -1,16 +1,30 @@
+
+/* ==========================================================
+   VETERINARIA AREVALO
+   VERIFICACIÓN DE CUENTA
+
+   MEJORAS DE USABILIDAD:
+   - Código de exactamente cuatro números.
+   - Se eliminan caracteres no numéricos.
+   - Se muestra el correo recuperado del registro.
+   - Mensajes claros de éxito y error.
+   - Protección contra envíos repetidos.
+   - Conserva la conexión con Spring Boot.
+   ========================================================== */
+
+
 // ==========================================================
 // IMPORTACIONES
 // ==========================================================
 
 // Component permite crear el componente.
-// ChangeDetectorRef ayuda a actualizar la vista
-// después de recibir una respuesta del backend.
+// ChangeDetectorRef actualiza la vista después de la API.
 import {
   Component,
   ChangeDetectorRef
 } from '@angular/core';
 
-// CommonModule permite utilizar *ngIf.
+// Permite utilizar *ngIf en el HTML.
 import { CommonModule } from '@angular/common';
 
 // Herramientas para formularios reactivos.
@@ -21,13 +35,18 @@ import {
   Validators
 } from '@angular/forms';
 
-// Router permite navegar entre páginas.
+// Permite navegar entre las páginas.
 import { Router } from '@angular/router';
 
-// Servicio de autenticación.
-import { AuthServicio }
-  from '../../../Servicios/auth-servicio';
+// Servicio existente de autenticación.
+import {
+  AuthServicio
+} from '../../../Servicios/auth-servicio';
 
+
+// ==========================================================
+// COMPONENTE DE VERIFICACIÓN
+// ==========================================================
 
 @Component({
 
@@ -48,16 +67,16 @@ import { AuthServicio }
 export class VerificarCodigo {
 
 
-  // ==========================================================
+  // ========================================================
   // FORMULARIO
-  // ==========================================================
+  // ========================================================
 
   verificarForm: FormGroup;
 
 
-  // ==========================================================
-  // VARIABLES DE CONTROL
-  // ==========================================================
+  // ========================================================
+  // ESTADOS DE LA INTERFAZ
+  // ========================================================
 
   cargando: boolean = false;
 
@@ -66,14 +85,17 @@ export class VerificarCodigo {
   mensajeExito: string = '';
 
 
-  // El correo NO lo escribe nuevamente el usuario.
-  // Lo recuperamos automáticamente.
+  // ========================================================
+  // CORREO RECUPERADO DEL REGISTRO
+  // ========================================================
+
+  // El usuario no tiene que escribirlo nuevamente.
   correo: string = '';
 
 
-  // ==========================================================
+  // ========================================================
   // CONSTRUCTOR
-  // ==========================================================
+  // ========================================================
 
   constructor(
 
@@ -88,13 +110,9 @@ export class VerificarCodigo {
   ) {
 
 
-    // ========================================================
-    // FORMULARIO DEL CÓDIGO
-    // ========================================================
-    //
-    // El código enviado por el backend
-    // siempre tiene 4 dígitos.
-    // ========================================================
+    // ======================================================
+    // FORMULARIO REACTIVO
+    // ======================================================
 
     this.verificarForm = this.fb.group({
 
@@ -103,7 +121,7 @@ export class VerificarCodigo {
         [
           Validators.required,
 
-          // Solamente permite exactamente 4 números.
+          // Acepta exactamente cuatro dígitos.
           Validators.pattern(/^[0-9]{4}$/)
         ]
       ]
@@ -111,50 +129,89 @@ export class VerificarCodigo {
     });
 
 
-    // ========================================================
-    // RECUPERAR CORREO DEL REGISTRO
-    // ========================================================
+    // ======================================================
+    // RECUPERAR CORREO TEMPORAL
+    // ======================================================
 
     const correoGuardado =
-      sessionStorage.getItem(
-        'correoVerificacion'
-      );
+      sessionStorage.getItem('correoVerificacion');
 
 
     if (correoGuardado) {
 
-      this.correo =
-        correoGuardado;
+      this.correo = correoGuardado;
 
     } else {
 
-      // Si alguien entra directamente a esta página
-      // sin haberse registrado primero,
-      // mostramos un mensaje.
+      // Cuando se entra sin completar antes el registro.
       this.mensajeError =
-        'No se encontró un registro pendiente de verificación.';
+        'No se encontró un registro pendiente de verificación. Regresa al registro.';
 
     }
 
   }
 
 
-  // ==========================================================
+  // ========================================================
+  // PERMITIR SOLO NÚMEROS EN EL CÓDIGO
+  // ========================================================
+
+  /**
+   * Elimina letras, símbolos y espacios.
+   * También limita el código a cuatro dígitos.
+   *
+   * Ayuda cuando se pega el código desde el correo.
+   */
+  limpiarCodigo(): void {
+
+    const control =
+      this.verificarForm.get('codigo');
+
+    if (!control) {
+      return;
+    }
+
+    const valorActual =
+      String(control.value ?? '');
+
+    const codigoLimpio =
+      valorActual
+        .replace(/\D/g, '')
+        .slice(0, 4);
+
+    if (valorActual !== codigoLimpio) {
+
+      control.setValue(codigoLimpio, {
+        emitEvent: false
+      });
+
+    }
+
+  }
+
+
+  // ========================================================
   // VERIFICAR CÓDIGO
-  // ==========================================================
+  // ========================================================
 
   verificarCodigo(): void {
 
 
-    // Limpiamos mensajes anteriores.
+    // Evita enviar varias peticiones mientras se verifica.
+    if (this.cargando) {
+      return;
+    }
+
+
+    // Limpiamos los mensajes anteriores.
     this.mensajeError = '';
 
     this.mensajeExito = '';
 
 
-    // ========================================================
-    // VALIDAR QUE EXISTA EL CORREO
-    // ========================================================
+    // ======================================================
+    // VALIDAR EL CORREO DEL REGISTRO
+    // ======================================================
 
     if (!this.correo) {
 
@@ -166,9 +223,11 @@ export class VerificarCodigo {
     }
 
 
-    // ========================================================
-    // VALIDAR FORMULARIO
-    // ========================================================
+    // ======================================================
+    // VALIDAR EL FORMULARIO
+    // ======================================================
+
+    this.limpiarCodigo();
 
     if (this.verificarForm.invalid) {
 
@@ -179,31 +238,29 @@ export class VerificarCodigo {
     }
 
 
-    const codigo =
-      this.verificarForm.value.codigo;
+    // Obtener el código sin convertirlo a número.
+    // Así no se pierden ceros al inicio, por ejemplo 0042.
+    const codigo = String(
+      this.verificarForm.get('codigo')?.value ?? ''
+    );
 
 
+    // Mostrar el estado de carga.
     this.cargando = true;
 
 
-    // ========================================================
-    // ENVIAR VERIFICACIÓN
-    // ========================================================
-    //
-    // Aunque el usuario solamente escribe:
-    //
-    // código
-    //
-    // Angular envía internamente:
-    //
-    // {
-    //   correo,
-    //   codigo
-    // }
-    //
-    // POST:
-    // /api/auth/verificar-codigo
-    // ========================================================
+    // ======================================================
+    // ENVIAR LA VERIFICACIÓN A SPRING BOOT
+    // ======================================================
+
+    /*
+      Se conserva el método del servicio existente:
+
+      verificarCodigo(correo, codigo)
+
+      Endpoint:
+      POST /api/auth/verificar-codigo
+    */
 
     this.authServicio
       .verificarCodigo(
@@ -213,45 +270,32 @@ export class VerificarCodigo {
       .subscribe({
 
 
-        // ====================================================
+        // ==================================================
         // VERIFICACIÓN CORRECTA
-        // ====================================================
+        // ==================================================
 
         next: (respuesta) => {
 
-
-          console.log(
-            'Respuesta de verificación:',
-            respuesta
-          );
-
-
           this.cargando = false;
 
-
+          // Mostrar el resultado de la verificación.
           this.mensajeExito =
             respuesta?.mensaje ||
-            'Cuenta verificada correctamente.';
+            'Tu correo fue verificado correctamente.';
 
-
-          // Ya no necesitamos guardar
-          // el correo temporalmente.
+          // El correo temporal ya no es necesario.
           sessionStorage.removeItem(
             'correoVerificacion'
           );
 
-
           this.cd.detectChanges();
 
 
-          // Después de verificar correctamente,
-          // enviamos al usuario al login.
-          //
-          // Todavía deberá esperar que un ADMIN
-          // apruebe su cuenta.
+          // Conservamos la navegación original.
+          // La aprobación del ADMIN sigue siendo necesaria.
           setTimeout(() => {
 
-            this.router.navigate([
+            void this.router.navigate([
               '/login'
             ]);
 
@@ -260,28 +304,39 @@ export class VerificarCodigo {
         },
 
 
-        // ====================================================
-        // ERROR
-        // ====================================================
+        // ==================================================
+        // ERROR DE VERIFICACIÓN
+        // ==================================================
 
         error: (error) => {
 
-
-          console.error(
-            'Error completo de verificación:',
-            error
-          );
-
-
           this.cargando = false;
 
-
-          this.mensajeError =
+          // Buscar el mensaje enviado por Spring Boot.
+          const mensajeBackend =
             error?.error?.mensaje ||
             error?.error?.message ||
+            error?.error?.detalle ||
             error?.error?.detail ||
-            'El código ingresado es incorrecto.';
+            '';
 
+
+          // Error de conexión con la API.
+          if (error?.status === 0) {
+
+            this.mensajeError =
+              'No se pudo conectar con el servidor. Comprueba que la API esté encendida.';
+
+          } else {
+
+            // Mostrar el error recibido o un mensaje general.
+            this.mensajeError =
+              typeof mensajeBackend === 'string' &&
+              mensajeBackend.trim()
+                ? mensajeBackend
+                : 'No se pudo verificar el código. Revísalo e intenta nuevamente.';
+
+          }
 
           this.cd.detectChanges();
 
@@ -292,26 +347,26 @@ export class VerificarCodigo {
   }
 
 
-  // ==========================================================
+  // ========================================================
   // VOLVER AL REGISTRO
-  // ==========================================================
+  // ========================================================
 
   volverRegistro(): void {
 
-    this.router.navigate([
+    void this.router.navigate([
       '/registro'
     ]);
 
   }
 
 
-  // ==========================================================
-  // IR AL LOGIN
-  // ==========================================================
+  // ========================================================
+  // VOLVER AL LOGIN
+  // ========================================================
 
   irLogin(): void {
 
-    this.router.navigate([
+    void this.router.navigate([
       '/login'
     ]);
 

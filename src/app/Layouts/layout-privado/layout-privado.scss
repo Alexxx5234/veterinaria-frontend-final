@@ -1,0 +1,1122 @@
+
+/* ==========================================================
+   VETERINARIA AREVALO
+   LAYOUT PRIVADO - ESTILOS COMPLETOS
+
+   - Menú lateral persistente.
+   - Menú móvil desplegable.
+   - Barra superior.
+   - Notificaciones y accesibilidad.
+   - Compatibilidad con Dashboards anteriores.
+
+   Todos los estilos utilizan .layout-privado
+   para no modificar las páginas públicas.
+   ========================================================== */
+
+
+/* ==========================================================
+   1. CONFIGURACIÓN GENERAL
+   ========================================================== */
+
+.layout-privado {
+  --escala-ui: 1;
+
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+
+  background: #f5f3ff;
+
+  color: #292742;
+
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+.layout-privado *,
+.layout-privado *::before,
+.layout-privado *::after {
+  box-sizing: border-box;
+}
+
+
+/* ==========================================================
+   2. MENÚ LATERAL
+   ========================================================== */
+
+.layout-privado .menu-principal {
+  position: sticky;
+  top: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  width: 260px;
+  height: 100vh;
+  height: 100dvh;
+
+  padding: 25px 18px;
+
+  overflow-y: auto;
+
+  color: #ffffff;
+
+  background: linear-gradient(
+    180deg,
+    #5946d5,
+    #704fe6,
+    #7655eb
+  );
+
+  z-index: 100;
+}
+
+
+/* ==========================================================
+   3. MARCA
+   ========================================================== */
+
+.layout-privado .menu-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  margin-bottom: 30px;
+}
+
+.layout-privado .menu-marca {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+}
+
+.layout-privado .menu-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 46px;
+  height: 46px;
+
+  flex-shrink: 0;
+
+  border-radius: 13px;
+
+  background: rgba(255, 255, 255, 0.18);
+
+  font-size: 24px;
+}
+
+.layout-privado .menu-marca strong {
+  display: block;
+
+  color: #ffffff;
+
+  font-size: 17px;
+}
+
+.layout-privado .menu-marca small {
+  display: block;
+
+  margin-top: 4px;
+
+  color: #e8e2ff;
+
+  font-size: 12px;
+}
+
+
+/* ==========================================================
+   4. PERFIL DEL USUARIO
+   ========================================================== */
+
+.layout-privado .menu-perfil {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  margin-bottom: 28px;
+  padding: 15px 12px;
+
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 13px;
+
+  background: rgba(255, 255, 255, 0.10);
+}
+
+.layout-privado .perfil-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 40px;
+  height: 40px;
+
+  flex-shrink: 0;
+
+  border-radius: 11px;
+
+  background: rgba(255, 255, 255, 0.16);
+
+  font-size: 21px;
+}
+
+.layout-privado .menu-perfil strong {
+  display: block;
+
+  color: #ffffff;
+
+  font-size: 13px;
+}
+
+.layout-privado .menu-perfil small {
+  display: block;
+
+  margin-top: 4px;
+
+  color: #e7e0ff;
+
+  font-size: 11px;
+}
+
+
+/* ==========================================================
+   5. NAVEGACIÓN
+   ========================================================== */
+
+.layout-privado .menu-navegacion {
+  display: flex;
+  flex-direction: column;
+
+  gap: 7px;
+}
+
+.layout-privado .titulo-menu {
+  margin: 0 0 12px 12px;
+
+  color: #e5ddff;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  letter-spacing: 1.2px;
+}
+
+.layout-privado .enlace-menu {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  min-height: 46px;
+  padding: 12px 14px;
+
+  border-radius: 11px;
+
+  color: #f5f1ff;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  text-decoration: none;
+
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.layout-privado .enlace-menu:hover {
+  background: rgba(255, 255, 255, 0.15);
+
+  transform: translateX(3px);
+}
+
+/* Marca automáticamente la opción actual. */
+.layout-privado .enlace-menu.activo {
+  background: #ffffff;
+
+  color: #5542cc;
+
+  box-shadow:
+    0 4px 15px rgba(34, 19, 117, 0.14);
+}
+
+.layout-privado .enlace-icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 25px;
+
+  flex-shrink: 0;
+
+  font-size: 18px;
+}
+
+
+/* ==========================================================
+   6. CERRAR SESIÓN
+   ========================================================== */
+
+.layout-privado .menu-pie {
+  margin-top: auto;
+
+  padding-top: 30px;
+}
+
+.layout-privado .boton-salir {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-height: 47px;
+
+  gap: 10px;
+  padding: 12px;
+
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 11px;
+
+  background: rgba(255, 255, 255, 0.14);
+
+  color: #ffffff;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.layout-privado .boton-salir:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.layout-privado .menu-pie p {
+  margin: 20px 0 0;
+
+  color: #e5deff;
+
+  font-size: 11px;
+  text-align: center;
+}
+
+
+/* ==========================================================
+   7. ÁREA DE TRABAJO
+   ========================================================== */
+
+.layout-privado .area-trabajo {
+  min-width: 0;
+
+  background: linear-gradient(
+    135deg,
+    #f5f7ff,
+    #f0edff
+  );
+}
+
+
+/* ==========================================================
+   8. BARRA SUPERIOR
+   ========================================================== */
+
+.layout-privado .barra-global {
+  position: sticky;
+  top: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 15px;
+
+  min-height: 75px;
+
+  padding: 14px 30px;
+
+  border-bottom: 1px solid #e9e4f9;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 5px 18px rgba(53, 42, 105, 0.04);
+
+  z-index: 80;
+}
+
+.layout-privado .titulo-barra {
+  min-width: 0;
+}
+
+.layout-privado .titulo-barra strong {
+  display: block;
+
+  color: #292742;
+
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.layout-privado .titulo-barra small {
+  display: block;
+
+  margin-top: 4px;
+
+  color: #68647d;
+
+  font-size: 12px;
+}
+
+
+/* ==========================================================
+   9. BOTONES SUPERIORES
+   ========================================================== */
+
+.layout-privado .herramientas-globales {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  margin-left: auto;
+}
+
+.layout-privado .herramienta {
+  position: relative;
+}
+
+.layout-privado .boton-herramienta {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 44px;
+  height: 44px;
+
+  border: 1px solid #e0d9fb;
+  border-radius: 11px;
+
+  background: #f4f1ff;
+
+  font-size: 21px;
+
+  cursor: pointer;
+}
+
+.layout-privado .boton-herramienta:hover {
+  background: #e9e3ff;
+}
+
+.layout-privado .numero-avisos {
+  position: absolute;
+
+  top: -7px;
+  right: -7px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 21px;
+  height: 21px;
+
+  padding: 3px;
+
+  border-radius: 50%;
+
+  background: #bc2845;
+  color: #ffffff;
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.layout-privado .rol-superior {
+  padding: 8px 12px;
+
+  border-radius: 20px;
+
+  background: #eee9ff;
+  color: #5741c5;
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+
+/* ==========================================================
+   10. PANEL DE NOTIFICACIONES Y ACCESIBILIDAD
+   ========================================================== */
+
+.layout-privado .panel-flotante {
+  position: absolute;
+
+  top: calc(100% + 12px);
+  right: 0;
+
+  width: 350px;
+  max-width: calc(100vw - 30px);
+
+  padding: 18px;
+
+  border: 1px solid #e4def6;
+  border-radius: 15px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 15px 40px rgba(43, 31, 101, 0.18);
+
+  color: #302d4f;
+
+  z-index: 120;
+}
+
+.layout-privado .panel-titulo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  margin-bottom: 15px;
+}
+
+.layout-privado .panel-titulo h2 {
+  margin: 0;
+
+  color: #292742;
+
+  font-size: 17px;
+}
+
+.layout-privado .boton-cerrar-panel {
+  width: 34px;
+  height: 34px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #f0ecff;
+  color: #5946d5;
+
+  font-size: 14px;
+
+  cursor: pointer;
+}
+
+
+/* ==========================================================
+   11. AVISOS
+   ========================================================== */
+
+.layout-privado .sin-avisos {
+  padding: 20px 10px;
+
+  color: #625e78;
+
+  font-size: 13px;
+  text-align: center;
+}
+
+.layout-privado .lista-avisos {
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.layout-privado .aviso-item {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 10px;
+  padding: 12px;
+
+  border: 1px solid #e8e2f9;
+  border-radius: 10px;
+
+  background: #f9f7ff;
+}
+
+.layout-privado .aviso-item strong {
+  display: block;
+
+  color: #302d4f;
+
+  font-size: 12px;
+}
+
+.layout-privado .aviso-item p {
+  margin: 5px 0;
+
+  color: #625e78;
+
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.layout-privado .aviso-item small {
+  color: #77738a;
+
+  font-size: 11px;
+}
+
+
+/* ==========================================================
+   12. OPCIONES DE ACCESIBILIDAD
+   ========================================================== */
+
+.layout-privado .fila-opcion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  flex-wrap: wrap;
+
+  gap: 12px;
+  padding: 13px 0;
+
+  border-bottom: 1px solid #eeeaf7;
+}
+
+.layout-privado .fila-opcion > div:first-child {
+  flex: 1;
+
+  min-width: 125px;
+}
+
+.layout-privado .fila-opcion strong {
+  display: block;
+
+  color: #302d4f;
+
+  font-size: 13px;
+}
+
+.layout-privado .fila-opcion small {
+  display: block;
+
+  margin-top: 4px;
+
+  color: #68647d;
+
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.layout-privado .boton-opcion {
+  min-height: 36px;
+
+  padding: 8px 11px;
+
+  border: 1px solid #d8cff9;
+  border-radius: 8px;
+
+  background: #f3f0ff;
+  color: #5946d5;
+
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.layout-privado .controles-texto {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+}
+
+.layout-privado .controles-texto button {
+  min-height: 36px;
+  min-width: 36px;
+
+  border: 1px solid #d8cff9;
+  border-radius: 8px;
+
+  background: #f3f0ff;
+  color: #4d39b5;
+
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.layout-privado .controles-texto button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.layout-privado .controles-texto span {
+  color: #302d4f;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.layout-privado .boton-restablecer {
+  width: 100%;
+  min-height: 40px;
+
+  margin-top: 15px;
+
+  border: 1px solid #d8cff9;
+  border-radius: 9px;
+
+  background: #ffffff;
+  color: #5744c8;
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+
+/* ==========================================================
+   13. CONTENIDO DE LAS PÁGINAS
+   ========================================================== */
+
+.layout-privado .contenido-ruta {
+  min-width: 0;
+
+  padding: 25px;
+}
+
+/* Angular inserta el componente después del router-outlet. */
+.layout-privado .contenido-ruta > router-outlet + * {
+  display: block;
+  min-width: 0;
+}
+
+
+/* ==========================================================
+   14. EVITAR MENÚS DUPLICADOS
+   ========================================================== */
+
+/*
+   Los Dashboards anteriores ya tienen su menú.
+   Lo ocultamos SOLO cuando están dentro del layout.
+
+   Así conservamos sus estadísticas, textos
+   y consultas a Spring Boot.
+*/
+
+.layout-privado app-dashboard-admin .dashboard-admin-page,
+.layout-privado app-dashboard-usuario .dashboard-usuario-page {
+  display: block !important;
+
+  min-height: auto !important;
+
+  background: transparent !important;
+}
+
+.layout-privado app-dashboard-admin .sidebar,
+.layout-privado app-dashboard-usuario .sidebar,
+.layout-privado app-dashboard-admin .menu-overlay,
+.layout-privado app-dashboard-usuario .menu-overlay,
+.layout-privado app-dashboard-admin .btn-menu,
+.layout-privado app-dashboard-usuario .btn-menu {
+  display: none !important;
+}
+
+/* El contenido del Dashboard utiliza el espacio libre. */
+.layout-privado app-dashboard-admin .dashboard-main,
+.layout-privado app-dashboard-usuario .dashboard-main {
+  padding: 0 !important;
+}
+
+
+/* ==========================================================
+   15. EVITAR HERRAMIENTAS REPETIDAS EN MASCOTAS
+   ========================================================== */
+
+/*
+   Si Mis Mascotas ya tenía botones de accesibilidad,
+   utilizaremos los botones globales de arriba.
+*/
+
+.layout-privado app-mascotas .herramientas-header {
+  display: none !important;
+}
+
+
+/* ==========================================================
+   16. NAVEGACIÓN POR TECLADO
+   ========================================================== */
+
+.layout-privado .enlace-menu:focus-visible,
+.layout-privado .boton-salir:focus-visible,
+.layout-privado .boton-herramienta:focus-visible,
+.layout-privado .boton-opcion:focus-visible,
+.layout-privado .boton-restablecer:focus-visible,
+.layout-privado .abrir-menu-movil:focus-visible,
+.layout-privado .cerrar-menu-movil:focus-visible {
+  outline: 3px solid #b7a4ff;
+  outline-offset: 3px;
+}
+
+
+/* ==========================================================
+   17. TAMAÑO DE TEXTO AJUSTABLE
+   ========================================================== */
+
+/*
+   Se aplican solo cuando la escala es diferente
+   del tamaño normal.
+
+   Afecta textos, formularios y tablas de los módulos.
+*/
+
+.layout-privado.texto-ajustado .contenido-ruta h1 {
+  font-size: calc(29px * var(--escala-ui)) !important;
+}
+
+.layout-privado.texto-ajustado .contenido-ruta h2 {
+  font-size: calc(23px * var(--escala-ui)) !important;
+}
+
+.layout-privado.texto-ajustado .contenido-ruta h3 {
+  font-size: calc(19px * var(--escala-ui)) !important;
+}
+
+.layout-privado.texto-ajustado .contenido-ruta
+:is(p, label, input, select, textarea, button, a, td, th) {
+  font-size: calc(14px * var(--escala-ui)) !important;
+}
+
+.layout-privado.texto-ajustado .contenido-ruta
+:is(small, .resumen-label, .card-enlace) {
+  font-size: calc(12px * var(--escala-ui)) !important;
+}
+
+
+/* ==========================================================
+   18. MODO ALTO CONTRASTE
+   ========================================================== */
+
+.layout-privado.contraste-alto,
+.layout-privado.contraste-alto .area-trabajo,
+.layout-privado.contraste-alto .contenido-ruta {
+  background: #ffffff !important;
+
+  color: #111111 !important;
+}
+
+.layout-privado.contraste-alto .menu-principal {
+  background: #000000 !important;
+}
+
+.layout-privado.contraste-alto .barra-global {
+  border-bottom: 2px solid #000000;
+
+  background: #ffffff;
+}
+
+.layout-privado.contraste-alto .barra-global
+:is(strong, small) {
+  color: #111111;
+}
+
+.layout-privado.contraste-alto .boton-herramienta,
+.layout-privado.contraste-alto .rol-superior {
+  border: 2px solid #111111;
+
+  background: #ffffff;
+  color: #111111;
+}
+
+.layout-privado.contraste-alto .panel-flotante {
+  border: 2px solid #111111;
+  background: #ffffff;
+}
+
+/* Fondo general de las páginas privadas. */
+.layout-privado.contraste-alto .contenido-ruta
+:is(
+  .dashboard-admin-page,
+  .dashboard-usuario-page,
+  .dashboard-container,
+  .mascotas-container
+) {
+  background: #ffffff !important;
+}
+
+/* Tarjetas y formularios con bordes definidos. */
+.layout-privado.contraste-alto .contenido-ruta
+:is(
+  .dashboard-header,
+  .resumen-card,
+  .detalle-panel,
+  .formulario-card,
+  .mascota-card,
+  .card,
+  .sin-mascotas
+) {
+  border: 2px solid #111111 !important;
+
+  background: #ffffff !important;
+  box-shadow: none !important;
+}
+
+/* Textos de mayor contraste. */
+.layout-privado.contraste-alto .contenido-ruta
+:is(h1, h2, h3, p, label, strong, small) {
+  color: #111111 !important;
+}
+
+/* Campos y botones. */
+.layout-privado.contraste-alto .contenido-ruta
+:is(input, select, textarea) {
+  border: 2px solid #111111 !important;
+
+  background: #ffffff !important;
+  color: #111111 !important;
+}
+
+.layout-privado.contraste-alto .contenido-ruta button {
+  border: 2px solid #111111 !important;
+
+  background: #ffffff !important;
+  color: #111111 !important;
+}
+
+/* Los banners conservan contraste inverso. */
+.layout-privado.contraste-alto .contenido-ruta .bienvenida {
+  border: 2px solid #000000 !important;
+
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+.layout-privado.contraste-alto .contenido-ruta .bienvenida
+:is(h1, h2, h3, p, span, strong, small) {
+  color: #ffffff !important;
+}
+
+
+/* ==========================================================
+   19. REDUCIR ANIMACIONES
+   ========================================================== */
+
+.layout-privado.movimiento-reducido *,
+.layout-privado.movimiento-reducido *::before,
+.layout-privado.movimiento-reducido *::after {
+  transition: none !important;
+  animation: none !important;
+  scroll-behavior: auto !important;
+}
+
+.layout-privado.movimiento-reducido
+:is(.enlace-menu, .mascota-card, .modulo-card):hover {
+  transform: none !important;
+}
+
+
+/* ==========================================================
+   20. CONTROLES PARA CELULARES
+   ========================================================== */
+
+.layout-privado .abrir-menu-movil,
+.layout-privado .cerrar-menu-movil,
+.layout-privado .fondo-menu {
+  display: none;
+}
+
+
+/* ==========================================================
+   21. TABLETS Y CELULARES
+   ========================================================== */
+
+@media (max-width: 850px) {
+
+  .layout-privado {
+    display: block;
+  }
+
+  /* MENÚ OCULTO HASTA PULSAR ☰ */
+  .layout-privado .menu-principal {
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    width: min(280px, 85vw);
+    height: 100vh;
+    height: 100dvh;
+
+    visibility: hidden;
+
+    transform: translateX(-100%);
+
+    z-index: 1001;
+
+    transition:
+      transform 0.25s ease,
+      visibility 0.25s ease;
+  }
+
+  .layout-privado .menu-principal.abierto {
+    visibility: visible;
+
+    transform: translateX(0);
+  }
+
+  /* FONDO OSCURO CUANDO EL MENÚ ESTÁ ABIERTO */
+  .layout-privado .fondo-menu {
+    position: fixed;
+
+    inset: 0;
+
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    padding: 0;
+    border: none;
+
+    background: rgba(24, 18, 55, 0.50);
+
+    z-index: 1000;
+  }
+
+  /* BOTÓN PARA ABRIR MENÚ */
+  .layout-privado .abrir-menu-movil {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 42px;
+    height: 42px;
+
+    flex-shrink: 0;
+
+    border: 1px solid #ded7ff;
+    border-radius: 10px;
+
+    background: #eeeaff;
+    color: #5946d5;
+
+    font-size: 21px;
+
+    cursor: pointer;
+  }
+
+  /* BOTÓN PARA CERRAR MENÚ */
+  .layout-privado .cerrar-menu-movil {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 35px;
+    height: 35px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+
+    cursor: pointer;
+  }
+
+  .layout-privado .barra-global {
+    padding: 12px 18px;
+  }
+
+  .layout-privado .contenido-ruta {
+    padding: 18px;
+  }
+
+}
+
+
+/* ==========================================================
+   22. CELULARES
+   ========================================================== */
+
+@media (max-width: 600px) {
+
+  .layout-privado .barra-global {
+    min-height: 65px;
+
+    padding: 10px 12px;
+  }
+
+  .layout-privado .titulo-barra strong {
+    font-size: 13px;
+  }
+
+  .layout-privado .titulo-barra small {
+    font-size: 10px;
+  }
+
+  .layout-privado .rol-superior {
+    display: none;
+  }
+
+  .layout-privado .herramientas-globales {
+    gap: 6px;
+  }
+
+  .layout-privado .boton-herramienta {
+    width: 40px;
+    height: 40px;
+
+    font-size: 18px;
+  }
+
+  .layout-privado .contenido-ruta {
+    padding: 12px;
+  }
+
+  /* Los paneles utilizan el ancho del teléfono. */
+  .layout-privado .herramienta {
+    position: static;
+  }
+
+  .layout-privado .panel-flotante {
+    top: calc(100% + 5px);
+
+    right: 12px;
+    left: 12px;
+
+    width: auto;
+    max-width: none;
+  }
+
+}
+
+
+/* ==========================================================
+   23. MOVIMIENTO REDUCIDO DEL DISPOSITIVO
+   ========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .layout-privado *,
+  .layout-privado *::before,
+  .layout-privado *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+
+}

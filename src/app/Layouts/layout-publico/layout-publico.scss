@@ -1,0 +1,67 @@
+
+/* ==========================================================
+   VETERINARIA AREVALO
+   LAYOUT PÚBLICO
+
+   El botón de accesibilidad permanece visible
+   en Login, Registro y Verificación.
+   ========================================================== */
+
+
+/* CONTENEDOR PRINCIPAL */
+
+:host {
+  display: block;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.layout-publico {
+  position: relative;
+
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+
+/* BOTÓN FLOTANTE DE ACCESIBILIDAD */
+
+.accesibilidad-publica {
+  position: fixed;
+
+  top: 18px;
+  right: 18px;
+
+  z-index: 10001;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+/* EVITAR QUE SE OCULTE DEBAJO DE OTROS ELEMENTOS */
+
+.accesibilidad-publica app-panel-accesibilidad {
+  position: relative;
+  z-index: 10002;
+}
+
+
+/* ACCESIBILIDAD POR TECLADO */
+
+.accesibilidad-publica:focus-within {
+  z-index: 10003;
+}
+
+
+/* TABLETS Y CELULARES */
+
+@media (max-width: 600px) {
+
+  .accesibilidad-publica {
+    top: 12px;
+    right: 12px;
+  }
+
+}

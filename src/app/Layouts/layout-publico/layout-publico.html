@@ -1,0 +1,54 @@
+
+<!-- ==========================================================
+     VETERINARIA AREVALO
+     LAYOUT PÚBLICO
+
+     Aparece en:
+     - /login
+     - /registro
+     - /verificar-codigo
+     ========================================================== -->
+
+<div class="layout-publico">
+
+  <!-- ======================================================
+       BOTÓN GLOBAL DE ACCESIBILIDAD
+       ====================================================== -->
+
+  <!--
+    Utiliza el mismo componente ♿ que ADMIN y USER.
+
+    Incluye:
+    - Lectura en voz alta.
+    - Control de volumen.
+    - Velocidad de lectura.
+    - Contraste normal, suave, alto y oscuro.
+    - Tamaño de visualización.
+    - Espaciado de texto.
+    - Resaltado de enlaces.
+    - Reducción de animaciones.
+  -->
+
+  <div class="accesibilidad-publica">
+
+    <app-panel-accesibilidad>
+    </app-panel-accesibilidad>
+
+  </div>
+
+
+  <!-- ======================================================
+       PÁGINAS PÚBLICAS
+       ====================================================== -->
+
+  <!--
+    Angular mostrará aquí el contenido original
+    de Login, Registro o Verificación.
+
+    Los componentes originales no se modifican.
+  -->
+
+  <router-outlet>
+  </router-outlet>
+
+</div>

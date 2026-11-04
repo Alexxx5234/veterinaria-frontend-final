@@ -1,157 +1,295 @@
+
+<!-- ==========================================================
+     LOGIN - VETERINARIA AREVALO
+
+     MEJORAS:
+     - Panel informativo a la izquierda.
+     - Formulario a la derecha.
+     - Mensajes de error accesibles.
+     - Conserva las funciones del login original.
+     ========================================================== -->
+
 <div class="login-page">
 
-  <div class="login-card">
+  <!-- CONTENEDOR DE DOS COLUMNAS -->
+  <main class="login-container">
 
-    <div class="logo-area">
+    <!-- ====================================================
+         SECCIÓN IZQUIERDA: INFORMACIÓN
+         ==================================================== -->
 
-      <div class="logo-icon">
-        🐾
-      </div>
+    <section class="login-info">
 
-      <h1>
-        Veterinaria
-      </h1>
+      <!-- Nombre de la veterinaria -->
+      <div class="marca">
 
-      <p>
-        Inicia sesión para gestionar tus mascotas y citas
-      </p>
+        <div class="marca-icono" aria-hidden="true">
+          🐾
+        </div>
 
-    </div>
-
-
-    <form
-      [formGroup]="loginForm"
-      (ngSubmit)="iniciarSesion()"
-      class="login-form"
-    >
-
-
-      <!-- CORREO -->
-      <div class="form-group">
-
-        <label for="correo">
-          Correo electrónico
-        </label>
-
-        <input
-          id="correo"
-          type="email"
-          formControlName="correo"
-          placeholder="ejemplo@correo.com"
-        >
-
-        <small
-          class="error"
-          *ngIf="
-            loginForm.get('correo')?.touched &&
-            loginForm.get('correo')?.hasError('required')
-          "
-        >
-          El correo es obligatorio.
-        </small>
-
-        <small
-          class="error"
-          *ngIf="
-            loginForm.get('correo')?.touched &&
-            loginForm.get('correo')?.hasError('email')
-          "
-        >
-          Ingresa un correo válido.
-        </small>
+        <span>
+          Veterinaria Arevalo
+        </span>
 
       </div>
 
+      <!-- Frase principal -->
+      <div class="informacion">
 
-      <!-- CONTRASEÑA -->
-      <div class="form-group">
+        <div class="etiqueta">
+          CUIDAMOS A QUIENES MÁS QUIERES
+        </div>
 
-        <label for="password">
-          Contraseña
-        </label>
+        <h1>
+          Su bienestar es
+          <span>nuestra prioridad.</span>
+        </h1>
+
+        <p>
+          Gestiona tus mascotas, organiza tus citas
+          veterinarias y consulta nuestros servicios
+          desde un solo lugar.
+        </p>
+
+        <!-- Características del sistema -->
+        <div class="beneficios">
+
+          <div class="beneficio">
+            <span aria-hidden="true">✓</span>
+            Gestión sencilla de mascotas
+          </div>
+
+          <div class="beneficio">
+            <span aria-hidden="true">✓</span>
+            Organización de citas veterinarias
+          </div>
+
+          <div class="beneficio">
+            <span aria-hidden="true">✓</span>
+            Información disponible en un solo lugar
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Mensaje inferior -->
+      <div class="info-footer">
+        🐶 🐱 Cuidando juntos de nuestros compañeros.
+      </div>
+
+    </section>
 
 
-        <div class="password-container">
+    <!-- ====================================================
+         SECCIÓN DERECHA: FORMULARIO LOGIN
+         ==================================================== -->
 
-          <input
-            id="password"
-            [type]="mostrarPassword ? 'text' : 'password'"
-            formControlName="password"
-            placeholder="Ingresa tu contraseña"
-          >
+    <section class="login-formulario">
 
+      <div class="login-card">
 
-          <button
-            type="button"
-            class="btn-ver-password"
-            (click)="cambiarVisibilidadPassword()"
-            [attr.aria-label]="
-              mostrarPassword
-                ? 'Ocultar contraseña'
-                : 'Mostrar contraseña'
-            "
-          >
-            {{ mostrarPassword ? '🙈' : '👁️' }}
-          </button>
+        <!-- ENCABEZADO -->
+        <div class="logo-area">
+
+          <div class="logo-icon" aria-hidden="true">
+            🐾
+          </div>
+
+          <h2>
+            Bienvenido de nuevo
+          </h2>
+
+          <p>
+            Ingresa tus datos para acceder a tu cuenta.
+          </p>
 
         </div>
 
 
-        <small
-          class="error"
-          *ngIf="
-            loginForm.get('password')?.touched &&
-            loginForm.get('password')?.hasError('required')
-          "
+        <!-- ================================================
+             FORMULARIO REACTIVO ANGULAR
+             ================================================ -->
+
+        <form
+          [formGroup]="loginForm"
+          (ngSubmit)="iniciarSesion()"
+          class="login-form"
+          novalidate
+          [attr.aria-busy]="cargando"
         >
-          La contraseña es obligatoria.
-        </small>
+
+
+          <!-- ==============================================
+               CORREO ELECTRÓNICO
+               ============================================== -->
+
+          <div class="form-group">
+
+            <label for="correo">
+              Correo electrónico
+            </label>
+
+            <input
+              id="correo"
+              type="email"
+              formControlName="correo"
+              placeholder="ejemplo@correo.com"
+              autocomplete="username"
+              required
+              [class.input-error]="
+                loginForm.get('correo')?.touched &&
+                loginForm.get('correo')?.invalid
+              "
+              [attr.aria-invalid]="
+                loginForm.get('correo')?.touched &&
+                loginForm.get('correo')?.invalid
+              "
+            >
+
+            <!-- Correo obligatorio -->
+            <small
+              class="error"
+              *ngIf="
+                loginForm.get('correo')?.touched &&
+                loginForm.get('correo')?.hasError('required')
+              "
+            >
+              El correo electrónico es obligatorio.
+            </small>
+
+            <!-- Formato incorrecto -->
+            <small
+              class="error"
+              *ngIf="
+                loginForm.get('correo')?.touched &&
+                loginForm.get('correo')?.hasError('email')
+              "
+            >
+              Ingresa un correo electrónico válido.
+            </small>
+
+          </div>
+
+
+          <!-- ==============================================
+               CONTRASEÑA
+               ============================================== -->
+
+          <div class="form-group">
+
+            <label for="password">
+              Contraseña
+            </label>
+
+            <div class="password-container">
+
+              <input
+                id="password"
+                [type]="
+                  mostrarPassword ? 'text' : 'password'
+                "
+                formControlName="password"
+                placeholder="Ingresa tu contraseña"
+                autocomplete="current-password"
+                required
+                [class.input-error]="
+                  loginForm.get('password')?.touched &&
+                  loginForm.get('password')?.invalid
+                "
+                [attr.aria-invalid]="
+                  loginForm.get('password')?.touched &&
+                  loginForm.get('password')?.invalid
+                "
+              >
+
+              <!-- Mostrar u ocultar contraseña -->
+              <button
+                type="button"
+                class="btn-ver-password"
+                (click)="cambiarVisibilidadPassword()"
+                [attr.aria-label]="
+                  mostrarPassword
+                    ? 'Ocultar contraseña'
+                    : 'Mostrar contraseña'
+                "
+                [attr.aria-pressed]="mostrarPassword"
+              >
+                {{ mostrarPassword ? '🙈' : '👁️' }}
+              </button>
+
+            </div>
+
+            <!-- Contraseña obligatoria -->
+            <small
+              class="error"
+              *ngIf="
+                loginForm.get('password')?.touched &&
+                loginForm.get('password')?.hasError('required')
+              "
+            >
+              La contraseña es obligatoria.
+            </small>
+
+          </div>
+
+
+          <!-- ==============================================
+               MENSAJE DE ERROR DEL BACKEND
+               ============================================== -->
+
+          <div
+            class="mensaje-error"
+            *ngIf="mensajeError"
+            role="alert"
+          >
+            {{ mensajeError }}
+          </div>
+
+
+          <!-- ==============================================
+               BOTÓN DE INICIO DE SESIÓN
+               ============================================== -->
+
+          <button
+            type="submit"
+            class="btn-login"
+            [disabled]="cargando"
+          >
+
+            <span *ngIf="!cargando">
+              Iniciar sesión
+            </span>
+
+            <span *ngIf="cargando">
+              Ingresando...
+            </span>
+
+          </button>
+
+
+          <!-- ==============================================
+               ENLACE DE REGISTRO
+               ============================================== -->
+
+          <div class="registro">
+
+            <span>
+              ¿No tienes una cuenta?
+            </span>
+
+            <a href="/registro">
+              Regístrate aquí
+            </a>
+
+          </div>
+
+        </form>
 
       </div>
 
+    </section>
 
-      <!-- MENSAJE -->
-      <div
-        class="mensaje-error"
-        *ngIf="mensajeError"
-      >
-        {{ mensajeError }}
-      </div>
-
-
-      <!-- LOGIN -->
-      <button
-        type="submit"
-        class="btn-login"
-        [disabled]="cargando"
-      >
-
-        <span *ngIf="!cargando">
-          Iniciar sesión
-        </span>
-
-        <span *ngIf="cargando">
-          Ingresando...
-        </span>
-
-      </button>
-
-
-      <!-- REGISTRO -->
-      <div class="registro">
-
-        <span>
-          ¿No tienes una cuenta?
-        </span>
-
-        <a href="/registro">
-          Registrarse
-        </a>
-
-      </div>
-
-    </form>
-
-  </div>
+  </main>
 
 </div>

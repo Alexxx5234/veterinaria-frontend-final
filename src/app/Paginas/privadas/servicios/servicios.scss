@@ -1,296 +1,933 @@
-/* =========================================================
-   CONTENEDOR PRINCIPAL
-   ========================================================= */
 
-.servicios-container {
-  min-height: 100vh;
-  padding: 40px;
+/* ==========================================================
+   VETERINARIA AREVALO - SERVICIOS (USER)
 
-  background:
-    linear-gradient(
-      135deg,
-      #f5f7ff,
-      #eef1ff
-    );
+   DISEÑO:
+   - Mismo estilo de Mis Mascotas y Mis Citas.
+   - Compatible con el menú lateral permanente.
+   - Catálogo con buscador y ordenamiento.
+   - Tarjetas de servicios con precios.
+   - Accesibilidad por teclado.
+   - Diseño responsivo para celulares.
+   ========================================================== */
+
+
+/* ==========================================================
+   1. CONFIGURACIÓN GENERAL
+   ========================================================== */
+
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+:host *,
+:host *::before,
+:host *::after {
+  box-sizing: border-box;
 }
 
 
-/* =========================================================
-   CABECERA
-   ========================================================= */
+/* ==========================================================
+   2. CONTENEDOR PRINCIPAL
+   ========================================================== */
+
+/*
+   LayoutPrivado ya controla el menú lateral,
+   el espacio principal y el fondo de la página.
+*/
+
+.servicios-container {
+  width: 100%;
+  min-width: 0;
+
+  padding: 0;
+
+  background: transparent;
+
+  color: #302d4f;
+
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+
+/* ==========================================================
+   3. CABECERA
+   ========================================================== */
 
 .servicios-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
 
+  flex-wrap: wrap;
   gap: 20px;
 
-  padding: 25px 30px;
-  margin-bottom: 30px;
+  margin-bottom: 25px;
+  padding: 28px 30px;
 
-  background-color: white;
-
+  border: 1px solid #ece8fa;
   border-radius: 18px;
 
+  background: #ffffff;
+
   box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.08);
+    0 8px 25px rgba(53, 42, 105, 0.06);
 }
 
+.header-texto {
+  flex: 1;
+  min-width: 220px;
+}
+
+.etiqueta-pagina {
+  display: inline-block;
+
+  margin-bottom: 10px;
+
+  color: #6251d5;
+
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
 
 .servicios-header h1 {
   margin: 0;
 
   color: #292742;
 
-  font-size: 28px;
+  font-size: 29px;
+  font-weight: 700;
+  line-height: 1.3;
 }
-
 
 .servicios-header p {
-  margin-top: 6px;
-  margin-bottom: 0;
+  margin: 9px 0 0;
 
-  color: #77758a;
+  color: #68647d;
+
+  font-size: 14px;
+  line-height: 1.6;
 }
 
 
-/* =========================================================
-   BOTÓN VOLVER
-   ========================================================= */
+/* ==========================================================
+   4. BOTONES DE LA CABECERA
+   ========================================================== */
 
-.btn-volver {
-  padding: 11px 18px;
+.acciones-header {
+  display: flex;
+  align-items: center;
 
-  border: none;
-  border-radius: 9px;
+  flex-wrap: wrap;
+  gap: 11px;
+}
 
-  color: #555269;
+.btn-agendar,
+.btn-volver,
+.btn-actualizar,
+.btn-cita,
+.btn-limpiar {
+  min-height: 44px;
 
-  background-color: #eeeeF7;
+  padding: 11px 17px;
 
-  font-weight: 600;
+  border-radius: 10px;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
 
   cursor: pointer;
 
-  transition: 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
+.btn-agendar {
+  border: none;
+
+  background: linear-gradient(
+    135deg,
+    #6254e8,
+    #7c5ce7
+  );
+
+  color: #ffffff;
+}
+
+.btn-agendar:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 7px 18px rgba(98, 84, 232, 0.25);
+}
+
+.btn-volver {
+  border: 1px solid #e0dcf0;
+
+  background: #f3f1fc;
+  color: #514c68;
+}
 
 .btn-volver:hover {
-  background-color: #e2e2ef;
-
-  transform: translateY(-1px);
+  background: #e9e5f9;
 }
 
 
-/* =========================================================
-   MENSAJES
-   ========================================================= */
+/* ==========================================================
+   5. MENSAJES
+   ========================================================== */
 
 .mensaje-info,
 .mensaje-error,
-.sin-servicios {
-  padding: 20px;
+.mensaje-exito {
+  padding: 15px 18px;
+
+  margin-bottom: 23px;
+
+  border-radius: 12px;
+
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.mensaje-info {
+  border: 1px solid #ded6ff;
+
+  background: #ffffff;
+  color: #5946d5;
+
+  text-align: center;
+}
+
+.mensaje-error {
+  border: 1px solid #f3b4b4;
+
+  background: #fff1f0;
+  color: #a32020;
+}
+
+.mensaje-exito {
+  border: 1px solid #b7ebc9;
+
+  background: #ecfdf3;
+  color: #176b3a;
+}
+
+.btn-reintentar {
+  min-height: 35px;
+
+  margin-left: 12px;
+  padding: 7px 13px;
+
+  border: 1px solid #a32020;
+  border-radius: 8px;
+
+  background: #ffffff;
+  color: #a32020;
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+
+/* ==========================================================
+   6. TARJETA RESUMEN
+   ========================================================== */
+
+.resumen-servicios {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+
+  gap: 18px;
+
+  margin-bottom: 28px;
+  padding: 24px 28px;
+
+  overflow: hidden;
+
+  border: 1px solid #dcd5ff;
+  border-radius: 17px;
+
+  background: linear-gradient(
+    135deg,
+    #f8f6ff,
+    #efebff
+  );
+}
+
+.resumen-icono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 66px;
+  height: 66px;
+
+  flex-shrink: 0;
+
+  border-radius: 17px;
+
+  background: #e3dcff;
+
+  font-size: 31px;
+}
+
+.resumen-texto {
+  position: relative;
+  z-index: 1;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  gap: 4px;
+}
+
+.resumen-texto span {
+  color: #5745b9;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.resumen-texto strong {
+  color: #30246f;
+
+  font-size: 31px;
+  font-weight: 700;
+}
+
+.resumen-texto small {
+  color: #68647d;
+
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.resumen-decoration {
+  position: absolute;
+  right: 28px;
+
+  color: #b8a7ff;
+
+  font-size: 57px;
+  opacity: 0.35;
+
+  pointer-events: none;
+}
+
+
+/* ==========================================================
+   7. ENCABEZADO DEL CATÁLOGO
+   ========================================================== */
+
+.listado-section {
+  min-width: 0;
+}
+
+.listado-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  flex-wrap: wrap;
+  gap: 16px;
+
+  margin-bottom: 20px;
+}
+
+.listado-header h2 {
+  margin: 0;
+
+  color: #302d4f;
+
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.listado-header p {
+  margin: 7px 0 0;
+
+  color: #68647d;
+
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.listado-acciones {
+  display: flex;
+  align-items: center;
+
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.total-servicios {
+  display: inline-flex;
+  align-items: center;
+
+  min-height: 35px;
+
+  padding: 8px 12px;
+
+  border-radius: 20px;
+
+  background: #eee9ff;
+  color: #5946c9;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.btn-actualizar {
+  border: 1px solid #ded6ff;
+
+  background: #ffffff;
+  color: #5946d5;
+}
+
+.btn-actualizar:hover:not(:disabled) {
+  background: #f3f0ff;
+}
+
+.btn-actualizar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
+/* ==========================================================
+   8. BUSCADOR Y ORDENAMIENTO
+   ========================================================== */
+
+.filtros-card {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 2fr) minmax(180px, 1fr);
+
+  gap: 18px;
 
   margin-bottom: 25px;
+  padding: 20px;
+
+  border: 1px solid #ece8fa;
+  border-radius: 15px;
+
+  background: #ffffff;
+}
+
+.filtro-grupo {
+  min-width: 0;
+}
+
+.filtro-grupo label {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: #39364d;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.filtro-grupo input,
+.filtro-grupo select {
+  display: block;
+
+  width: 100%;
+  min-height: 46px;
+
+  padding: 11px 13px;
+
+  border: 1px solid #d8d8e5;
+  border-radius: 9px;
+
+  outline: none;
+
+  background: #fafafe;
+  color: #302d4f;
+
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.filtro-grupo input::placeholder {
+  color: #77738a;
+}
+
+.filtro-grupo input:focus,
+.filtro-grupo select:focus {
+  border-color: #6254e8;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 0 0 3px rgba(98, 84, 232, 0.15);
+}
+
+.filtro-ayuda {
+  display: block;
+
+  margin-top: 7px;
+
+  color: #68647d;
+
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+
+/* ==========================================================
+   9. ESTADO SIN SERVICIOS Y SIN RESULTADOS
+   ========================================================== */
+
+.sin-servicios,
+.sin-resultados {
+  padding: 35px 25px;
+
+  border: 1px solid #ece8fa;
+  border-radius: 17px;
+
+  background: #ffffff;
 
   text-align: center;
 
-  border-radius: 14px;
-}
-
-
-/* Mensaje mientras carga */
-
-.mensaje-info {
-  color: #6254e8;
-
-  background-color: white;
-
   box-shadow:
-    0 8px 25px rgba(0, 0, 0, 0.07);
+    0 8px 25px rgba(53, 42, 105, 0.05);
 }
-
-
-/* Mensaje cuando ocurre un error */
-
-.mensaje-error {
-  color: #b42318;
-
-  background-color: #fff1f0;
-
-  border: 1px solid #ffd3cf;
-}
-
-
-/* =========================================================
-   SIN SERVICIOS
-   ========================================================= */
-
-.sin-servicios {
-  background-color: white;
-
-  box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.07);
-}
-
 
 .sin-icono {
-  font-size: 55px;
+  margin-bottom: 12px;
 
-  margin-bottom: 10px;
+  font-size: 47px;
 }
 
+.sin-servicios h3,
+.sin-resultados h3 {
+  margin: 0 0 10px;
 
-.sin-servicios h2 {
   color: #302d4f;
+
+  font-size: 20px;
+}
+
+.sin-servicios p,
+.sin-resultados p {
+  max-width: 470px;
+
+  margin: 0 auto;
+
+  color: #68647d;
+
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.btn-limpiar {
+  margin-top: 20px;
+
+  border: 1px solid #6254e8;
+
+  background: #ffffff;
+  color: #5946d5;
+}
+
+.btn-limpiar:hover {
+  background: #f3f0ff;
 }
 
 
-.sin-servicios p {
-  color: #77758a;
-}
-
-
-/* =========================================================
-   LISTADO DE SERVICIOS
-   ========================================================= */
+/* ==========================================================
+   10. CUADRÍCULA DE SERVICIOS
+   ========================================================== */
 
 .servicios-grid {
   display: grid;
 
   grid-template-columns:
-    repeat(
-      auto-fit,
-      minmax(260px, 1fr)
-    );
+    repeat(auto-fit, minmax(260px, 1fr));
 
-  gap: 24px;
+  gap: 22px;
 }
 
 
-/* =========================================================
-   TARJETA DE SERVICIO
-   ========================================================= */
+/* ==========================================================
+   11. TARJETA DE SERVICIO
+   ========================================================== */
 
 .servicio-card {
-  padding: 28px;
+  display: flex;
+  flex-direction: column;
 
-  background-color: white;
+  min-width: 0;
+  padding: 25px;
 
+  border: 1px solid #ece8fa;
   border-radius: 18px;
 
+  background: #ffffff;
+
   box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.08);
+    0 8px 25px rgba(53, 42, 105, 0.06);
 
-  transition: 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
-
 
 .servicio-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-4px);
 
   box-shadow:
-    0 15px 35px rgba(0, 0, 0, 0.12);
+    0 13px 30px rgba(74, 56, 139, 0.12);
 }
 
 
-/* Icono */
+/* ==========================================================
+   12. PARTE SUPERIOR DE LA TARJETA
+   ========================================================== */
+
+.tarjeta-superior {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  margin-bottom: 18px;
+}
 
 .servicio-icono {
-  width: 55px;
-  height: 55px;
-
   display: flex;
   align-items: center;
   justify-content: center;
 
-  margin-bottom: 18px;
+  width: 60px;
+  height: 60px;
 
-  border-radius: 14px;
+  flex-shrink: 0;
 
-  background:
-    linear-gradient(
-      135deg,
-      #ede9fe,
-      #ddd6fe
-    );
+  border-radius: 15px;
 
-  font-size: 28px;
+  background: linear-gradient(
+    135deg,
+    #ede9fe,
+    #ddd6fe
+  );
+
+  font-size: 29px;
+}
+
+.etiqueta-servicio {
+  max-width: 150px;
+
+  padding: 7px 11px;
+
+  border-radius: 20px;
+
+  background: #f3f0ff;
+  color: #604acb;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  text-align: center;
 }
 
 
-/* Nombre del servicio */
+/* ==========================================================
+   13. NOMBRE Y DESCRIPCIÓN
+   ========================================================== */
 
-.servicio-card h2 {
-  margin-top: 0;
-  margin-bottom: 12px;
+.servicio-card h3 {
+  margin: 0 0 12px;
 
   color: #302d4f;
 
   font-size: 21px;
+  font-weight: 700;
+
+  line-height: 1.4;
+  overflow-wrap: anywhere;
 }
-
-
-/* Descripción */
 
 .descripcion {
-  min-height: 50px;
+  flex: 1;
 
-  margin-bottom: 22px;
+  margin: 0 0 23px;
 
-  color: #77758a;
+  color: #68647d;
 
-  line-height: 1.5;
+  font-size: 13px;
+  line-height: 1.7;
+
+  overflow-wrap: anywhere;
 }
 
 
-/* =========================================================
-   PRECIO
-   ========================================================= */
+/* ==========================================================
+   14. PRECIO DEL SERVICIO
+   ========================================================== */
+
+.tarjeta-precio {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  flex-wrap: wrap;
+  gap: 10px;
+
+  margin-bottom: 19px;
+  padding: 15px;
+
+  border: 1px solid #eae4ff;
+  border-radius: 11px;
+
+  background: #f9f7ff;
+}
+
+.tarjeta-precio > span {
+  color: #625e78;
+
+  font-size: 12px;
+  font-weight: 600;
+}
 
 .precio {
-  display: inline-block;
+  color: #5541c5;
 
-  padding: 8px 14px;
-
-  border-radius: 20px;
-
-  color: #5646d7;
-
-  background-color: #f0edff;
-
-  font-size: 18px;
+  font-size: 21px;
   font-weight: 700;
 }
 
+.precio-no-disponible {
+  font-size: 13px;
+}
 
-/* =========================================================
-   RESPONSIVO
-   ========================================================= */
 
-@media (max-width: 700px) {
+/* ==========================================================
+   15. BOTÓN IR A AGENDAR
+   ========================================================== */
 
-  .servicios-container {
-    padding: 20px;
+.btn-cita {
+  display: block;
+
+  width: 100%;
+
+  margin-top: auto;
+
+  border: 1px solid #6254e8;
+
+  background: #ffffff;
+  color: #5742cf;
+}
+
+.btn-cita:hover {
+  background: #6254e8;
+  color: #ffffff;
+}
+
+
+/* ==========================================================
+   16. AYUDA DEL CATÁLOGO
+   ========================================================== */
+
+.ayuda-catalogo {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 12px;
+
+  margin-top: 25px;
+  padding: 18px 20px;
+
+  border: 1px solid #ded6ff;
+  border-radius: 13px;
+
+  background: #f8f6ff;
+}
+
+.ayuda-catalogo > span {
+  flex-shrink: 0;
+
+  font-size: 21px;
+}
+
+.ayuda-catalogo p {
+  margin: 0;
+
+  color: #59546e;
+
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.ayuda-catalogo strong {
+  color: #5141b8;
+}
+
+
+/* ==========================================================
+   17. ACCESIBILIDAD POR TECLADO
+   ========================================================== */
+
+.servicios-container button:focus-visible,
+.servicios-container input:focus-visible,
+.servicios-container select:focus-visible {
+  outline: 3px solid #6952e6;
+  outline-offset: 3px;
+}
+
+
+/* ==========================================================
+   18. PANTALLAS MEDIANAS
+   ========================================================== */
+
+@media (max-width: 1050px) {
+
+  .servicios-header {
+    padding: 24px;
   }
 
+  .servicios-grid {
+    gap: 17px;
+  }
+
+}
+
+
+/* ==========================================================
+   19. TABLETS
+   ========================================================== */
+
+@media (max-width: 800px) {
 
   .servicios-header {
     flex-direction: column;
-
     align-items: flex-start;
   }
 
+  .acciones-header {
+    width: 100%;
+  }
 
+}
+
+
+/* ==========================================================
+   20. CELULARES
+   ========================================================== */
+
+@media (max-width: 600px) {
+
+  .servicios-header {
+    padding: 20px;
+  }
+
+  .servicios-header h1 {
+    font-size: 25px;
+  }
+
+  .acciones-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn-agendar,
   .btn-volver {
     width: 100%;
   }
 
+  .resumen-servicios {
+    padding: 19px;
+  }
+
+  .resumen-icono {
+    width: 55px;
+    height: 55px;
+
+    font-size: 25px;
+  }
+
+  .resumen-decoration {
+    display: none;
+  }
+
+  .filtros-card {
+    grid-template-columns: 1fr;
+    padding: 17px;
+  }
+
+  .listado-acciones {
+    width: 100%;
+  }
 
   .servicios-grid {
     grid-template-columns: 1fr;
+  }
+
+  .servicio-card {
+    padding: 21px;
+  }
+
+  .ayuda-catalogo {
+    padding: 15px;
+  }
+
+}
+
+
+/* ==========================================================
+   21. CELULARES PEQUEÑOS
+   ========================================================== */
+
+@media (max-width: 370px) {
+
+  .servicios-header,
+  .servicio-card {
+    padding: 16px;
+  }
+
+  .servicios-header h1 {
+    font-size: 23px;
+  }
+
+  .tarjeta-superior {
+    flex-wrap: wrap;
+  }
+
+}
+
+
+/* ==========================================================
+   22. REDUCIR ANIMACIONES
+   ========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .servicios-container *,
+  .servicios-container *::before,
+  .servicios-container *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .servicio-card:hover,
+  .btn-agendar:hover {
+    transform: none;
   }
 
 }

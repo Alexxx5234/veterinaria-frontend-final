@@ -26,7 +26,7 @@ export class VeterinarioServicio {
   // ==========================================================
 
   private apiUrl =
-    'http://localhost:8080/api/veterinarios';
+    'http://100.110.172.31:8080/api/veterinarios';
 
 
   // ==========================================================

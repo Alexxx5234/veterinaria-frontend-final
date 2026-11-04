@@ -1,317 +1,762 @@
-<!-- =======================================================
+
+<!-- ==========================================================
+     VETERINARIA AREVALO
      ADMINISTRACIÓN DE USUARIOS
-     ======================================================= -->
+
+     MEJORAS:
+     - Estadísticas de usuarios.
+     - Navegación entre Todos y Pendientes.
+     - Buscador y filtro por estado.
+     - Información de cada cuenta organizada.
+     - Acciones con confirmación.
+     - Estados visuales diferenciados.
+     - Accesibilidad y diseño responsivo.
+
+     El menú lateral, la campana y la accesibilidad
+     pertenecen al LayoutPrivado.
+     ========================================================== -->
 
 <div class="usuarios-container">
 
-  <!-- =====================================================
-       CABECERA
-       ===================================================== -->
+
+  <!-- ========================================================
+       1. ENCABEZADO PRINCIPAL
+       ======================================================== -->
 
   <header class="usuarios-header">
 
-    <div>
-      <h1>👥 Administración de Usuarios</h1>
+    <div class="header-texto">
+
+      <span class="etiqueta-pagina">
+        PANEL ADMINISTRATIVO
+      </span>
+
+      <h1>
+        Administración de Usuarios 👥
+      </h1>
 
       <p>
-        Consulta, aprueba, rechaza, bloquea,
-        activa y elimina cuentas.
+        Gestiona las cuentas registradas, revisa
+        solicitudes y controla sus estados.
       </p>
+
     </div>
 
-    <button
-      type="button"
-      class="btn-volver"
-      (click)="volverDashboard()"
-    >
-      ← Volver
-    </button>
+
+    <div class="acciones-header">
+
+      <button
+        type="button"
+        class="btn-volver"
+        (click)="volverDashboard()"
+      >
+        ← Volver al panel
+      </button>
+
+    </div>
 
   </header>
 
 
-  <!-- =====================================================
-       FILTROS
-       ===================================================== -->
+  <!-- ========================================================
+       2. MENSAJES DEL SISTEMA
+       ======================================================== -->
 
-  <div class="filtros">
-
-    <button
-      type="button"
-      class="btn-filtro"
-      [class.activo]="vistaActual === 'todos'"
-      (click)="cargarUsuarios()"
-    >
-      Todos los usuarios
-    </button>
-
-
-    <button
-      type="button"
-      class="btn-filtro"
-      [class.activo]="vistaActual === 'pendientes'"
-      (click)="cargarPendientes()"
-    >
-      Usuarios pendientes
-    </button>
-
-  </div>
-
-
-  <!-- =====================================================
-       MENSAJE DE ÉXITO
-       ===================================================== -->
-
+  <!-- OPERACIÓN CORRECTA -->
   <div
     class="mensaje-exito"
     *ngIf="mensajeExito"
+    role="status"
+    aria-live="polite"
   >
+    <span aria-hidden="true">✅</span>
     {{ mensajeExito }}
   </div>
 
 
-  <!-- =====================================================
-       MENSAJE DE ERROR
-       ===================================================== -->
-
+  <!-- OPERACIÓN CON ERROR -->
   <div
     class="mensaje-error"
     *ngIf="mensajeError"
+    role="alert"
   >
+
+    <span aria-hidden="true">⚠️</span>
+
     {{ mensajeError }}
-  </div>
 
-
-  <!-- =====================================================
-       CARGANDO
-       ===================================================== -->
-
-  <div
-    class="mensaje-info"
-    *ngIf="cargando"
-  >
-    Cargando usuarios...
-  </div>
-
-
-  <!-- =====================================================
-       SIN USUARIOS
-       ===================================================== -->
-
-  <div
-    class="sin-usuarios"
-    *ngIf="
-      !cargando &&
-      !mensajeError &&
-      usuarios.length === 0
-    "
-  >
-
-    <div class="sin-icono">
-      👥
-    </div>
-
-    <h2>
-      No hay usuarios para mostrar
-    </h2>
-
-    <p *ngIf="vistaActual === 'pendientes'">
-      Actualmente no existen usuarios pendientes de aprobación.
-    </p>
-
-    <p *ngIf="vistaActual === 'todos'">
-      No existen usuarios registrados en el sistema.
-    </p>
+    <button
+      type="button"
+      class="btn-reintentar"
+      *ngIf="errorCarga"
+      (click)="actualizarUsuarios()"
+    >
+      Reintentar
+    </button>
 
   </div>
 
 
-  <!-- =====================================================
-       LISTADO DE USUARIOS
-       ===================================================== -->
+  <!-- ========================================================
+       3. RESUMEN GENERAL
+       ======================================================== -->
 
   <section
-    class="usuarios-grid"
-    *ngIf="
-      !cargando &&
-      usuarios.length > 0
-    "
+    class="resumen-grid"
+    *ngIf="!cargando && !errorCarga"
+    aria-label="Resumen de cuentas registradas"
   >
 
-    <article
-      class="usuario-card"
-      *ngFor="let usuario of usuarios"
-    >
 
-
-      <!-- ===============================================
-           CABECERA DE LA TARJETA
-           =============================================== -->
-
-      <div class="usuario-superior">
-
-        <div class="usuario-icono">
-          👤
-        </div>
-
-
-        <div>
-
-          <h2>
-            {{ usuario.nombre }}
-          </h2>
-
-          <span
-            class="rol"
-            [class.admin]="usuario.rol === 'ADMIN'"
-          >
-            {{ usuario.rol }}
-          </span>
-
-        </div>
-
-      </div>
-
-
-      <!-- ===============================================
-           INFORMACIÓN
-           =============================================== -->
-
-      <div class="usuario-info">
-
-        <p>
-          <strong>ID:</strong>
-          {{ usuario.id }}
-        </p>
-
-
-        <p>
-          <strong>Correo:</strong>
-          {{ usuario.correo }}
-        </p>
-
-
-        <p>
-          <strong>Estado:</strong>
-
-          <span
-            class="estado"
-            [class.pendiente]="usuario.estado === 'PENDIENTE'"
-            [class.aprobada]="usuario.estado === 'APROBADA'"
-            [class.rechazada]="usuario.estado === 'RECHAZADA'"
-            [class.bloqueada]="usuario.estado === 'BLOQUEADA'"
-          >
-            {{ usuario.estado }}
-          </span>
-
-        </p>
-
-
-        <p>
-          <strong>Cuenta activa:</strong>
-
-          <span
-            [class.activo-cuenta]="usuario.activo"
-            [class.inactivo-cuenta]="!usuario.activo"
-          >
-            {{ usuario.activo ? 'Sí' : 'No' }}
-          </span>
-        </p>
-
-
-        <p>
-          <strong>Correo verificado:</strong>
-
-          {{ usuario.verificado ? 'Sí' : 'No' }}
-        </p>
-
-      </div>
-
-
-      <!-- ===============================================
-           CUENTA ADMIN
-           =============================================== -->
+    <!-- TOTAL DE USUARIOS -->
+    <article class="resumen-card">
 
       <div
-        class="aviso-admin"
-        *ngIf="esAdmin(usuario)"
+        class="resumen-icono icono-total"
+        aria-hidden="true"
       >
-        Cuenta administrativa
+        👥
       </div>
 
+      <div class="resumen-datos">
 
-      <!-- ===============================================
-           ACCIONES PARA USER
-           =============================================== -->
+        <span>
+          Total de usuarios
+        </span>
 
-      <div
-        class="acciones"
-        *ngIf="!esAdmin(usuario)"
-      >
-
-
-        <!-- APROBAR -->
-        <button
-          type="button"
-          class="btn-aprobar"
-          *ngIf="usuario.estado === 'PENDIENTE'"
-          (click)="aprobarUsuario(usuario)"
-        >
-          ✓ Aprobar
-        </button>
-
-
-        <!-- RECHAZAR -->
-        <button
-          type="button"
-          class="btn-rechazar"
-          *ngIf="usuario.estado === 'PENDIENTE'"
-          (click)="rechazarUsuario(usuario)"
-        >
-          ✕ Rechazar
-        </button>
-
-
-        <!-- BLOQUEAR -->
-        <button
-          type="button"
-          class="btn-bloquear"
-          *ngIf="
-            usuario.estado === 'APROBADA' &&
-            usuario.activo
-          "
-          (click)="bloquearUsuario(usuario)"
-        >
-          🔒 Bloquear
-        </button>
-
-
-        <!-- ACTIVAR -->
-        <button
-          type="button"
-          class="btn-activar"
-          *ngIf="
-            usuario.estado === 'BLOQUEADA' ||
-            !usuario.activo
-          "
-          (click)="activarUsuario(usuario)"
-        >
-          🔓 Activar
-        </button>
-
-
-        <!-- ELIMINAR -->
-        <button
-          type="button"
-          class="btn-eliminar"
-          (click)="eliminarUsuario(usuario)"
-        >
-          🗑 Eliminar
-        </button>
+        <strong>
+          {{ totalUsuarios }}
+        </strong>
 
       </div>
 
     </article>
+
+
+    <!-- APROBADOS -->
+    <article class="resumen-card">
+
+      <div
+        class="resumen-icono icono-aprobados"
+        aria-hidden="true"
+      >
+        ✅
+      </div>
+
+      <div class="resumen-datos">
+
+        <span>
+          Aprobados
+        </span>
+
+        <strong>
+          {{ totalAprobados }}
+        </strong>
+
+      </div>
+
+    </article>
+
+
+    <!-- PENDIENTES -->
+    <article class="resumen-card">
+
+      <div
+        class="resumen-icono icono-pendientes"
+        aria-hidden="true"
+      >
+        ⏳
+      </div>
+
+      <div class="resumen-datos">
+
+        <span>
+          Pendientes
+        </span>
+
+        <strong>
+          {{ totalPendientes }}
+        </strong>
+
+      </div>
+
+    </article>
+
+
+    <!-- BLOQUEADOS -->
+    <article class="resumen-card">
+
+      <div
+        class="resumen-icono icono-bloqueados"
+        aria-hidden="true"
+      >
+        🔒
+      </div>
+
+      <div class="resumen-datos">
+
+        <span>
+          Bloqueados
+        </span>
+
+        <strong>
+          {{ totalBloqueados }}
+        </strong>
+
+      </div>
+
+    </article>
+
+  </section>
+
+
+  <!-- ========================================================
+       4. ENCABEZADO DE GESTIÓN
+       ======================================================== -->
+
+  <section
+    class="gestion-section"
+    aria-labelledby="titulo-gestion"
+  >
+
+
+    <div class="gestion-header">
+
+      <div>
+
+        <h2 id="titulo-gestion">
+          Gestión de cuentas
+        </h2>
+
+        <p>
+          Selecciona una vista para consultar
+          las cuentas del sistema.
+        </p>
+
+      </div>
+
+
+      <div class="gestion-acciones">
+
+        <span
+          class="total-resultados"
+          *ngIf="!cargando && !errorCarga"
+        >
+          {{ usuarios.length }}
+          {{
+            usuarios.length === 1
+              ? 'registro'
+              : 'registros'
+          }}
+        </span>
+
+
+        <button
+          type="button"
+          class="btn-actualizar"
+          (click)="actualizarUsuarios()"
+          [disabled]="cargando || hayAccionEnCurso"
+        >
+
+          {{
+            cargando
+              ? 'Consultando...'
+              : '↻ Actualizar'
+          }}
+
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- ======================================================
+         5. SELECCIONAR VISTA
+         ====================================================== -->
+
+    <div
+      class="filtros-vista"
+      role="group"
+      aria-label="Seleccionar vista de usuarios"
+    >
+
+
+      <!-- TODOS -->
+      <button
+        type="button"
+        class="btn-filtro"
+        [class.activo]="vistaActual === 'todos'"
+        [attr.aria-pressed]="vistaActual === 'todos'"
+        [disabled]="cargando || hayAccionEnCurso"
+        (click)="cargarUsuarios()"
+      >
+        👥 Todos los usuarios
+      </button>
+
+
+      <!-- PENDIENTES -->
+      <button
+        type="button"
+        class="btn-filtro"
+        [class.activo]="vistaActual === 'pendientes'"
+        [attr.aria-pressed]="vistaActual === 'pendientes'"
+        [disabled]="cargando || hayAccionEnCurso"
+        (click)="cargarPendientes()"
+      >
+        ⏳ Usuarios pendientes
+
+        <span
+          class="contador-pendientes"
+          *ngIf="!cargando && !errorCarga"
+        >
+          {{ totalPendientes }}
+        </span>
+
+      </button>
+
+    </div>
+
+
+    <!-- ======================================================
+         6. BUSCADOR Y FILTRO POR ESTADO
+         ====================================================== -->
+
+    <div
+      class="filtros-card"
+      *ngIf="
+        !cargando &&
+        !errorCarga &&
+        usuarios.length > 0
+      "
+    >
+
+
+      <!-- BUSCAR -->
+      <div class="filtro-grupo">
+
+        <label for="buscarUsuario">
+          Buscar usuario
+        </label>
+
+        <input
+          id="buscarUsuario"
+          type="search"
+          [(ngModel)]="busqueda"
+          placeholder="Nombre, correo o ID..."
+          autocomplete="off"
+          aria-describedby="ayuda-busqueda"
+        >
+
+        <small
+          id="ayuda-busqueda"
+          class="texto-ayuda"
+        >
+          Busca sin distinguir mayúsculas ni tildes.
+        </small>
+
+      </div>
+
+
+      <!-- FILTRAR ESTADO -->
+      <div class="filtro-grupo">
+
+        <label for="filtroEstado">
+          Estado de la cuenta
+        </label>
+
+        <select
+          id="filtroEstado"
+          [(ngModel)]="filtroEstado"
+        >
+
+          <option value="TODOS">
+            Todos los estados
+          </option>
+
+          <option
+            *ngFor="let estado of estadosDisponibles"
+            [value]="estado"
+          >
+            {{ estado }}
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+
+    <!-- ======================================================
+         7. CARGANDO
+         ====================================================== -->
+
+    <div
+      class="mensaje-info"
+      *ngIf="cargando"
+      role="status"
+      aria-live="polite"
+    >
+      Consultando las cuentas registradas...
+    </div>
+
+
+    <!-- ======================================================
+         8. SIN CUENTAS EN LA VISTA
+         ====================================================== -->
+
+    <div
+      class="sin-usuarios"
+      *ngIf="
+        !cargando &&
+        !errorCarga &&
+        usuarios.length === 0
+      "
+    >
+
+      <div
+        class="sin-icono"
+        aria-hidden="true"
+      >
+        👥
+      </div>
+
+
+      <h3>
+        No hay usuarios para mostrar
+      </h3>
+
+
+      <p *ngIf="vistaActual === 'pendientes'">
+        Actualmente no existen usuarios pendientes
+        de aprobación.
+      </p>
+
+
+      <p *ngIf="vistaActual === 'todos'">
+        No existen cuentas registradas en el sistema.
+      </p>
+
+    </div>
+
+
+    <!-- ======================================================
+         9. SIN RESULTADOS DE BÚSQUEDA
+         ====================================================== -->
+
+    <div
+      class="sin-resultados"
+      *ngIf="
+        !cargando &&
+        !errorCarga &&
+        usuarios.length > 0 &&
+        usuariosFiltrados.length === 0
+      "
+    >
+
+      <div
+        class="sin-icono"
+        aria-hidden="true"
+      >
+        🔎
+      </div>
+
+      <h3>
+        No encontramos usuarios con esos filtros
+      </h3>
+
+      <p>
+        Prueba otro nombre, correo o estado.
+      </p>
+
+      <button
+        type="button"
+        class="btn-limpiar"
+        (click)="limpiarFiltros()"
+      >
+        Limpiar filtros
+      </button>
+
+    </div>
+
+
+    <!-- ======================================================
+         10. LISTADO DE CUENTAS
+         ====================================================== -->
+
+    <div
+      class="usuarios-grid"
+      *ngIf="
+        !cargando &&
+        !errorCarga &&
+        usuariosFiltrados.length > 0
+      "
+    >
+
+
+      <!-- TARJETA INDIVIDUAL -->
+      <article
+        class="usuario-card"
+        *ngFor="
+          let usuario of usuariosFiltrados;
+          trackBy: trackByUsuario
+        "
+        [attr.aria-busy]="accionEnCursoId === usuario.id"
+      >
+
+
+        <!-- ================================================
+             ENCABEZADO DEL USUARIO
+             ================================================ -->
+
+        <div class="usuario-superior">
+
+          <div
+            class="usuario-icono"
+            aria-hidden="true"
+          >
+            {{ esAdmin(usuario) ? '🛡️' : '👤' }}
+          </div>
+
+
+          <div class="usuario-identidad">
+
+            <h3>
+              {{ usuario.nombre }}
+            </h3>
+
+            <span
+              class="rol"
+              [class.admin]="esAdmin(usuario)"
+            >
+              {{ usuario.rol }}
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <!-- ================================================
+             DATOS DE LA CUENTA
+             ================================================ -->
+
+        <div class="usuario-info">
+
+
+          <!-- IDENTIFICADOR -->
+          <div class="info-fila">
+
+            <strong>
+              ID
+            </strong>
+
+            <span>
+              #{{ usuario.id }}
+            </span>
+
+          </div>
+
+
+          <!-- CORREO -->
+          <div class="info-fila">
+
+            <strong>
+              Correo
+            </strong>
+
+            <span class="correo-usuario">
+              {{ usuario.correo }}
+            </span>
+
+          </div>
+
+
+          <!-- ESTADO -->
+          <div class="info-fila">
+
+            <strong>
+              Estado
+            </strong>
+
+            <span
+              class="estado"
+              [class.pendiente]="usuario.estado === 'PENDIENTE'"
+              [class.aprobada]="usuario.estado === 'APROBADA'"
+              [class.rechazada]="usuario.estado === 'RECHAZADA'"
+              [class.bloqueada]="usuario.estado === 'BLOQUEADA'"
+              [class.inactiva]="usuario.estado === 'INACTIVA'"
+            >
+              {{ usuario.estado }}
+            </span>
+
+          </div>
+
+
+          <!-- CUENTA ACTIVA -->
+          <div class="info-fila">
+
+            <strong>
+              Cuenta activa
+            </strong>
+
+            <span
+              class="estado-simple"
+              [class.cuenta-activa]="usuario.activo"
+              [class.cuenta-inactiva]="!usuario.activo"
+            >
+              {{
+                usuario.activo
+                  ? '● Activa'
+                  : '● Inactiva'
+              }}
+            </span>
+
+          </div>
+
+
+          <!-- CORREO VERIFICADO -->
+          <div class="info-fila">
+
+            <strong>
+              Correo verificado
+            </strong>
+
+            <span
+              class="estado-simple"
+              [class.cuenta-activa]="usuario.verificado"
+              [class.cuenta-inactiva]="!usuario.verificado"
+            >
+              {{
+                usuario.verificado
+                  ? '✓ Verificado'
+                  : '✕ No verificado'
+              }}
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <!-- ================================================
+             CUENTA ADMINISTRATIVA
+             ================================================ -->
+
+        <div
+          class="aviso-admin"
+          *ngIf="esAdmin(usuario)"
+        >
+          🛡️ Cuenta administrativa protegida.
+        </div>
+
+
+        <!-- ================================================
+             ACCIONES ADMINISTRATIVAS PARA USER
+             ================================================ -->
+
+        <div
+          class="acciones"
+          *ngIf="!esAdmin(usuario)"
+        >
+
+
+          <!-- APROBAR -->
+          <button
+            type="button"
+            class="btn-aprobar"
+            *ngIf="usuario.estado === 'PENDIENTE'"
+            [disabled]="hayAccionEnCurso"
+            (click)="aprobarUsuario(usuario)"
+            [attr.aria-label]="
+              'Aprobar usuario ' + usuario.nombre
+            "
+          >
+            ✓ Aprobar
+          </button>
+
+
+          <!-- RECHAZAR -->
+          <button
+            type="button"
+            class="btn-rechazar"
+            *ngIf="usuario.estado === 'PENDIENTE'"
+            [disabled]="hayAccionEnCurso"
+            (click)="rechazarUsuario(usuario)"
+            [attr.aria-label]="
+              'Rechazar usuario ' + usuario.nombre
+            "
+          >
+            ✕ Rechazar
+          </button>
+
+
+          <!-- BLOQUEAR -->
+          <button
+            type="button"
+            class="btn-bloquear"
+            *ngIf="
+              usuario.estado === 'APROBADA' &&
+              usuario.activo
+            "
+            [disabled]="hayAccionEnCurso"
+            (click)="bloquearUsuario(usuario)"
+            [attr.aria-label]="
+              'Bloquear usuario ' + usuario.nombre
+            "
+          >
+            🔒 Bloquear
+          </button>
+
+
+          <!-- ACTIVAR -->
+          <button
+            type="button"
+            class="btn-activar"
+            *ngIf="
+              usuario.estado === 'BLOQUEADA' ||
+              !usuario.activo
+            "
+            [disabled]="hayAccionEnCurso"
+            (click)="activarUsuario(usuario)"
+            [attr.aria-label]="
+              'Activar usuario ' + usuario.nombre
+            "
+          >
+            🔓 Activar
+          </button>
+
+
+          <!-- ELIMINAR -->
+          <button
+            type="button"
+            class="btn-eliminar"
+            [disabled]="hayAccionEnCurso"
+            (click)="eliminarUsuario(usuario)"
+            [attr.aria-label]="
+              'Eliminar permanentemente al usuario ' +
+              usuario.nombre
+            "
+          >
+            🗑 Eliminar
+          </button>
+
+
+          <!-- OPERACIÓN EN CURSO -->
+          <p
+            class="accion-cargando"
+            *ngIf="accionEnCursoId === usuario.id"
+            role="status"
+          >
+            Procesando solicitud...
+          </p>
+
+        </div>
+
+      </article>
+
+    </div>
 
   </section>
 

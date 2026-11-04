@@ -1,38 +1,62 @@
+
+/* ==========================================================
+   VETERINARIA AREVALO
+   ADMINISTRACIÓN DE CITAS (ADMIN)
+
+   FUNCIONALIDADES:
+   - Consultar todas las citas de Spring Boot.
+   - Consultar mascotas, veterinarios y servicios.
+   - Mostrar estadísticas por estado.
+   - Buscar y filtrar citas.
+   - Ordenar por fecha.
+   - Registrar nuevas citas.
+   - Editar citas existentes.
+   - Cancelar citas sin eliminarlas.
+   - Eliminar citas con confirmación.
+   - Validar formularios.
+   - Enviar notificaciones al menú global.
+
+   IMPORTANTE:
+   Se mantienen los endpoints de CitaServicio.
+   ========================================================== */
+
+
 // ==========================================================
-// IMPORTACIONES
+// IMPORTACIONES ANGULAR
 // ==========================================================
 
-// Component permite crear el componente.
-// OnInit ejecuta código al abrir la página.
-// ChangeDetectorRef permite actualizar la vista
-// después de recibir datos del backend.
 import {
   Component,
   OnInit,
-  ChangeDetectorRef
+  ChangeDetectorRef,
+  ViewChild,
+  ElementRef
 } from '@angular/core';
 
-// Permite usar *ngIf y *ngFor.
+// Directivas y formato de fechas y valores.
 import { CommonModule } from '@angular/common';
 
-// Herramientas para formularios reactivos.
+// Formularios reactivos y filtros con ngModel.
 import {
   FormBuilder,
   FormGroup,
+  FormsModule,
   ReactiveFormsModule,
   Validators
 } from '@angular/forms';
 
-// Router permite volver al dashboard ADMIN.
+// Navegación entre páginas.
 import { Router } from '@angular/router';
 
-// forkJoin permite cargar varias peticiones
-// al mismo tiempo.
-import { forkJoin } from 'rxjs';
+// Consultar varias peticiones al mismo tiempo.
+import {
+  forkJoin,
+  Observable
+} from 'rxjs';
 
 
 // ==========================================================
-// SERVICIOS
+// SERVICIOS DE LA API
 // ==========================================================
 
 import { CitaServicio }
@@ -47,6 +71,62 @@ import { VeterinarioServicio }
 import { ServicioServicio }
   from '../../../Servicios/servicio-servicio';
 
+// Notificaciones globales.
+import { NotificacionesServicio }
+  from '../../../Servicios/notificaciones-servicio';
+
+
+// ==========================================================
+// INTERFACES
+// ==========================================================
+
+// Propietario de una mascota.
+interface PropietarioCita {
+  id?: number;
+  nombre?: string;
+  apellido?: string;
+  correo?: string;
+}
+
+// Mascota asociada a una cita.
+interface MascotaCita {
+  id: number;
+  nombre?: string;
+  especie?: string;
+  raza?: string;
+  usuario?: PropietarioCita | null;
+}
+
+// Veterinario asociado a una cita.
+interface VeterinarioCita {
+  id: number;
+  nombre?: string;
+  apellido?: string;
+  especialidad?: string;
+}
+
+// Servicio veterinario.
+interface ServicioCita {
+  id: number;
+  nombre?: string;
+  precio?: number | string | null;
+}
+
+// Información recibida desde la API.
+interface CitaAdmin {
+  id: number;
+  fechaHora: string;
+  motivo?: string | null;
+  estado: string;
+  mascota?: MascotaCita | null;
+  veterinario?: VeterinarioCita | null;
+  servicio?: ServicioCita | null;
+}
+
+
+// ==========================================================
+// COMPONENTE ADMIN CITAS
+// ==========================================================
 
 @Component({
 
@@ -56,6 +136,7 @@ import { ServicioServicio }
 
   imports: [
     CommonModule,
+    FormsModule,
     ReactiveFormsModule
   ],
 
@@ -67,47 +148,72 @@ import { ServicioServicio }
 export class AdminCitas implements OnInit {
 
 
-  // ==========================================================
-  // LISTAS
-  // ==========================================================
+  // ========================================================
+  // LISTAS DEL SISTEMA
+  // ========================================================
 
-  citas: any[] = [];
+  citas: CitaAdmin[] = [];
 
-  mascotas: any[] = [];
+  mascotas: MascotaCita[] = [];
 
-  veterinarios: any[] = [];
+  veterinarios: VeterinarioCita[] = [];
 
-  servicios: any[] = [];
+  servicios: ServicioCita[] = [];
 
 
-  // ==========================================================
-  // VARIABLES DE CONTROL
-  // ==========================================================
+  // ========================================================
+  // ESTADOS DE LA PÁGINA
+  // ========================================================
 
   cargando: boolean = false;
+
+  errorCarga: boolean = false;
+
+  guardando: boolean = false;
+
+  // Identifica una cita que se está cancelando
+  // o eliminando.
+  procesandoId: number | null = null;
 
   mensajeError: string = '';
 
   mensajeExito: string = '';
 
+
+  // ========================================================
+  // BÚSQUEDA Y FILTROS
+  // ========================================================
+
+  // Permite buscar citas por diferentes datos.
+  busqueda: string = '';
+
+  // Por defecto se muestran todas.
+  filtroEstado: string = 'TODOS';
+
+  // Las más recientes aparecen primero.
+  ordenarPor: string = 'fechaDesc';
+
+
+  // ========================================================
+  // FORMULARIO
+  // ========================================================
+
   mostrarFormulario: boolean = false;
 
-
-  // null = creando
-  // número = editando
+  // null: nueva cita.
+  // número: editar una cita existente.
   citaEditandoId: number | null = null;
-
-
-  // ==========================================================
-  // FORMULARIO
-  // ==========================================================
 
   citaForm: FormGroup;
 
+  // Enfocar la fecha al abrir el formulario.
+  @ViewChild('campoFecha')
+  campoFecha?: ElementRef<HTMLInputElement>;
 
-  // ==========================================================
+
+  // ========================================================
   // CONSTRUCTOR
-  // ==========================================================
+  // ========================================================
 
   constructor(
 
@@ -119,6 +225,8 @@ export class AdminCitas implements OnInit {
 
     private servicioServicio: ServicioServicio,
 
+    private notificacionesServicio: NotificacionesServicio,
+
     private fb: FormBuilder,
 
     private router: Router,
@@ -127,8 +235,7 @@ export class AdminCitas implements OnInit {
 
   ) {
 
-
-    // Los campos coinciden con Cita.java.
+    // Los campos conservan los nombres originales.
     this.citaForm = this.fb.group({
 
       fechaHora: [
@@ -166,9 +273,9 @@ export class AdminCitas implements OnInit {
   }
 
 
-  // ==========================================================
-  // AL ABRIR LA PÁGINA
-  // ==========================================================
+  // ========================================================
+  // INICIAR LA PÁGINA
+  // ========================================================
 
   ngOnInit(): void {
 
@@ -177,91 +284,160 @@ export class AdminCitas implements OnInit {
   }
 
 
-  // ==========================================================
-  // CARGAR DATOS
-  // ==========================================================
-  //
-  // Cargamos al mismo tiempo:
-  //
-  // - Todas las citas
-  // - Todas las mascotas
-  // - Veterinarios
-  // - Servicios
-  //
-  // ==========================================================
+  // ========================================================
+  // NORMALIZAR TEXTO
+  // ========================================================
 
-  cargarDatos(): void {
+  /*
+    Permite buscar sin importar:
+    - Mayúsculas o minúsculas.
+    - Tildes.
+
+    Ejemplo:
+    "vacunacion" encuentra "Vacunación".
+  */
+
+  private normalizarTexto(valor: unknown): string {
+
+    return String(valor ?? '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim();
+
+  }
+
+
+  // ========================================================
+  // CARGAR DATOS DESDE SPRING BOOT
+  // ========================================================
+
+  cargarDatos(
+    actualizacionManual: boolean = false
+  ): void {
+
+    // Impedir peticiones simultáneas.
+    if (
+      this.cargando ||
+      this.guardando ||
+      this.procesandoId !== null
+    ) {
+      return;
+    }
 
     this.cargando = true;
+
+    this.errorCarga = false;
 
     this.mensajeError = '';
 
 
+    // ======================================================
+    // CONSULTAS REST EXISTENTES
+    // ======================================================
+
+    /*
+      forkJoin consulta simultáneamente:
+
+      GET /api/citas
+      GET /api/mascotas
+      GET /api/veterinarios
+      GET /api/servicios
+
+      El interceptor agrega automáticamente el JWT
+      de la sesión ADMIN.
+    */
+
     forkJoin({
 
       citas:
-        this.citaServicio
-          .listarTodasCitas(),
+        this.citaServicio.listarTodasCitas(),
 
       mascotas:
-        this.mascotaServicio
-          .listarTodasMascotas(),
+        this.mascotaServicio.listarTodasMascotas(),
 
       veterinarios:
-        this.veterinarioServicio
-          .listarVeterinarios(),
+        this.veterinarioServicio.listarVeterinarios(),
 
       servicios:
-        this.servicioServicio
-          .listarServicios()
+        this.servicioServicio.listarServicios()
 
-    })
-    .subscribe({
+    }).subscribe({
 
+
+      // ====================================================
+      // RESPUESTA CORRECTA
+      // ====================================================
 
       next: (respuesta) => {
 
-        this.citas =
-          respuesta.citas;
+        // Guardar únicamente arreglos.
+        this.citas = Array.isArray(respuesta.citas)
+          ? respuesta.citas
+          : [];
 
-        this.mascotas =
-          respuesta.mascotas;
+        this.mascotas = Array.isArray(respuesta.mascotas)
+          ? respuesta.mascotas
+          : [];
 
         this.veterinarios =
-          respuesta.veterinarios;
+          Array.isArray(respuesta.veterinarios)
+            ? respuesta.veterinarios
+            : [];
 
-        this.servicios =
-          respuesta.servicios;
-
+        this.servicios = Array.isArray(respuesta.servicios)
+          ? respuesta.servicios
+          : [];
 
         this.cargando = false;
 
+        this.errorCarga = false;
 
-        console.log(
-          'Datos de administración de citas:',
-          respuesta
-        );
 
+        // Confirmar una actualización manual.
+        if (actualizacionManual) {
+
+          this.mensajeExito =
+            'El listado de citas se actualizó correctamente.';
+
+          this.notificacionesServicio.agregar(
+            'Citas actualizadas',
+            'Se consultó nuevamente el listado de citas.',
+            'info'
+          );
+
+        }
 
         this.cd.detectChanges();
 
       },
 
 
+      // ====================================================
+      // ERROR DE CONSULTA
+      // ====================================================
+
       error: (error) => {
 
         console.error(
-          'Error al cargar datos:',
+          'Error al cargar administración de citas:',
           error
         );
 
-
-        this.mensajeError =
-          'No se pudieron cargar los datos de las citas.';
-
-
         this.cargando = false;
 
+        this.errorCarga = true;
+
+        this.mensajeError =
+          error?.status === 0
+            ? 'No se pudo conectar con Spring Boot. Verifica que la API esté encendida.'
+            : 'No se pudieron cargar los datos de las citas. Intenta nuevamente.';
+
+        this.notificacionesServicio.agregar(
+          'Error al consultar citas',
+          'No fue posible cargar la información de las citas.',
+          'error'
+        );
 
         this.cd.detectChanges();
 
@@ -272,15 +448,185 @@ export class AdminCitas implements OnInit {
   }
 
 
-  // ==========================================================
+  // ========================================================
+  // ESTADÍSTICAS
+  // ========================================================
+
+  get totalCitas(): number {
+
+    return this.citas.length;
+
+  }
+
+  get totalPendientes(): number {
+
+    return this.citas.filter(
+      cita => cita.estado === 'PENDIENTE'
+    ).length;
+
+  }
+
+  get totalConfirmadas(): number {
+
+    return this.citas.filter(
+      cita => cita.estado === 'CONFIRMADA'
+    ).length;
+
+  }
+
+  get totalCompletadas(): number {
+
+    return this.citas.filter(
+      cita => cita.estado === 'COMPLETADA'
+    ).length;
+
+  }
+
+  get totalCanceladas(): number {
+
+    return this.citas.filter(
+      cita => cita.estado === 'CANCELADA'
+    ).length;
+
+  }
+
+
+  // ========================================================
+  // FILTRAR Y ORDENAR CITAS
+  // ========================================================
+
+  get citasFiltradas(): CitaAdmin[] {
+
+    const textoBuscado =
+      this.normalizarTexto(this.busqueda);
+
+    // ======================================================
+    // BÚSQUEDA Y ESTADO
+    // ======================================================
+
+    const resultado = this.citas.filter(cita => {
+
+      // Buscar en todos los datos relevantes.
+      const contenido = this.normalizarTexto([
+
+        cita.id,
+        cita.motivo,
+        cita.estado,
+
+        cita.mascota?.nombre,
+        cita.mascota?.especie,
+
+        cita.mascota?.usuario?.nombre,
+        cita.mascota?.usuario?.apellido,
+        cita.mascota?.usuario?.correo,
+
+        cita.veterinario?.nombre,
+        cita.veterinario?.apellido,
+
+        cita.servicio?.nombre
+
+      ].join(' '));
+
+      const coincideBusqueda =
+        contenido.includes(textoBuscado);
+
+      const coincideEstado =
+        this.filtroEstado === 'TODOS' ||
+        cita.estado === this.filtroEstado;
+
+      return coincideBusqueda && coincideEstado;
+
+    });
+
+
+    // ======================================================
+    // ORDENAMIENTO
+    // ======================================================
+
+    return [...resultado].sort((a, b) => {
+
+      // Los valores ISO de fecha y hora de Spring Boot
+      // permiten ordenar cronológicamente.
+      const fechaA = String(a.fechaHora ?? '');
+      const fechaB = String(b.fechaHora ?? '');
+
+      const comparacion =
+        fechaA.localeCompare(fechaB);
+
+      if (this.ordenarPor === 'fechaAsc') {
+        return comparacion;
+      }
+
+      if (this.ordenarPor === 'idDesc') {
+        return b.id - a.id;
+      }
+
+      // Predeterminado: fecha más reciente primero.
+      return -comparacion;
+
+    });
+
+  }
+
+
+  // ========================================================
+  // LIMPIAR FILTROS
+  // ========================================================
+
+  limpiarFiltros(): void {
+
+    this.busqueda = '';
+
+    this.filtroEstado = 'TODOS';
+
+    this.ordenarPor = 'fechaDesc';
+
+  }
+
+
+  // ========================================================
+  // VALIDACIÓN VISUAL DE CAMPOS
+  // ========================================================
+
+  campoInvalido(nombreCampo: string): boolean {
+
+    const control = this.citaForm.get(nombreCampo);
+
+    return !!control &&
+      control.invalid &&
+      (control.touched || control.dirty);
+
+  }
+
+
+  // ========================================================
+  // COMPROBAR OPERACIONES ACTIVAS
+  // ========================================================
+
+  get hayOperacionEnCurso(): boolean {
+
+    return (
+      this.guardando ||
+      this.procesandoId !== null
+    );
+
+  }
+
+
+  // ========================================================
   // NUEVA CITA
-  // ==========================================================
+  // ========================================================
 
   nuevaCita(): void {
 
+    if (this.cargando || this.hayOperacionEnCurso) {
+      return;
+    }
+
+    // No existe ID porque se creará una cita nueva.
     this.citaEditandoId = null;
 
-
+    // Limpiar formulario.
     this.citaForm.reset({
 
       fechaHora: '',
@@ -297,76 +643,94 @@ export class AdminCitas implements OnInit {
 
     });
 
-
     this.mensajeError = '';
 
     this.mensajeExito = '';
 
     this.mostrarFormulario = true;
 
+    this.cd.detectChanges();
+
+    this.campoFecha?.nativeElement.focus();
+
   }
 
 
-  // ==========================================================
+  // ========================================================
   // EDITAR CITA
-  // ==========================================================
+  // ========================================================
 
-  editarCita(
-    cita: any
-  ): void {
+  editarCita(cita: CitaAdmin): void {
 
+    if (this.cargando || this.hayOperacionEnCurso) {
+      return;
+    }
 
-    this.citaEditandoId =
-      cita.id;
+    // Guardamos el ID para ejecutar el PUT.
+    this.citaEditandoId = cita.id;
 
-
-    this.citaForm.patchValue({
+    // Cargamos los valores actuales.
+    this.citaForm.reset({
 
       fechaHora:
-        this.formatearFechaParaInput(
-          cita.fechaHora
-        ),
+        this.formatearFechaParaInput(cita.fechaHora),
 
       motivo:
-        cita.motivo,
+        cita.motivo ?? '',
 
       mascotaId:
-        cita.mascota?.id,
+        cita.mascota?.id ?? '',
 
       veterinarioId:
-        cita.veterinario?.id,
+        cita.veterinario?.id ?? '',
 
       servicioId:
-        cita.servicio?.id,
+        cita.servicio?.id ?? '',
 
       estado:
-        cita.estado
+        cita.estado ?? 'PENDIENTE'
 
     });
 
-
     this.mensajeError = '';
 
     this.mensajeExito = '';
 
     this.mostrarFormulario = true;
 
+    this.cd.detectChanges();
+
+    this.campoFecha?.nativeElement.focus();
+
   }
 
 
-  // ==========================================================
+  // ========================================================
   // GUARDAR CITA
-  // ==========================================================
-  //
-  // Sirve tanto para:
-  //
-  // POST → crear
-  // PUT  → actualizar
-  //
-  // ==========================================================
+  // ========================================================
+
+  /*
+    Este método conserva el funcionamiento original:
+
+    Crear:
+    POST /api/citas
+
+    Editar:
+    PUT /api/citas/{id}
+  */
 
   guardarCita(): void {
 
+    if (this.cargando || this.hayOperacionEnCurso) {
+      return;
+    }
+
+    this.mensajeError = '';
+
+
+    // ======================================================
+    // VALIDAR FORMULARIO
+    // ======================================================
 
     if (this.citaForm.invalid) {
 
@@ -376,219 +740,218 @@ export class AdminCitas implements OnInit {
 
     }
 
+    const valores = this.citaForm.getRawValue();
 
-    // Construimos exactamente el JSON
-    // que espera CitaController.
+    // No aceptar motivos que contengan solo espacios.
+    const motivo = String(
+      valores.motivo ?? ''
+    ).trim();
+
+    if (!motivo) {
+
+      this.citaForm.get('motivo')?.setErrors({
+        required: true
+      });
+
+      this.citaForm.get('motivo')?.markAsTouched();
+
+      return;
+
+    }
+
+
+    // ======================================================
+    // JSON PARA SPRING BOOT
+    // ======================================================
+
+    /*
+      Mantenemos las relaciones por ID:
+
+      mascota: { id }
+      veterinario: { id }
+      servicio: { id }
+
+      El estado sigue siendo editable por ADMIN.
+    */
+
     const datosCita = {
 
       fechaHora:
-        this.citaForm.value.fechaHora,
+        valores.fechaHora,
 
-      motivo:
-        this.citaForm.value.motivo,
+      motivo,
 
       estado:
-        this.citaForm.value.estado,
+        valores.estado,
 
       mascota: {
-
-        id:
-          Number(
-            this.citaForm.value.mascotaId
-          )
-
+        id: Number(valores.mascotaId)
       },
 
       veterinario: {
-
-        id:
-          Number(
-            this.citaForm.value.veterinarioId
-          )
-
+        id: Number(valores.veterinarioId)
       },
 
       servicio: {
-
-        id:
-          Number(
-            this.citaForm.value.servicioId
-          )
-
+        id: Number(valores.servicioId)
       }
 
     };
 
 
-    console.log(
-      'Datos enviados:',
-      datosCita
-    );
+    // ======================================================
+    // CREAR O ACTUALIZAR
+    // ======================================================
 
+    const editando =
+      this.citaEditandoId !== null;
 
-    // ========================================================
-    // ACTUALIZAR
-    // ========================================================
+    const peticion: Observable<any> = editando
 
-    if (
-      this.citaEditandoId !== null
-    ) {
-
-
-      this.citaServicio
-        .actualizarCita(
-          this.citaEditandoId,
+      ? this.citaServicio.actualizarCita(
+          this.citaEditandoId!,
           datosCita
         )
-        .subscribe({
+
+      : this.citaServicio.crearCita(
+          datosCita
+        );
 
 
-          next: (respuesta) => {
+    this.guardando = true;
 
-            console.log(
-              'Cita actualizada:',
-              respuesta
-            );
+    this.mensajeExito = '';
 
 
-            this.mensajeExito =
-              'Cita actualizada correctamente.';
+    peticion.subscribe({
 
 
-            this.cerrarFormulario();
+      // ====================================================
+      // RESPUESTA CORRECTA
+      // ====================================================
+
+      next: () => {
+
+        this.guardando = false;
+
+        // Cerramos el formulario.
+        this.cerrarFormulario();
+
+        // Mensaje local de confirmación.
+        this.mensajeExito = editando
+          ? 'Cita actualizada correctamente.'
+          : 'Cita creada correctamente.';
+
+        // Mensaje global en la campana.
+        this.notificacionesServicio.agregar(
+
+          editando
+            ? 'Cita actualizada'
+            : 'Nueva cita registrada',
+
+          this.mensajeExito,
+
+          'exito'
+
+        );
+
+        // Consultar nuevamente la API.
+        this.cargarDatos();
+
+        this.cd.detectChanges();
+
+      },
 
 
-            this.cargarDatos();
+      // ====================================================
+      // ERROR AL GUARDAR
+      // ====================================================
 
-          },
+      error: (error) => {
 
+        console.error(
+          'Error al guardar cita:',
+          error
+        );
 
-          error: (error) => {
+        this.guardando = false;
 
-            console.error(
-              'Error completo al actualizar:',
-              error
-            );
+        this.mensajeError =
+          error?.error?.mensaje ||
+          error?.error?.message ||
+          error?.error?.detail ||
+          'No se pudo guardar la cita. Revisa los datos ingresados.';
 
+        this.notificacionesServicio.agregar(
+          'Error al guardar cita',
+          'No se pudo completar el registro o la actualización.',
+          'error'
+        );
 
-            this.mensajeError =
-              error?.error?.message ||
-              error?.error?.mensaje ||
-              error?.error?.detail ||
-              'No se pudo actualizar la cita.';
+        this.cd.detectChanges();
 
+      }
 
-            this.cd.detectChanges();
-
-          }
-
-        });
-
-
-      return;
-
-    }
-
-
-    // ========================================================
-    // CREAR
-    // ========================================================
-
-    this.citaServicio
-      .crearCita(
-        datosCita
-      )
-      .subscribe({
-
-
-        next: (respuesta) => {
-
-          console.log(
-            'Cita creada:',
-            respuesta
-          );
-
-
-          this.mensajeExito =
-            'Cita creada correctamente.';
-
-
-          this.cerrarFormulario();
-
-
-          this.cargarDatos();
-
-        },
-
-
-        error: (error) => {
-
-          console.error(
-            'Error completo al crear cita:',
-            error
-          );
-
-
-          this.mensajeError =
-            error?.error?.message ||
-            error?.error?.mensaje ||
-            error?.error?.detail ||
-            'No se pudo crear la cita.';
-
-
-          this.cd.detectChanges();
-
-        }
-
-      });
+    });
 
   }
 
 
-  // ==========================================================
+  // ========================================================
   // CANCELAR CITA
-  // ==========================================================
-  //
-  // No elimina la cita.
-  //
-  // Cambia el estado a CANCELADA.
-  // ==========================================================
+  // ========================================================
 
-  cancelarCita(
-    cita: any
-  ): void {
+  /*
+    CANCELAR no elimina la cita.
 
+    PUT /api/citas/{id}/cancelar
 
-    const confirmar =
-      window.confirm(
-        `¿Estás seguro de cancelar la cita #${cita.id}?`
-      );
+    El backend actualiza el estado a CANCELADA.
+  */
 
+  cancelarCita(cita: CitaAdmin): void {
 
-    if (!confirmar) {
-
+    if (
+      this.cargando ||
+      this.hayOperacionEnCurso ||
+      cita.estado === 'CANCELADA'
+    ) {
       return;
-
     }
 
+    const confirmar = window.confirm(
+      `¿Deseas cancelar la cita #${cita.id}? La cita seguirá registrada con estado CANCELADA.`
+    );
+
+    if (!confirmar) {
+      return;
+    }
+
+    this.procesandoId = cita.id;
+
+    this.mensajeError = '';
+    this.mensajeExito = '';
 
     this.citaServicio
-      .cancelarCita(
-        cita.id
-      )
+      .cancelarCita(cita.id)
       .subscribe({
 
-
         next: () => {
+
+          this.procesandoId = null;
 
           this.mensajeExito =
             'Cita cancelada correctamente.';
 
+          this.notificacionesServicio.agregar(
+            'Cita cancelada',
+            `La cita #${cita.id} fue cancelada.`,
+            'exito'
+          );
 
           this.cargarDatos();
 
         },
-
 
         error: (error) => {
 
@@ -597,12 +960,18 @@ export class AdminCitas implements OnInit {
             error
           );
 
+          this.procesandoId = null;
 
           this.mensajeError =
-            error?.error?.message ||
             error?.error?.mensaje ||
+            error?.error?.message ||
             'No se pudo cancelar la cita.';
 
+          this.notificacionesServicio.agregar(
+            'Error al cancelar cita',
+            `No se pudo cancelar la cita #${cita.id}.`,
+            'error'
+          );
 
           this.cd.detectChanges();
 
@@ -613,50 +982,62 @@ export class AdminCitas implements OnInit {
   }
 
 
-  // ==========================================================
+  // ========================================================
   // ELIMINAR CITA
-  // ==========================================================
-  //
-  // Elimina definitivamente la cita.
-  //
-  // Solo ADMIN.
-  // ==========================================================
+  // ========================================================
 
-  eliminarCita(
-    cita: any
-  ): void {
+  /*
+    DELETE /api/citas/{id}
 
+    A diferencia de cancelar, esta operación
+    elimina definitivamente el registro.
+  */
 
-    const confirmar =
-      window.confirm(
-        `¿Eliminar definitivamente la cita #${cita.id}?`
-      );
+  eliminarCita(cita: CitaAdmin): void {
 
-
-    if (!confirmar) {
-
+    if (this.cargando || this.hayOperacionEnCurso) {
       return;
-
     }
 
+    const confirmar = window.confirm(
+      `¿Eliminar definitivamente la cita #${cita.id}? Esta acción no se puede deshacer.`
+    );
+
+    if (!confirmar) {
+      return;
+    }
+
+    this.procesandoId = cita.id;
+
+    this.mensajeError = '';
+    this.mensajeExito = '';
 
     this.citaServicio
-      .eliminarCita(
-        cita.id
-      )
+      .eliminarCita(cita.id)
       .subscribe({
 
-
         next: () => {
+
+          this.procesandoId = null;
+
+          // Si el formulario corresponde a esta cita,
+          // lo cerramos para evitar editarla.
+          if (this.citaEditandoId === cita.id) {
+            this.cerrarFormulario();
+          }
 
           this.mensajeExito =
             'Cita eliminada correctamente.';
 
+          this.notificacionesServicio.agregar(
+            'Cita eliminada',
+            `La cita #${cita.id} fue eliminada.`,
+            'exito'
+          );
 
           this.cargarDatos();
 
         },
-
 
         error: (error) => {
 
@@ -665,12 +1046,18 @@ export class AdminCitas implements OnInit {
             error
           );
 
+          this.procesandoId = null;
 
           this.mensajeError =
-            error?.error?.message ||
             error?.error?.mensaje ||
+            error?.error?.message ||
             'No se pudo eliminar la cita.';
 
+          this.notificacionesServicio.agregar(
+            'Error al eliminar cita',
+            `No se pudo eliminar la cita #${cita.id}.`,
+            'error'
+          );
 
           this.cd.detectChanges();
 
@@ -681,47 +1068,42 @@ export class AdminCitas implements OnInit {
   }
 
 
-  // ==========================================================
-  // FORMATEAR FECHA
-  // ==========================================================
-  //
-  // datetime-local necesita:
-  //
-  // 2026-10-06T15:30
-  //
-  // El backend puede devolver:
-  //
-  // 2026-10-06T15:30:00
-  //
-  // Por eso conservamos únicamente
-  // los primeros 16 caracteres.
-  // ==========================================================
+  // ========================================================
+  // FORMATEAR FECHA PARA datetime-local
+  // ========================================================
+
+  /*
+    Se mantiene la lógica de tu código original.
+
+    El backend puede devolver:
+    2026-10-25T18:45:00
+
+    El input necesita:
+    2026-10-25T18:45
+  */
 
   formatearFechaParaInput(
     fechaHora: string
   ): string {
 
-
     if (!fechaHora) {
-
       return '';
-
     }
 
-
-    return fechaHora.substring(
-      0,
-      16
-    );
+    return String(fechaHora).substring(0, 16);
 
   }
 
 
-  // ==========================================================
+  // ========================================================
   // CERRAR FORMULARIO
-  // ==========================================================
+  // ========================================================
 
   cerrarFormulario(): void {
+
+    if (this.guardando) {
+      return;
+    }
 
     this.mostrarFormulario = false;
 
@@ -734,13 +1116,27 @@ export class AdminCitas implements OnInit {
   }
 
 
-  // ==========================================================
-  // VOLVER AL DASHBOARD
-  // ==========================================================
+  // ========================================================
+  // IDENTIFICADOR DE CITAS PARA ANGULAR
+  // ========================================================
+
+  trackByCita(
+    index: number,
+    cita: CitaAdmin
+  ): number {
+
+    return cita.id ?? index;
+
+  }
+
+
+  // ========================================================
+  // VOLVER AL DASHBOARD ADMIN
+  // ========================================================
 
   volverDashboard(): void {
 
-    this.router.navigate([
+    void this.router.navigate([
       '/admin/dashboard'
     ]);
 

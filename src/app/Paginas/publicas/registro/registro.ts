@@ -1,3 +1,20 @@
+
+/* ==========================================================
+   VETERINARIA AREVALO
+   REGISTRO DE USUARIOS
+
+   MEJORAS DE USABILIDAD:
+   - Validación de datos y contraseñas.
+   - Mensajes claros para el usuario.
+   - Mostrar y ocultar contraseñas.
+   - Evitar registros duplicados durante la carga.
+   - Conservar la conexión con Spring Boot.
+   ========================================================== */
+
+// ==========================================================
+// IMPORTACIONES DE ANGULAR
+// ==========================================================
+
 import {
   Component,
   ChangeDetectorRef
@@ -6,17 +23,57 @@ import {
 import { CommonModule } from '@angular/common';
 
 import {
+  AbstractControl,
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
+  ValidationErrors,
+  ValidatorFn,
   Validators
 } from '@angular/forms';
 
 import { Router } from '@angular/router';
 
-import { AuthServicio }
-  from '../../../Servicios/auth-servicio';
+// Servicio existente que consume la API REST.
+import {
+  AuthServicio
+} from '../../../Servicios/auth-servicio';
 
+
+// ==========================================================
+// VALIDACIÓN DE CONTRASEÑAS
+// ==========================================================
+
+/**
+ * Comprueba que la contraseña y su confirmación
+ * sean iguales antes de enviar los datos.
+ */
+const validarPasswords: ValidatorFn = (
+  formulario: AbstractControl
+): ValidationErrors | null => {
+
+  const password =
+    formulario.get('password')?.value;
+
+  const confirmacion =
+    formulario.get('confirmarPassword')?.value;
+
+  // No mostrar el error mientras algún campo esté vacío.
+  if (!password || !confirmacion) {
+    return null;
+  }
+
+  // Si son diferentes, Angular marca el formulario inválido.
+  return password === confirmacion
+    ? null
+    : { passwordsDiferentes: true };
+
+};
+
+
+// ==========================================================
+// COMPONENTE REGISTRO
+// ==========================================================
 
 @Component({
 
@@ -37,21 +94,35 @@ import { AuthServicio }
 export class Registro {
 
 
+  // ========================================================
+  // FORMULARIO
+  // ========================================================
+
   registroForm: FormGroup;
 
 
+  // ========================================================
+  // VARIABLES DE CONTROL
+  // ========================================================
+
+  // Controla el estado del botón al registrar.
   cargando: boolean = false;
 
+  // Mensaje recibido cuando ocurre un error.
   mensajeError: string = '';
 
+  // Mensaje recibido cuando el registro es correcto.
   mensajeExito: string = '';
 
-
-  // Mostrar / ocultar contraseñas.
+  // Controlan la visibilidad de cada contraseña.
   mostrarPassword: boolean = false;
 
   mostrarConfirmarPassword: boolean = false;
 
+
+  // ========================================================
+  // CONSTRUCTOR
+  // ========================================================
 
   constructor(
 
@@ -65,7 +136,7 @@ export class Registro {
 
   ) {
 
-
+    // Creamos el formulario con sus validaciones.
     this.registroForm = this.fb.group({
 
       nombre: [
@@ -97,14 +168,19 @@ export class Registro {
         Validators.required
       ]
 
+    }, {
+
+      // Comprueba que coincidan las contraseñas.
+      validators: validarPasswords
+
     });
 
   }
 
 
-  // ==========================================================
+  // ========================================================
   // MOSTRAR / OCULTAR CONTRASEÑA
-  // ==========================================================
+  // ========================================================
 
   cambiarVisibilidadPassword(): void {
 
@@ -114,6 +190,10 @@ export class Registro {
   }
 
 
+  // ========================================================
+  // MOSTRAR / OCULTAR CONFIRMACIÓN
+  // ========================================================
+
   cambiarVisibilidadConfirmacion(): void {
 
     this.mostrarConfirmarPassword =
@@ -122,57 +202,79 @@ export class Registro {
   }
 
 
-  // ==========================================================
-  // REGISTRAR
-  // ==========================================================
+  // ========================================================
+  // REGISTRAR USUARIO
+  // ========================================================
 
   registrar(): void {
 
+    // Evitar que se envíe más de una petición.
+    if (this.cargando) {
+      return;
+    }
 
+    // Limpiamos los mensajes anteriores.
     this.mensajeError = '';
-
     this.mensajeExito = '';
 
-
+    // Si existen campos incorrectos, mostramos sus errores.
     if (this.registroForm.invalid) {
 
       this.registroForm.markAllAsTouched();
 
+      // Mensaje general solamente para contraseñas diferentes.
+      if (
+        this.registroForm.hasError('passwordsDiferentes')
+      ) {
+
+        this.mensajeError =
+          'Las contraseñas no coinciden. Revisa la confirmación.';
+
+      }
+
       return;
 
     }
 
 
-    const password =
-      this.registroForm.value.password;
+    // ======================================================
+    // OBTENER DATOS DEL FORMULARIO
+    // ======================================================
 
+    // Quitamos espacios accidentales del nombre y correo.
+    const nombre = String(
+      this.registroForm.get('nombre')?.value ?? ''
+    ).trim();
 
-    const confirmarPassword =
-      this.registroForm.value.confirmarPassword;
+    const correo = String(
+      this.registroForm.get('correo')?.value ?? ''
+    ).trim();
 
+    // La contraseña conserva todos sus caracteres.
+    const password = String(
+      this.registroForm.get('password')?.value ?? ''
+    );
 
-    if (
-      password !== confirmarPassword
-    ) {
+    // Comprobar los campos después de quitar espacios.
+    if (nombre.length < 3) {
+
+      this.registroForm.get('nombre')?.setErrors({
+        minlength: true
+      });
 
       this.mensajeError =
-        'Las contraseñas no coinciden.';
+        'El nombre debe tener al menos 3 caracteres.';
 
       return;
 
     }
 
 
-    const nombre =
-      this.registroForm.value.nombre;
-
-
-    const correo =
-      this.registroForm.value.correo;
-
+    // ======================================================
+    // ENVIAR DATOS A SPRING BOOT
+    // ======================================================
 
     this.cargando = true;
-
 
     this.authServicio
       .registrar(
@@ -183,37 +285,31 @@ export class Registro {
       .subscribe({
 
 
+        // ==================================================
+        // REGISTRO CORRECTO
+        // ==================================================
+
         next: (respuesta) => {
-
-
-          console.log(
-            'Respuesta del registro:',
-            respuesta
-          );
-
 
           this.cargando = false;
 
-
+          // Presentar confirmación del registro.
           this.mensajeExito =
             respuesta?.mensaje ||
-            'Usuario registrado correctamente.';
+            'Cuenta registrada correctamente.';
 
-
-          // Guardamos temporalmente el correo.
+          // Guardar correo para verificar el código.
           sessionStorage.setItem(
             'correoVerificacion',
             correo
           );
 
-
           this.cd.detectChanges();
 
-
-          // Ir a verificar código.
+          // Se mantiene el flujo de verificación original.
           setTimeout(() => {
 
-            this.router.navigate([
+            void this.router.navigate([
               '/verificar-codigo'
             ]);
 
@@ -222,25 +318,36 @@ export class Registro {
         },
 
 
+        // ==================================================
+        // ERROR DEL BACKEND
+        // ==================================================
+
         error: (error) => {
-
-
-          console.error(
-            'Error completo del registro:',
-            error
-          );
-
 
           this.cargando = false;
 
-
-          this.mensajeError =
+          const mensajeBackend =
             error?.error?.mensaje ||
             error?.error?.message ||
             error?.error?.detalle ||
             error?.error?.detail ||
-            'No se pudo registrar la cuenta.';
+            '';
 
+          // Si la API no responde, mostrar un mensaje claro.
+          if (error?.status === 0) {
+
+            this.mensajeError =
+              'No se pudo conectar con el servidor. Verifica que la API esté encendida.';
+
+          } else {
+
+            this.mensajeError =
+              typeof mensajeBackend === 'string' &&
+              mensajeBackend.trim()
+                ? mensajeBackend
+                : 'No se pudo registrar la cuenta. Intenta nuevamente.';
+
+          }
 
           this.cd.detectChanges();
 
@@ -251,13 +358,13 @@ export class Registro {
   }
 
 
-  // ==========================================================
-  // IR AL LOGIN
-  // ==========================================================
+  // ========================================================
+  // REGRESAR AL LOGIN
+  // ========================================================
 
   irLogin(): void {
 
-    this.router.navigate([
+    void this.router.navigate([
       '/login'
     ]);
 

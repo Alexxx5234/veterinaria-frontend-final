@@ -1,20 +1,26 @@
+
 // ==========================================================
-// IMPORTACIONES
+// VETERINARIA AREVALO - MIS MASCOTAS
+//
+// MEJORAS:
+// - Notificaciones sobre operaciones reales.
+// - Opciones de accesibilidad.
+// - Validaciones comprensibles.
+// - Evitar solicitudes duplicadas.
+// - Conservar los métodos de la API REST.
 // ==========================================================
 
-// Component permite crear el componente.
-// OnInit ejecuta código al abrir la página.
-// ChangeDetectorRef permite actualizar manualmente la vista.
 import {
   Component,
   OnInit,
-  ChangeDetectorRef
+  ChangeDetectorRef,
+  HostListener,
+  ViewChild,
+  ElementRef
 } from '@angular/core';
 
-// CommonModule permite utilizar *ngIf y *ngFor.
 import { CommonModule } from '@angular/common';
 
-// Herramientas para crear el formulario de mascotas.
 import {
   FormBuilder,
   FormGroup,
@@ -22,26 +28,36 @@ import {
   Validators
 } from '@angular/forms';
 
-// Router permite navegar entre páginas.
 import { Router } from '@angular/router';
 
-// Servicio que se comunica con Spring Boot.
-import { MascotaServicio }
-  from '../../../Servicios/mascota-servicio';
+import {
+  MascotaServicio
+} from '../../../Servicios/mascota-servicio';
 
 
+// ==========================================================
+// ESTRUCTURA DE LAS NOTIFICACIONES
+// ==========================================================
+
+interface NotificacionMascota {
+  id: number;
+  titulo: string;
+  mensaje: string;
+  tipo: 'exito' | 'error' | 'info';
+  hora: string;
+  leida: boolean;
+}
+
+
+// ==========================================================
+// COMPONENTE
+// ==========================================================
 
 @Component({
-
   selector: 'app-mascotas',
 
   standalone: true,
 
-  // CommonModule:
-  // permite *ngIf y *ngFor.
-  //
-  // ReactiveFormsModule:
-  // permite utilizar formularios reactivos.
   imports: [
     CommonModule,
     ReactiveFormsModule
@@ -50,70 +66,91 @@ import { MascotaServicio }
   templateUrl: './mascotas.html',
 
   styleUrl: './mascotas.scss'
-
 })
 export class Mascotas implements OnInit {
 
 
-  // ==========================================================
+  // ========================================================
   // LISTA DE MASCOTAS
-  // ==========================================================
+  // ========================================================
 
   mascotas: any[] = [];
 
 
-  // ==========================================================
+  // ========================================================
   // ESTADOS DE LA PÁGINA
-  // ==========================================================
+  // ========================================================
 
-  // Indica si estamos consultando la API.
   cargando: boolean = false;
 
-  // Mensaje de error.
+  // Separa el proceso de guardar del proceso de consultar.
+  guardando: boolean = false;
+
   mensajeError: string = '';
 
-  // Mensaje cuando una operación funciona.
   mensajeExito: string = '';
 
 
-
-  // ==========================================================
+  // ========================================================
   // FORMULARIO
-  // ==========================================================
+  // ========================================================
 
   mascotaForm: FormGroup;
 
-
-  // Controla si mostramos u ocultamos el formulario.
   mostrarFormulario: boolean = false;
 
-
-  // Si esta variable tiene un ID significa
-  // que estamos EDITANDO una mascota.
-  //
-  // Si es null significa que estamos REGISTRANDO.
   mascotaEditandoId: number | null = null;
 
+  // Permite enfocar el nombre al abrir el formulario.
+  @ViewChild('campoNombre')
+  campoNombre?: ElementRef<HTMLInputElement>;
 
 
-  // ==========================================================
+  // ========================================================
+  // NOTIFICACIONES
+  // ========================================================
+
+  notificacionesAbiertas: boolean = false;
+
+  notificaciones: NotificacionMascota[] = [];
+
+  private contadorNotificaciones: number = 0;
+
+  // Número de avisos pendientes de lectura.
+  get notificacionesNoLeidas(): number {
+    return this.notificaciones.filter(
+      notificacion => !notificacion.leida
+    ).length;
+  }
+
+
+  // ========================================================
+  // ACCESIBILIDAD
+  // ========================================================
+
+  accesibilidadAbierta: boolean = false;
+
+  altoContraste: boolean = false;
+
+  reducirMovimiento: boolean = false;
+
+  // 1 = tamaño normal.
+  // 1.1 = letras 10 % más grandes.
+  // 1.2 = letras 20 % más grandes.
+  escalaFuente: number = 1;
+
+
+  // ========================================================
   // CONSTRUCTOR
-  // ==========================================================
+  // ========================================================
 
   constructor(
-
     private mascotaServicio: MascotaServicio,
-
     private router: Router,
-
     private fb: FormBuilder,
-
     private cd: ChangeDetectorRef
-
   ) {
 
-
-    // Creamos el formulario.
     this.mascotaForm = this.fb.group({
 
       nombre: [
@@ -135,7 +172,8 @@ export class Mascotas implements OnInit {
         '',
         [
           Validators.required,
-          Validators.min(0)
+          Validators.min(0),
+          Validators.pattern(/^\d+$/)
         ]
       ],
 
@@ -149,54 +187,46 @@ export class Mascotas implements OnInit {
   }
 
 
-
-  // ==========================================================
+  // ========================================================
   // AL ABRIR LA PÁGINA
-  // ==========================================================
+  // ========================================================
 
   ngOnInit(): void {
+
+    this.recuperarAccesibilidad();
 
     this.cargarMascotas();
 
   }
 
 
-
-  // ==========================================================
-  // CARGAR LAS MASCOTAS DEL USER
-  // ==========================================================
+  // ========================================================
+  // CONSULTAR MIS MASCOTAS
+  // ========================================================
 
   cargarMascotas(): void {
 
     this.cargando = true;
-
     this.mensajeError = '';
 
-
+    // Conserva el endpoint del servicio original.
     this.mascotaServicio
       .listarMisMascotas()
       .subscribe({
 
+        next: (respuesta: any) => {
 
-        // RESPUESTA CORRECTA
-        next: (respuesta) => {
-
-          this.mascotas = respuesta;
+          this.mascotas = Array.isArray(respuesta)
+            ? respuesta
+            : [];
 
           this.cargando = false;
-
-          console.log(
-            'Mascotas del usuario:',
-            respuesta
-          );
 
           this.cd.detectChanges();
 
         },
 
-
-        // ERROR
-        error: (error) => {
+        error: (error: any) => {
 
           console.error(
             'Error al cargar mascotas:',
@@ -204,9 +234,15 @@ export class Mascotas implements OnInit {
           );
 
           this.mensajeError =
-            'No se pudieron cargar las mascotas.';
+            'No se pudieron cargar tus mascotas. Intenta nuevamente.';
 
           this.cargando = false;
+
+          this.agregarNotificacion(
+            'Error al consultar mascotas',
+            'No se pudo obtener la información del servidor.',
+            'error'
+          );
 
           this.cd.detectChanges();
 
@@ -217,98 +253,138 @@ export class Mascotas implements OnInit {
   }
 
 
-
-  // ==========================================================
+  // ========================================================
   // ABRIR FORMULARIO PARA REGISTRAR
-  // ==========================================================
+  // ========================================================
 
   nuevaMascota(): void {
 
-    // Indicamos que NO estamos editando.
     this.mascotaEditandoId = null;
 
-    // Limpiamos el formulario.
     this.mascotaForm.reset();
 
-    // Limpiamos mensajes.
     this.mensajeError = '';
     this.mensajeExito = '';
 
-    // Mostramos el formulario.
     this.mostrarFormulario = true;
+
+    this.enfocarFormulario();
 
   }
 
 
-
-  // ==========================================================
+  // ========================================================
   // ABRIR FORMULARIO PARA EDITAR
-  // ==========================================================
+  // ========================================================
 
   editarMascota(mascota: any): void {
 
-    // Guardamos el ID de la mascota que editaremos.
     this.mascotaEditandoId = mascota.id;
 
-
-    // Colocamos los datos actuales dentro del formulario.
     this.mascotaForm.patchValue({
-
       nombre: mascota.nombre,
-
       especie: mascota.especie,
-
       raza: mascota.raza,
-
       edad: mascota.edad,
-
       sexo: mascota.sexo
-
     });
-
 
     this.mensajeError = '';
     this.mensajeExito = '';
 
-    // Mostramos el formulario.
     this.mostrarFormulario = true;
+
+    this.enfocarFormulario();
 
   }
 
 
+  // ========================================================
+  // ENFOCAR EL PRIMER CAMPO
+  // ========================================================
 
-  // ==========================================================
-  // GUARDAR MASCOTA
-  // ==========================================================
-  // Este método sirve tanto para:
-  //
-  // REGISTRAR → POST
-  // EDITAR    → PUT
-  // ==========================================================
+  private enfocarFormulario(): void {
+
+    // Primero actualizamos el formulario *ngIf.
+    this.cd.detectChanges();
+
+    // Luego enfocamos el campo del nombre.
+    this.campoNombre?.nativeElement.focus();
+
+  }
+
+
+  // ========================================================
+  // REGISTRAR O EDITAR MASCOTA
+  // ========================================================
 
   guardarMascota(): void {
 
+    // Evita dos solicitudes simultáneas.
+    if (this.guardando) {
+      return;
+    }
 
-    // Si hay campos incorrectos, no continuamos.
+    this.mensajeError = '';
+    this.mensajeExito = '';
+
+    // Validaciones declaradas en FormBuilder.
     if (this.mascotaForm.invalid) {
 
       this.mascotaForm.markAllAsTouched();
 
       return;
-
     }
 
+    // Obtenemos y limpiamos los datos.
+    const valores = this.mascotaForm.getRawValue();
 
-    // Obtenemos los datos del formulario.
-    const datosMascota = this.mascotaForm.value;
+    const datosMascota = {
+      nombre: String(valores.nombre ?? '').trim(),
+      especie: String(valores.especie ?? '').trim(),
+      raza: String(valores.raza ?? '').trim(),
+      edad: Number(valores.edad),
+      sexo: valores.sexo
+    };
+
+    // Impedir que se registren campos solo con espacios.
+    if (
+      !datosMascota.nombre ||
+      !datosMascota.especie ||
+      !datosMascota.raza
+    ) {
+
+      for (
+        const campo of ['nombre', 'especie', 'raza']
+      ) {
+
+        const control = this.mascotaForm.get(campo);
+
+        if (
+          !String(control?.value ?? '').trim()
+        ) {
+
+          control?.setErrors({
+            required: true
+          });
+
+          control?.markAsTouched();
+
+        }
+
+      }
+
+      return;
+    }
+
+    this.guardando = true;
 
 
-    // ========================================================
-    // EDITAR MASCOTA
-    // ========================================================
+    // ======================================================
+    // EDITAR MASCOTA - PUT
+    // ======================================================
 
     if (this.mascotaEditandoId !== null) {
-
 
       this.mascotaServicio
         .actualizarMascota(
@@ -317,29 +393,42 @@ export class Mascotas implements OnInit {
         )
         .subscribe({
 
-
           next: () => {
 
+            this.guardando = false;
+
             this.mensajeExito =
-              'Mascota actualizada correctamente.';
+              'Los datos de tu mascota se actualizaron correctamente.';
+
+            this.agregarNotificacion(
+              'Mascota actualizada',
+              `Se actualizaron los datos de ${datosMascota.nombre}.`,
+              'exito'
+            );
 
             this.cerrarFormulario();
 
-            // Recargamos la lista.
             this.cargarMascotas();
 
           },
 
-
-          error: (error) => {
+          error: (error: any) => {
 
             console.error(
               'Error al actualizar mascota:',
               error
             );
 
+            this.guardando = false;
+
             this.mensajeError =
-              'No se pudo actualizar la mascota.';
+              'No fue posible actualizar la mascota. Intenta nuevamente.';
+
+            this.agregarNotificacion(
+              'Error al actualizar',
+              `No se pudieron guardar los cambios de ${datosMascota.nombre}.`,
+              'error'
+            );
 
             this.cd.detectChanges();
 
@@ -347,44 +436,55 @@ export class Mascotas implements OnInit {
 
         });
 
-
       return;
-
     }
 
 
-
-    // ========================================================
-    // REGISTRAR NUEVA MASCOTA
-    // ========================================================
+    // ======================================================
+    // REGISTRAR MASCOTA - POST
+    // ======================================================
 
     this.mascotaServicio
       .registrarMascota(datosMascota)
       .subscribe({
 
-
         next: () => {
 
+          this.guardando = false;
+
           this.mensajeExito =
-            'Mascota registrada correctamente.';
+            'Tu mascota se registró correctamente.';
+
+          this.agregarNotificacion(
+            'Mascota registrada',
+            `Se registró correctamente a ${datosMascota.nombre}.`,
+            'exito'
+          );
 
           this.cerrarFormulario();
 
-          // Recargamos para mostrar la nueva mascota.
+          // Actualiza solo la lista, sin recargar la web.
           this.cargarMascotas();
 
         },
 
-
-        error: (error) => {
+        error: (error: any) => {
 
           console.error(
             'Error al registrar mascota:',
             error
           );
 
+          this.guardando = false;
+
           this.mensajeError =
-            'No se pudo registrar la mascota.';
+            'No fue posible registrar la mascota. Intenta nuevamente.';
+
+          this.agregarNotificacion(
+            'Error en el registro',
+            `No se pudo registrar a ${datosMascota.nombre}.`,
+            'error'
+          );
 
           this.cd.detectChanges();
 
@@ -395,12 +495,16 @@ export class Mascotas implements OnInit {
   }
 
 
-
-  // ==========================================================
+  // ========================================================
   // CERRAR FORMULARIO
-  // ==========================================================
+  // ========================================================
 
   cerrarFormulario(): void {
+
+    // No permitir cerrar mientras se guarda.
+    if (this.guardando) {
+      return;
+    }
 
     this.mostrarFormulario = false;
 
@@ -413,14 +517,271 @@ export class Mascotas implements OnInit {
   }
 
 
+  // ========================================================
+  // AGREGAR NOTIFICACIÓN
+  // ========================================================
 
-  // ==========================================================
-  // REGRESAR AL DASHBOARD
-  // ==========================================================
+  private agregarNotificacion(
+    titulo: string,
+    mensaje: string,
+    tipo: 'exito' | 'error' | 'info'
+  ): void {
+
+    this.contadorNotificaciones++;
+
+    this.notificaciones.unshift({
+
+      id: this.contadorNotificaciones,
+
+      titulo,
+
+      mensaje,
+
+      tipo,
+
+      hora: new Date().toLocaleTimeString(
+        'es-EC',
+        {
+          hour: '2-digit',
+          minute: '2-digit'
+        }
+      ),
+
+      leida: false
+
+    });
+
+    // Conservamos máximo 10 avisos recientes.
+    this.notificaciones =
+      this.notificaciones.slice(0, 10);
+
+  }
+
+
+  // ========================================================
+  // ABRIR O CERRAR NOTIFICACIONES
+  // ========================================================
+
+  cambiarNotificaciones(): void {
+
+    this.notificacionesAbiertas =
+      !this.notificacionesAbiertas;
+
+    this.accesibilidadAbierta = false;
+
+    if (this.notificacionesAbiertas) {
+
+      // Al abrir el panel se marcan como leídas.
+      this.notificaciones = this.notificaciones.map(
+        notificacion => ({
+          ...notificacion,
+          leida: true
+        })
+      );
+
+    }
+
+  }
+
+
+  // ========================================================
+  // LIMPIAR AVISOS
+  // ========================================================
+
+  limpiarNotificaciones(): void {
+
+    this.notificaciones = [];
+
+  }
+
+
+  // ========================================================
+  // ABRIR O CERRAR ACCESIBILIDAD
+  // ========================================================
+
+  cambiarAccesibilidad(): void {
+
+    this.accesibilidadAbierta =
+      !this.accesibilidadAbierta;
+
+    this.notificacionesAbiertas = false;
+
+  }
+
+
+  // ========================================================
+  // ALTO CONTRASTE
+  // ========================================================
+
+  cambiarContraste(): void {
+
+    this.altoContraste = !this.altoContraste;
+
+    this.guardarAccesibilidad();
+
+  }
+
+
+  // ========================================================
+  // AUMENTAR TAMAÑO DE LETRA
+  // ========================================================
+
+  aumentarFuente(): void {
+
+    this.escalaFuente = Math.min(
+      1.3,
+      Math.round(
+        (this.escalaFuente + 0.1) * 10
+      ) / 10
+    );
+
+    this.guardarAccesibilidad();
+
+  }
+
+
+  // ========================================================
+  // REDUCIR TAMAÑO DE LETRA
+  // ========================================================
+
+  disminuirFuente(): void {
+
+    this.escalaFuente = Math.max(
+      0.9,
+      Math.round(
+        (this.escalaFuente - 0.1) * 10
+      ) / 10
+    );
+
+    this.guardarAccesibilidad();
+
+  }
+
+
+  // ========================================================
+  // REDUCIR ANIMACIONES
+  // ========================================================
+
+  cambiarMovimiento(): void {
+
+    this.reducirMovimiento =
+      !this.reducirMovimiento;
+
+    this.guardarAccesibilidad();
+
+  }
+
+
+  // ========================================================
+  // RESTABLECER PREFERENCIAS
+  // ========================================================
+
+  restablecerAccesibilidad(): void {
+
+    this.altoContraste = false;
+
+    this.reducirMovimiento = false;
+
+    this.escalaFuente = 1;
+
+    this.guardarAccesibilidad();
+
+  }
+
+
+  // ========================================================
+  // GUARDAR PREFERENCIAS DE ESTA PESTAÑA
+  // ========================================================
+
+  private guardarAccesibilidad(): void {
+
+    try {
+
+      sessionStorage.setItem(
+        'mascotas-accesibilidad',
+        JSON.stringify({
+          altoContraste: this.altoContraste,
+          reducirMovimiento: this.reducirMovimiento,
+          escalaFuente: this.escalaFuente
+        })
+      );
+
+    } catch {
+
+      // La página puede funcionar aunque el navegador
+      // no permita guardar preferencias.
+    }
+
+  }
+
+
+  // ========================================================
+  // RECUPERAR PREFERENCIAS
+  // ========================================================
+
+  private recuperarAccesibilidad(): void {
+
+    try {
+
+      const guardado = sessionStorage.getItem(
+        'mascotas-accesibilidad'
+      );
+
+      if (!guardado) {
+        return;
+      }
+
+      const preferencias = JSON.parse(guardado);
+
+      this.altoContraste =
+        preferencias.altoContraste === true;
+
+      this.reducirMovimiento =
+        preferencias.reducirMovimiento === true;
+
+      const escala = Number(
+        preferencias.escalaFuente
+      );
+
+      if (Number.isFinite(escala)) {
+
+        this.escalaFuente = Math.max(
+          0.9,
+          Math.min(1.3, escala)
+        );
+
+      }
+
+    } catch {
+
+      this.restablecerAccesibilidad();
+
+    }
+
+  }
+
+
+  // ========================================================
+  // CERRAR PANELES CON ESCAPE
+  // ========================================================
+
+  @HostListener('document:keydown.escape')
+  cerrarPaneles(): void {
+
+    this.notificacionesAbiertas = false;
+
+    this.accesibilidadAbierta = false;
+
+  }
+
+
+  // ========================================================
+  // VOLVER AL DASHBOARD USER
+  // ========================================================
 
   volverDashboard(): void {
 
-    this.router.navigate([
+    void this.router.navigate([
       '/usuario/dashboard'
     ]);
 

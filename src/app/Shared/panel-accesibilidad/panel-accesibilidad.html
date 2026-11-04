@@ -1,0 +1,395 @@
+
+<!-- ==========================================================
+     VETERINARIA AREVALO
+     PANEL DE ACCESIBILIDAD
+
+     Este componente incluye su propio botón ♿.
+     ========================================================== -->
+
+<!-- BOTÓN PARA ABRIR LA ACCESIBILIDAD -->
+<button
+  type="button"
+  class="acceso-boton"
+  (click)="alternarPanel()"
+  [attr.aria-expanded]="abierto"
+  aria-controls="panel-accesibilidad"
+  aria-label="Abrir configuración de accesibilidad"
+  title="Accesibilidad"
+>
+  ♿
+</button>
+
+
+<!-- ========================================================
+     PANEL DE CONFIGURACIÓN
+     ======================================================== -->
+
+<section
+  *ngIf="abierto"
+  id="panel-accesibilidad"
+  class="accesibilidad-panel"
+  aria-label="Configuración de accesibilidad"
+>
+
+  <!-- CABECERA -->
+  <header class="panel-header">
+
+    <div>
+      <h2>♿ Accesibilidad</h2>
+      <p>Personaliza tu experiencia.</p>
+    </div>
+
+    <button
+      type="button"
+      class="btn-cerrar"
+      (click)="cerrarPanel()"
+      aria-label="Cerrar panel de accesibilidad"
+    >
+      ✕
+    </button>
+
+  </header>
+
+
+  <div class="panel-contenido">
+
+
+    <!-- ====================================================
+         1. OPCIONES DE CONTRASTE
+         ==================================================== -->
+
+    <div class="grupo-accesibilidad">
+
+      <h3>🎨 Apariencia y contraste</h3>
+
+      <p class="ayuda-grupo">
+        Selecciona el modo visual más cómodo.
+      </p>
+
+      <div
+        class="modos-grid"
+        role="group"
+        aria-label="Modos de contraste"
+      >
+
+        <button
+          type="button"
+          class="modo-btn"
+          [class.seleccionado]="ajustes.contraste === 'normal'"
+          [attr.aria-pressed]="ajustes.contraste === 'normal'"
+          (click)="cambiarContraste('normal')"
+        >
+          <span class="muestra-modo muestra-normal">
+            Aa
+          </span>
+          Normal
+        </button>
+
+        <button
+          type="button"
+          class="modo-btn"
+          [class.seleccionado]="ajustes.contraste === 'suave'"
+          [attr.aria-pressed]="ajustes.contraste === 'suave'"
+          (click)="cambiarContraste('suave')"
+        >
+          <span class="muestra-modo muestra-suave">
+            Aa
+          </span>
+          Suave
+        </button>
+
+        <button
+          type="button"
+          class="modo-btn"
+          [class.seleccionado]="ajustes.contraste === 'alto'"
+          [attr.aria-pressed]="ajustes.contraste === 'alto'"
+          (click)="cambiarContraste('alto')"
+        >
+          <span class="muestra-modo muestra-alto">
+            Aa
+          </span>
+          Alto
+        </button>
+
+        <button
+          type="button"
+          class="modo-btn"
+          [class.seleccionado]="ajustes.contraste === 'oscuro'"
+          [attr.aria-pressed]="ajustes.contraste === 'oscuro'"
+          (click)="cambiarContraste('oscuro')"
+        >
+          <span class="muestra-modo muestra-oscuro">
+            Aa
+          </span>
+          Oscuro
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- ====================================================
+         2. TAMAÑO DE LA INTERFAZ
+         ==================================================== -->
+
+    <div class="grupo-accesibilidad">
+
+      <h3>🔠 Tamaño de visualización</h3>
+
+      <div class="escala-control">
+
+        <button
+          type="button"
+          (click)="cambiarEscala(-10)"
+          [disabled]="ajustes.escala <= 80"
+          aria-label="Disminuir tamaño de visualización"
+        >
+          A−
+        </button>
+
+        <strong aria-live="polite">
+          {{ ajustes.escala }}%
+        </strong>
+
+        <button
+          type="button"
+          (click)="cambiarEscala(10)"
+          [disabled]="ajustes.escala >= 160"
+          aria-label="Aumentar tamaño de visualización"
+        >
+          A+
+        </button>
+
+      </div>
+
+      <p class="ayuda-grupo">
+        Amplía o reduce textos y controles.
+      </p>
+
+    </div>
+
+
+    <!-- ====================================================
+         3. NAVEGACIÓN HABLADA
+         ==================================================== -->
+
+    <div class="grupo-accesibilidad">
+
+      <h3>🔊 Lectura y sonido</h3>
+
+      <label class="opcion-switch">
+
+        <span class="opcion-texto">
+          <strong>Navegación hablada</strong>
+          <small>
+            Anuncia botones y enlaces al utilizarlos.
+          </small>
+        </span>
+
+        <input
+          #vozCheck
+          type="checkbox"
+          [checked]="ajustes.vozActiva"
+          [disabled]="!vozDisponible"
+          (change)="cambiarVozActiva(vozCheck.checked)"
+        >
+
+        <span
+          class="switch-visual"
+          aria-hidden="true"
+        ></span>
+
+      </label>
+
+
+      <!-- VOLUMEN -->
+      <div class="control-deslizador">
+
+        <label for="volumen-voz">
+          Volumen de voz
+          <strong>{{ ajustes.volumen }}%</strong>
+        </label>
+
+        <input
+          #volumenControl
+          id="volumen-voz"
+          type="range"
+          min="0"
+          max="100"
+          step="10"
+          [value]="ajustes.volumen"
+          [disabled]="!vozDisponible"
+          (input)="cambiarVolumen(volumenControl.valueAsNumber)"
+        >
+
+      </div>
+
+
+      <!-- VELOCIDAD -->
+      <div class="control-deslizador">
+
+        <label for="velocidad-voz">
+          Velocidad de lectura
+
+          <strong>
+            {{ ajustes.velocidad | number:'1.2-2' }}x
+          </strong>
+        </label>
+
+        <input
+          #velocidadControl
+          id="velocidad-voz"
+          type="range"
+          min="0.75"
+          max="1.5"
+          step="0.25"
+          [value]="ajustes.velocidad"
+          [disabled]="!vozDisponible"
+          (input)="cambiarVelocidad(velocidadControl.valueAsNumber)"
+        >
+
+      </div>
+
+
+      <!-- BOTONES DE LECTURA -->
+      <div class="acciones-voz">
+
+        <button
+          type="button"
+          class="btn-leer"
+          (click)="leerPagina()"
+          [disabled]="!vozDisponible"
+        >
+          ▶ Leer página
+        </button>
+
+        <button
+          type="button"
+          class="btn-detener"
+          (click)="detenerLectura()"
+          [disabled]="!leyendo"
+        >
+          ■ Detener
+        </button>
+
+      </div>
+
+      <p
+        class="mensaje-voz"
+        role="status"
+        aria-live="polite"
+        *ngIf="mensajeVoz"
+      >
+        {{ mensajeVoz }}
+      </p>
+
+      <p
+        class="ayuda-grupo"
+        *ngIf="!vozDisponible"
+      >
+        Este navegador no dispone de síntesis de voz.
+      </p>
+
+    </div>
+
+
+    <!-- ====================================================
+         4. OTRAS OPCIONES
+         ==================================================== -->
+
+    <div class="grupo-accesibilidad">
+
+      <h3>⚙️ Lectura y movimiento</h3>
+
+
+      <!-- ESPACIADO -->
+      <label class="opcion-switch">
+
+        <span class="opcion-texto">
+          <strong>Espaciado de texto</strong>
+          <small>Separa letras y líneas.</small>
+        </span>
+
+        <input
+          #espaciadoCheck
+          type="checkbox"
+          [checked]="ajustes.espaciarTexto"
+          (change)="cambiarEspaciado(espaciadoCheck.checked)"
+        >
+
+        <span
+          class="switch-visual"
+          aria-hidden="true"
+        ></span>
+
+      </label>
+
+
+      <!-- ENLACES -->
+      <label class="opcion-switch">
+
+        <span class="opcion-texto">
+          <strong>Resaltar enlaces</strong>
+          <small>Subraya los enlaces disponibles.</small>
+        </span>
+
+        <input
+          #enlacesCheck
+          type="checkbox"
+          [checked]="ajustes.subrayarEnlaces"
+          (change)="cambiarEnlaces(enlacesCheck.checked)"
+        >
+
+        <span
+          class="switch-visual"
+          aria-hidden="true"
+        ></span>
+
+      </label>
+
+
+      <!-- MOVIMIENTO -->
+      <label class="opcion-switch">
+
+        <span class="opcion-texto">
+          <strong>Reducir animaciones</strong>
+          <small>Disminuye los efectos de movimiento.</small>
+        </span>
+
+        <input
+          #movimientoCheck
+          type="checkbox"
+          [checked]="ajustes.reducirMovimiento"
+          (change)="cambiarMovimiento(movimientoCheck.checked)"
+        >
+
+        <span
+          class="switch-visual"
+          aria-hidden="true"
+        ></span>
+
+      </label>
+
+    </div>
+
+
+    <!-- ====================================================
+         5. RESTABLECER
+         ==================================================== -->
+
+    <button
+      type="button"
+      class="btn-restablecer"
+      (click)="restablecer()"
+    >
+      ↺ Restablecer configuración
+    </button>
+
+    <p class="pie-panel">
+      Las preferencias se mantienen en esta pestaña.
+    </p>
+
+  </div>
+
+</section>

@@ -1,142 +1,1147 @@
-.dashboard-container {
-  min-height: 100vh;
-  padding: 40px;
 
-  background:
-    linear-gradient(
-      135deg,
-      #f5f7ff,
-      #eef1ff
-    );
+/* ==========================================================
+   VETERINARIA AREVALO
+   DASHBOARD USUARIO - DISEÑO COMPLETO
+
+   MEJORAS:
+   - Menú lateral morado.
+   - Cerrar sesión en la parte inferior.
+   - Resumen personal con datos de la API.
+   - Próximas citas y mascotas registradas.
+   - Diseño responsivo y accesible.
+   ========================================================== */
+
+
+/* ==========================================================
+   1. CONFIGURACIÓN GENERAL
+   ========================================================== */
+
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+:host *,
+:host *::before,
+:host *::after {
+  box-sizing: border-box;
 }
 
 
-.dashboard-header {
+/* ==========================================================
+   2. DISTRIBUCIÓN PRINCIPAL
+   ========================================================== */
+
+.dashboard-usuario-page {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+
+  min-height: 100vh;
+  min-height: 100dvh;
+
+  background: linear-gradient(
+    135deg,
+    #f5f7ff,
+    #f0edff
+  );
+
+  color: #292742;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+
+/* ==========================================================
+   3. MENÚ LATERAL
+   ========================================================== */
+
+.sidebar {
+  position: sticky;
+  top: 0;
+
   display: flex;
+  flex-direction: column;
+
+  width: 260px;
+  height: 100vh;
+  height: 100dvh;
+
+  padding: 25px 18px;
+
+  overflow-y: auto;
+
+  color: #ffffff;
+
+  background: linear-gradient(
+    180deg,
+    #5946d5 0%,
+    #704fe6 55%,
+    #7655eb 100%
+  );
+
+  z-index: 100;
+}
+
+
+/* ==========================================================
+   4. LOGO
+   ========================================================== */
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
+
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+.sidebar-brand {
+  display: flex;
   align-items: center;
 
-  margin-bottom: 35px;
+  gap: 12px;
+}
 
-  background-color: white;
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  padding: 25px 30px;
+  width: 46px;
+  height: 46px;
 
-  border-radius: 18px;
+  flex-shrink: 0;
 
-  box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.08);
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.18);
+
+  font-size: 25px;
+}
+
+.sidebar-brand-text h2 {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.sidebar-brand-text span {
+  display: block;
+
+  margin-top: 3px;
+
+  color: #e8e2ff;
+  font-size: 12px;
 }
 
 
-.dashboard-header h1 {
+/* ==========================================================
+   5. PERFIL DEL USUARIO
+   ========================================================== */
+
+.sidebar-perfil {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+  padding: 15px 12px;
+  margin-bottom: 28px;
+
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 13px;
+
+  background: rgba(255, 255, 255, 0.10);
+}
+
+.perfil-icono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 39px;
+  height: 39px;
+
+  flex-shrink: 0;
+
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.16);
+
+  font-size: 21px;
+}
+
+.sidebar-perfil strong {
+  display: block;
+
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.sidebar-perfil span {
+  display: block;
+  margin-top: 4px;
+
+  color: #e7e0ff;
+  font-size: 11px;
+}
+
+
+/* ==========================================================
+   6. NAVEGACIÓN
+   ========================================================== */
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+
+  gap: 7px;
+}
+
+.menu-titulo {
+  margin: 0 0 12px 12px;
+
+  color: #e5ddff;
+
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+  min-height: 46px;
+
+  gap: 12px;
+  padding: 12px 14px;
+
+  border: none;
+  border-radius: 11px;
+
+  background: transparent;
+  color: #f5f1ff;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.nav-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 25px;
+  flex-shrink: 0;
+
+  font-size: 18px;
+}
+
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateX(3px);
+}
+
+.nav-item.activo {
+  background: #ffffff;
+  color: #5542cc;
+
+  font-weight: 700;
+
+  box-shadow:
+    0 4px 15px rgba(34, 19, 117, 0.14);
+}
+
+
+/* ==========================================================
+   7. PARTE INFERIOR Y CERRAR SESIÓN
+   ========================================================== */
+
+.sidebar-footer {
+  margin-top: auto;
+  padding-top: 30px;
+}
+
+.btn-cerrar-sesion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-height: 47px;
+
+  gap: 10px;
+  padding: 12px 15px;
+
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 11px;
+
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: background-color 0.2s ease;
+}
+
+.btn-cerrar-sesion:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.sidebar-copy {
+  margin: 20px 0 0;
+
+  color: #e5deff;
+
+  font-size: 11px;
+  text-align: center;
+}
+
+
+/* ==========================================================
+   8. CONTENIDO PRINCIPAL
+   ========================================================== */
+
+.dashboard-main {
+  min-width: 0;
+
+  padding: 32px 36px 45px;
+}
+
+
+/* ==========================================================
+   9. ENCABEZADO
+   ========================================================== */
+
+.dashboard-header {
+  margin-bottom: 25px;
+  padding: 26px 30px;
+
+  border: 1px solid #eeebfc;
+  border-radius: 18px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 8px 25px rgba(53, 42, 105, 0.06);
+}
+
+.header-superior {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.rol-badge {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 7px 12px;
+
+  border-radius: 20px;
+
+  background: #eee9ff;
+  color: #5741c5;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.header-texto h1 {
   margin: 0;
 
   color: #292742;
 
-  font-size: 28px;
+  font-size: 27px;
+  font-weight: 700;
+}
+
+.header-texto p {
+  margin: 9px 0 0;
+
+  color: #625e78;
+
+  font-size: 14px;
+  line-height: 1.6;
 }
 
 
-.dashboard-header p {
-  margin-top: 5px;
+/* ==========================================================
+   10. TARJETA DE BIENVENIDA
+   ========================================================== */
 
-  color: #77758a;
-}
+.bienvenida {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 
-
-.btn-cerrar {
-  padding: 11px 18px;
-
-  border: none;
-  border-radius: 9px;
-
-  background-color: #e74c3c;
-
-  color: white;
-
-  font-weight: 600;
-
-  cursor: pointer;
-}
-
-
-.dashboard-grid {
-  display: grid;
-
-  grid-template-columns:
-    repeat(
-      auto-fit,
-      minmax(230px, 1fr)
-    );
-
-  gap: 25px;
-}
-
-
-.card {
-  background-color: white;
-
-  padding: 30px;
+  gap: 20px;
+  margin-bottom: 32px;
+  padding: 28px 32px;
 
   border-radius: 18px;
 
+  background: linear-gradient(
+    135deg,
+    #6250df,
+    #8061ef
+  );
+
+  color: #ffffff;
+
   box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.08);
+    0 10px 25px rgba(98, 80, 223, 0.14);
+}
+
+.bienvenida-contenido {
+  min-width: 0;
+}
+
+.bienvenida-etiqueta {
+  display: inline-block;
+
+  margin-bottom: 12px;
+
+  color: #eee9ff;
+
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.bienvenida h2 {
+  margin: 0 0 10px;
+
+  color: #ffffff;
+
+  font-size: 23px;
+  font-weight: 700;
+}
+
+.bienvenida p {
+  max-width: 600px;
+  margin: 0;
+
+  color: #f1edff;
+
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.bienvenida-icono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 80px;
+  height: 80px;
+
+  flex-shrink: 0;
+
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.16);
+
+  font-size: 43px;
+}
+
+
+/* ==========================================================
+   11. ENCABEZADO DEL RESUMEN
+   ========================================================== */
+
+.resumen-section {
+  margin-bottom: 28px;
+}
+
+.resumen-encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  flex-wrap: wrap;
+  gap: 15px;
+
+  margin-bottom: 20px;
+}
+
+.resumen-encabezado h2 {
+  margin: 0;
+
+  color: #292742;
+
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.resumen-encabezado p {
+  margin: 6px 0 0;
+
+  color: #68647d;
+
+  font-size: 13px;
+}
+
+
+/* ==========================================================
+   12. BOTÓN ACTUALIZAR
+   ========================================================== */
+
+.btn-actualizar {
+  min-height: 43px;
+  padding: 11px 17px;
+
+  border: 1px solid #dcd4ff;
+  border-radius: 10px;
+
+  background: #ffffff;
+  color: #5b46d5;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
 
   cursor: pointer;
 
-  transition: 0.2s ease;
+  transition: background-color 0.2s ease;
+}
+
+.btn-actualizar:hover:not(:disabled) {
+  background: #eeeaff;
+}
+
+.btn-actualizar:disabled {
+  opacity: 0.6;
+  cursor: wait;
 }
 
 
-.card:hover {
-  transform: translateY(-5px);
+/* ==========================================================
+   13. ERROR DE CONEXIÓN
+   ========================================================== */
 
-  box-shadow:
-    0 15px 35px rgba(0, 0, 0, 0.12);
-}
+.resumen-alerta {
+  padding: 13px 16px;
+  margin-bottom: 20px;
 
+  border: 1px solid #f0b9b9;
+  border-radius: 10px;
 
-.icono {
-  font-size: 40px;
+  background: #fff1f0;
+  color: #a32020;
 
-  margin-bottom: 15px;
-}
-
-
-.card h2 {
-  color: #302d4f;
-
-  margin-bottom: 8px;
-}
-
-
-.card p {
-  color: #77758a;
-
+  font-size: 13px;
   line-height: 1.5;
 }
 
 
-@media (max-width: 600px) {
+/* ==========================================================
+   14. DISTRIBUCIÓN DE ESTADÍSTICAS
+   ========================================================== */
 
-  .dashboard-container {
+.resumen-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 18px;
+}
+
+
+/* ==========================================================
+   15. TARJETAS DE ESTADÍSTICAS
+   ========================================================== */
+
+.resumen-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  min-width: 0;
+  min-height: 185px;
+
+  padding: 23px;
+
+  border: 1px solid #ece8fa;
+  border-radius: 17px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 8px 24px rgba(53, 42, 105, 0.06);
+}
+
+.resumen-icono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 43px;
+  height: 43px;
+
+  margin-bottom: 12px;
+
+  border-radius: 12px;
+  background: #eee9ff;
+
+  font-size: 23px;
+}
+
+.resumen-label {
+  color: #625d79;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.resumen-numero {
+  display: block;
+
+  margin: 8px 0;
+
+  color: #342a75;
+
+  font-size: 35px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.resumen-card small {
+  margin-top: auto;
+
+  color: #77738a;
+
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+
+/* ==========================================================
+   16. CITAS PENDIENTES
+   ========================================================== */
+
+.resumen-destacado {
+  background: #f6f3ff;
+  border-color: #ded6ff;
+}
+
+.resumen-destacado .resumen-numero {
+  color: #6249d9;
+}
+
+
+/* ==========================================================
+   17. PANELES INFERIORES
+   ========================================================== */
+
+.detalle-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 20px;
+  align-items: start;
+}
+
+.detalle-panel {
+  min-width: 0;
+  padding: 24px;
+
+  border: 1px solid #ece8fa;
+  border-radius: 17px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 8px 24px rgba(53, 42, 105, 0.05);
+}
+
+
+/* ==========================================================
+   18. ENCABEZADO DE LOS PANELES
+   ========================================================== */
+
+.detalle-encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  flex-wrap: wrap;
+  gap: 12px;
+
+  margin-bottom: 22px;
+}
+
+.detalle-encabezado h2 {
+  margin: 0;
+
+  color: #292742;
+
+  font-size: 18px;
+}
+
+.detalle-encabezado p {
+  margin: 7px 0 0;
+
+  color: #77738a;
+
+  font-size: 12px;
+}
+
+.detalle-enlace {
+  min-height: 37px;
+  padding: 8px 10px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #f0ebff;
+  color: #5b46d5;
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: background-color 0.2s ease;
+}
+
+.detalle-enlace:hover {
+  background: #e5dcff;
+}
+
+
+/* ==========================================================
+   19. SIN REGISTROS Y ESTADO DE CARGA
+   ========================================================== */
+
+.detalle-vacio {
+  padding: 20px;
+
+  border-radius: 10px;
+
+  background: #f8f7fd;
+  color: #77738a;
+
+  font-size: 13px;
+  text-align: center;
+}
+
+
+/* ==========================================================
+   20. LISTADOS DE CITAS Y MASCOTAS
+   ========================================================== */
+
+.lista-elementos {
+  display: flex;
+  flex-direction: column;
+
+  gap: 12px;
+}
+
+.lista-item {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+  padding: 12px;
+
+  border: 1px solid #eeeafa;
+  border-radius: 11px;
+
+  background: #fbfaff;
+}
+
+.item-icono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 39px;
+  height: 39px;
+
+  flex-shrink: 0;
+
+  border-radius: 10px;
+  background: #ede9ff;
+
+  font-size: 20px;
+}
+
+.item-contenido {
+  display: flex;
+  flex-direction: column;
+
+  flex: 1;
+  min-width: 0;
+
+  gap: 4px;
+}
+
+.item-contenido strong {
+  color: #302d4f;
+  font-size: 13px;
+}
+
+.item-contenido span,
+.item-contenido small {
+  color: #6c6880;
+
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.item-estado {
+  padding: 6px 9px;
+
+  border-radius: 20px;
+
+  background: #ede8ff;
+  color: #5946d5;
+
+  font-size: 10px;
+  font-weight: 700;
+  text-align: center;
+
+  overflow-wrap: anywhere;
+}
+
+
+/* ==========================================================
+   21. ACCESIBILIDAD
+   ========================================================== */
+
+.nav-item:focus-visible,
+.btn-cerrar-sesion:focus-visible,
+.btn-menu:focus-visible,
+.sidebar-cerrar:focus-visible,
+.btn-actualizar:focus-visible,
+.detalle-enlace:focus-visible {
+  outline: 3px solid #b6a4ff;
+  outline-offset: 3px;
+}
+
+
+/* ==========================================================
+   22. CONTROLES DEL MENÚ MÓVIL
+   ========================================================== */
+
+.btn-menu,
+.sidebar-cerrar {
+  display: none;
+}
+
+.menu-overlay {
+  display: none;
+}
+
+
+/* ==========================================================
+   23. COMPUTADORAS MEDIANAS
+   ========================================================== */
+
+@media (max-width: 1200px) {
+
+  .dashboard-main {
+    padding: 25px;
+  }
+
+  .resumen-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .detalle-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+
+/* ==========================================================
+   24. TABLETS Y CELULARES
+   ========================================================== */
+
+@media (max-width: 850px) {
+
+  .dashboard-usuario-page {
+    display: block;
+  }
+
+
+  /* =========================================
+     MENÚ DESPLEGABLE
+     ========================================= */
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    width: min(280px, 85vw);
+    height: 100vh;
+    height: 100dvh;
+
+    visibility: hidden;
+
+    transform: translateX(-100%);
+
+    z-index: 1001;
+
+    transition:
+      transform 0.25s ease,
+      visibility 0.25s ease;
+  }
+
+  .sidebar.abierto {
+    visibility: visible;
+    transform: translateX(0);
+  }
+
+
+  /* =========================================
+     FONDO OSCURO
+     ========================================= */
+
+  .menu-overlay {
+    position: fixed;
+    inset: 0;
+
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    padding: 0;
+    border: none;
+
+    background: rgba(24, 18, 55, 0.45);
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    z-index: 1000;
+  }
+
+  .menu-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+
+  /* =========================================
+     BOTÓN CERRAR MENÚ
+     ========================================= */
+
+  .sidebar-cerrar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 34px;
+    height: 34px;
+
+    border: none;
+    border-radius: 9px;
+
+    background: rgba(255, 255, 255, 0.16);
+    color: #ffffff;
+
+    font-size: 15px;
+    cursor: pointer;
+  }
+
+
+  /* =========================================
+     BOTÓN ABRIR MENÚ
+     ========================================= */
+
+  .btn-menu {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 9px;
+    min-height: 43px;
+    padding: 10px 15px;
+
+    border: 1px solid #ded7ff;
+    border-radius: 10px;
+
+    background: #f2efff;
+    color: #5946d5;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+
+    cursor: pointer;
+  }
+
+
+  /* =========================================
+     CONTENIDO RESPONSIVO
+     ========================================= */
+
+  .dashboard-main {
     padding: 20px;
   }
 
-
-  .dashboard-header {
-    flex-direction: column;
-
-    align-items: flex-start;
-
-    gap: 20px;
+  .header-superior {
+    justify-content: space-between;
   }
 
+  .dashboard-header {
+    padding: 22px;
+  }
 
-  .btn-cerrar {
-    width: 100%;
+  .header-texto h1 {
+    font-size: 24px;
+  }
+
+  .detalle-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+
+/* ==========================================================
+   25. CELULARES
+   ========================================================== */
+
+@media (max-width: 600px) {
+
+  .dashboard-main {
+    padding: 15px;
+  }
+
+  .dashboard-header {
+    padding: 20px;
+  }
+
+  .header-texto h1 {
+    font-size: 22px;
+  }
+
+  .header-texto p {
+    font-size: 13px;
+  }
+
+  .bienvenida {
+    padding: 22px;
+  }
+
+  .bienvenida h2 {
+    font-size: 20px;
+  }
+
+  .bienvenida-icono {
+    display: none;
+  }
+
+  .resumen-encabezado h2 {
+    font-size: 20px;
+  }
+
+  .resumen-grid {
+    grid-template-columns: 1fr;
+    gap: 13px;
+  }
+
+  .resumen-card {
+    min-height: 160px;
+    padding: 19px;
+  }
+
+  .resumen-numero {
+    font-size: 31px;
+  }
+
+  .detalle-panel {
+    padding: 18px;
+  }
+
+  .lista-item {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .item-estado {
+    margin-left: 51px;
+  }
+
+}
+
+
+/* ==========================================================
+   26. CELULARES PEQUEÑOS
+   ========================================================== */
+
+@media (max-width: 360px) {
+
+  .dashboard-main {
+    padding: 10px;
+  }
+
+  .dashboard-header,
+  .bienvenida,
+  .detalle-panel {
+    padding: 15px;
+  }
+
+  .header-texto h1 {
+    font-size: 20px;
+  }
+
+  .bienvenida h2 {
+    font-size: 18px;
+  }
+
+  .rol-badge {
+    font-size: 10px;
+  }
+
+}
+
+
+/* ==========================================================
+   27. REDUCIR ANIMACIONES
+   ========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .nav-item,
+  .sidebar,
+  .btn-actualizar,
+  .detalle-enlace,
+  .btn-cerrar-sesion {
+    transition: none;
+  }
+
+  .nav-item:hover {
+    transform: none;
   }
 
 }

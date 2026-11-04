@@ -1,202 +1,532 @@
-/* =========================================================
-   CONTENEDOR PRINCIPAL
-   ========================================================= */
 
-.mascotas-container {
-  min-height: 100vh;
-  padding: 40px;
+/* ==========================================================
+   VETERINARIA AREVALO
+   ADMINISTRACIÓN DE MASCOTAS - ADMIN
 
-  background:
-    linear-gradient(
-      135deg,
-      #f5f7ff,
-      #eef1ff
-    );
+   DISEÑO ACTUALIZADO:
+   - Dos tarjetas de resumen:
+       1. Total de mascotas.
+       2. Total de propietarios.
+   - Sin contadores separados por especie.
+   - Buscador y filtros.
+   - Formulario de edición.
+   - Tarjetas de mascotas.
+   - Botones editar y eliminar.
+   - Accesibilidad.
+   - Adaptación a celulares.
+
+   El menú lateral pertenece a LayoutPrivado.
+   ========================================================== */
+
+
+/* ==========================================================
+   1. CONFIGURACIÓN GENERAL
+   ========================================================== */
+
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+:host *,
+:host *::before,
+:host *::after {
+  box-sizing: border-box;
 }
 
 
-/* =========================================================
-   CABECERA
-   ========================================================= */
+/* ==========================================================
+   2. CONTENEDOR PRINCIPAL
+   ========================================================== */
+
+.mascotas-container {
+  width: 100%;
+  min-width: 0;
+
+  padding: 0;
+
+  background: transparent;
+  color: #302d4f;
+
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+
+/* ==========================================================
+   3. CABECERA PRINCIPAL
+   ========================================================== */
 
 .mascotas-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
 
+  flex-wrap: wrap;
   gap: 20px;
 
-  padding: 25px 30px;
-  margin-bottom: 30px;
+  margin-bottom: 25px;
+  padding: 28px 30px;
 
-  background-color: white;
-
+  border: 1px solid #ece8fa;
   border-radius: 18px;
 
+  background: #ffffff;
+
   box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.08);
+    0 8px 25px rgba(53, 42, 105, 0.06);
 }
 
+.header-texto {
+  flex: 1;
+  min-width: 220px;
+}
+
+.etiqueta-pagina {
+  display: inline-block;
+
+  margin-bottom: 10px;
+
+  color: #6251d5;
+
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
 
 .mascotas-header h1 {
   margin: 0;
 
   color: #292742;
 
-  font-size: 28px;
+  font-size: 29px;
+  font-weight: 700;
+  line-height: 1.3;
 }
-
 
 .mascotas-header p {
-  margin-top: 6px;
-  margin-bottom: 0;
+  margin: 9px 0 0;
 
-  color: #77758a;
+  color: #68647d;
+
+  font-size: 14px;
+  line-height: 1.6;
 }
 
 
-/* =========================================================
-   BOTÓN VOLVER
-   ========================================================= */
+/* ==========================================================
+   4. BOTONES GENERALES
+   ========================================================== */
 
-.btn-volver {
-  padding: 11px 18px;
+.btn-volver,
+.btn-actualizar,
+.btn-guardar,
+.btn-cancelar,
+.btn-limpiar {
+  min-height: 44px;
 
-  border: none;
-  border-radius: 9px;
-
-  color: #555269;
-
-  background-color: #eeeef7;
-
-  font-weight: 600;
-
-  cursor: pointer;
-
-  transition: 0.2s ease;
-}
-
-
-.btn-volver:hover {
-  background-color: #e2e2ef;
-
-  transform: translateY(-1px);
-}
-
-
-/* =========================================================
-   MENSAJES
-   ========================================================= */
-
-.mensaje-info,
-.mensaje-error,
-.mensaje-exito,
-.sin-mascotas {
-  padding: 20px;
-
-  margin-bottom: 25px;
-
-  text-align: center;
-
-  border-radius: 14px;
-}
-
-
-.mensaje-info {
-  color: #6254e8;
-
-  background-color: white;
-
-  box-shadow:
-    0 8px 25px rgba(0, 0, 0, 0.07);
-}
-
-
-.mensaje-error {
-  color: #b42318;
-
-  background-color: #fff1f0;
-
-  border: 1px solid #ffd3cf;
-}
-
-
-.mensaje-exito {
-  color: #176b3a;
-
-  background-color: #ecfdf3;
-
-  border: 1px solid #b7ebc9;
-}
-
-
-/* =========================================================
-   FORMULARIO
-   ========================================================= */
-
-.formulario-card {
-  max-width: 750px;
-
-  margin: 0 auto 30px;
-
-  padding: 30px;
-
-  background-color: white;
-
-  border-radius: 18px;
-
-  box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.08);
-}
-
-
-.formulario-card h2 {
-  margin-top: 0;
-  margin-bottom: 20px;
-
-  color: #302d4f;
-
-  font-size: 23px;
-}
-
-
-/* =========================================================
-   DUEÑO ACTUAL
-   ========================================================= */
-
-.dueno-actual {
-  margin-bottom: 22px;
-
-  padding: 13px 15px;
+  padding: 11px 17px;
 
   border-radius: 10px;
 
-  color: #514d68;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
 
-  background-color: #f2efff;
+  cursor: pointer;
 
-  border: 1px solid #ddd6fe;
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
+
+/* BOTÓN VOLVER Y CANCELAR */
+
+.btn-volver,
+.btn-cancelar {
+  border: 1px solid #e0dcf0;
+
+  background: #f3f1fc;
+  color: #514c68;
+}
+
+.btn-volver:hover,
+.btn-cancelar:hover:not(:disabled) {
+  background: #e9e5f9;
+}
+
+
+/* BOTÓN ACTUALIZAR */
+
+.btn-actualizar {
+  border: 1px solid #ded6ff;
+
+  background: #ffffff;
+  color: #5946d5;
+}
+
+.btn-actualizar:hover:not(:disabled) {
+  background: #f3f0ff;
+}
+
+
+/* BOTONES DESHABILITADOS */
+
+.mascotas-container button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
+/* ==========================================================
+   5. RESUMEN DE MASCOTAS Y PROPIETARIOS
+   ========================================================== */
+
+/*
+   CAMBIO PRINCIPAL:
+
+   El resumen contiene solamente dos tarjetas:
+
+   🐾 Total de mascotas.
+   👤 Propietarios.
+
+   No se divide por especies.
+
+   Ambos contadores utilizan los datos obtenidos
+   desde Spring Boot.
+*/
+
+.resumen-grid {
+  display: grid;
+
+  /* Dos tarjetas en una sola fila. */
+  grid-template-columns:
+    repeat(2, minmax(0, 350px));
+
+  gap: 16px;
+
+  margin-bottom: 28px;
+}
+
+
+/* ==========================================================
+   6. TARJETAS DEL RESUMEN
+   ========================================================== */
+
+.resumen-card {
+  display: flex;
+  align-items: center;
+
+  gap: 15px;
+
+  width: 100%;
+  min-width: 0;
+
+  padding: 22px;
+
+  border: 1px solid #ece8fa;
+  border-radius: 17px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 7px 22px rgba(53, 42, 105, 0.05);
+}
+
+
+/* ICONO GENERAL */
+
+.resumen-icono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 55px;
+  height: 55px;
+
+  flex-shrink: 0;
+
+  border-radius: 15px;
+
+  background: #eee9ff;
+
+  font-size: 26px;
+}
+
+
+/* ICONO DE PROPIETARIOS */
+
+.resumen-card:nth-child(2) .resumen-icono {
+  background: #e9f8ed;
+}
+
+
+/* TÍTULOS DE LAS TARJETAS */
+
+.resumen-card span {
+  display: block;
+
+  color: #68647d;
+
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+
+/* CANTIDAD TOTAL */
+
+.resumen-card strong {
+  display: block;
+
+  margin-top: 5px;
+
+  color: #302d4f;
+
+  font-size: 30px;
+  font-weight: 700;
+}
+
+
+/* ==========================================================
+   7. MENSAJES DEL SISTEMA
+   ========================================================== */
+
+.mensaje-info,
+.mensaje-error,
+.mensaje-exito {
+  margin-bottom: 23px;
+  padding: 15px 18px;
+
+  border-radius: 12px;
+
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+
+/* MENSAJE DE CARGA */
+
+.mensaje-info {
+  border: 1px solid #ded6ff;
+
+  background: #ffffff;
+  color: #5946d5;
+
+  text-align: center;
+}
+
+
+/* MENSAJE DE ERROR */
+
+.mensaje-error {
+  border: 1px solid #f3b4b4;
+
+  background: #fff1f0;
+  color: #a32020;
+}
+
+
+/* MENSAJE DE ÉXITO */
+
+.mensaje-exito {
+  border: 1px solid #b7ebc9;
+
+  background: #ecfdf3;
+  color: #176b3a;
+}
+
+
+/* BOTÓN REINTENTAR */
+
+.btn-reintentar {
+  min-height: 35px;
+
+  margin-left: 12px;
+  padding: 7px 13px;
+
+  border: 1px solid #a32020;
+  border-radius: 8px;
+
+  background: #ffffff;
+  color: #a32020;
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+
+/* ==========================================================
+   8. FORMULARIO DE EDICIÓN
+   ========================================================== */
+
+.formulario-card {
+  max-width: 920px;
+
+  margin: 0 auto 28px;
+  padding: 30px;
+
+  border: 1px solid #ece8fa;
+  border-radius: 18px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 10px 30px rgba(53, 42, 105, 0.07);
+}
+
+
+/* ENCABEZADO DEL FORMULARIO */
+
+.formulario-header {
+  display: flex;
+  align-items: center;
+
+  gap: 15px;
+
+  margin-bottom: 23px;
+}
+
+.formulario-icono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 55px;
+  height: 55px;
+
+  flex-shrink: 0;
+
+  border-radius: 15px;
+
+  background: #eee9ff;
+
+  font-size: 26px;
+}
+
+.formulario-header h2 {
+  margin: 0;
+
+  color: #302d4f;
+
+  font-size: 22px;
+}
+
+.formulario-header p {
+  margin: 7px 0 0;
+
+  color: #68647d;
+
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+
+/* ==========================================================
+   9. PROPIETARIO ACTUAL
+   ========================================================== */
+
+/*
+   Mostramos el dueño de la mascota seleccionada.
+
+   El formulario edita los datos de la mascota,
+   pero conserva su propietario.
+*/
+
+.dueno-actual {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 13px;
+
+  margin-bottom: 24px;
+  padding: 16px;
+
+  border: 1px solid #ded6ff;
+  border-radius: 12px;
+
+  background: #f8f6ff;
+}
+
+.dueno-actual > span {
+  font-size: 22px;
+}
 
 .dueno-actual strong {
-  color: #423c70;
+  display: block;
+
+  color: #5141b8;
+
+  font-size: 13px;
+}
+
+.dueno-actual p {
+  margin: 6px 0;
+
+  color: #302d4f;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.dueno-actual small {
+  display: block;
+
+  color: #68647d;
+
+  font-size: 12px;
+  overflow-wrap: anywhere;
 }
 
 
-/* =========================================================
-   CAMPOS
-   ========================================================= */
+/* ==========================================================
+   10. ORGANIZACIÓN DEL FORMULARIO
+   ========================================================== */
+
+.campos-formulario {
+  min-width: 0;
+
+  margin: 0;
+  padding: 0;
+
+  border: none;
+}
+
+
+/* CAMPOS EN DOS COLUMNAS */
+
+.form-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 20px;
+}
 
 .form-group {
-  margin-bottom: 18px;
+  min-width: 0;
 }
 
+
+/* CAMPO QUE OCUPA TODO EL ANCHO */
+
+.campo-ancho {
+  grid-column: 1 / -1;
+}
+
+
+/* ETIQUETAS */
 
 .form-group label {
   display: block;
 
-  margin-bottom: 7px;
+  margin-bottom: 8px;
 
   color: #39364d;
 
@@ -205,9 +535,23 @@
 }
 
 
+/* INDICADOR DE CAMPO OBLIGATORIO */
+
+.obligatorio {
+  color: #b42332;
+}
+
+
+/* ==========================================================
+   11. CAMPOS INPUT Y SELECT
+   ========================================================== */
+
 .form-group input,
 .form-group select {
+  display: block;
+
   width: 100%;
+  min-height: 48px;
 
   padding: 12px 14px;
 
@@ -216,300 +560,580 @@
 
   outline: none;
 
-  background-color: #fafafe;
+  background: #fafafe;
+  color: #302d4f;
 
+  font-family: inherit;
   font-size: 14px;
 
-  box-sizing: border-box;
-
-  transition: 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
+
+/* TEXTO DE EJEMPLO */
+
+.form-group input::placeholder {
+  color: #77738a;
+}
+
+
+/* CUANDO SE SELECCIONA UN CAMPO */
 
 .form-group input:focus,
 .form-group select:focus {
   border-color: #6254e8;
 
-  background-color: white;
+  background: #ffffff;
 
   box-shadow:
-    0 0 0 3px rgba(98, 84, 232, 0.10);
+    0 0 0 3px rgba(98, 84, 232, 0.15);
 }
 
 
-/* =========================================================
-   VALIDACIONES
-   ========================================================= */
+/* ==========================================================
+   12. VALIDACIONES
+   ========================================================== */
+
+/* CAMPO CON ERROR */
+
+.form-group .input-error {
+  border-color: #c52c37;
+  background: #fffafa;
+}
+
+
+/* MENSAJE DE ERROR */
 
 .error-validacion {
   display: block;
 
-  margin-top: 6px;
+  margin-top: 7px;
 
-  color: #dc3545;
+  color: #b42332;
 
   font-size: 12px;
+  line-height: 1.5;
 }
 
 
-/* =========================================================
-   BOTONES DEL FORMULARIO
-   ========================================================= */
+/* TEXTO DE AYUDA */
+
+.texto-ayuda {
+  display: block;
+
+  margin-top: 7px;
+
+  color: #68647d;
+
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+
+/* ==========================================================
+   13. BOTONES DEL FORMULARIO
+   ========================================================== */
 
 .form-acciones {
   display: flex;
+  align-items: center;
 
+  flex-wrap: wrap;
   gap: 12px;
 
-  margin-top: 25px;
+  margin-top: 27px;
 }
 
+
+/* GUARDAR CAMBIOS */
 
 .btn-guardar {
-  padding: 12px 20px;
-
   border: none;
-  border-radius: 9px;
 
-  color: white;
+  background: linear-gradient(
+    135deg,
+    #6254e8,
+    #7c5ce7
+  );
 
-  background:
-    linear-gradient(
-      135deg,
-      #6254e8,
-      #7c5ce7
-    );
-
-  font-weight: 600;
-
-  cursor: pointer;
-
-  transition: 0.2s ease;
+  color: #ffffff;
 }
 
-
-.btn-guardar:hover {
-  transform: translateY(-1px);
+.btn-guardar:hover:not(:disabled) {
+  transform: translateY(-2px);
 
   box-shadow:
     0 7px 18px rgba(98, 84, 232, 0.25);
 }
 
 
-.btn-cancelar {
-  padding: 12px 20px;
+/* ==========================================================
+   14. ENCABEZADO DEL LISTADO
+   ========================================================== */
 
-  border: none;
+.listado-section {
+  min-width: 0;
+}
+
+.listado-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  flex-wrap: wrap;
+  gap: 16px;
+
+  margin-bottom: 20px;
+}
+
+.listado-header h2 {
+  margin: 0;
+
+  color: #302d4f;
+
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.listado-header p {
+  margin: 7px 0 0;
+
+  color: #68647d;
+
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+
+/* CONTADOR Y ACTUALIZAR */
+
+.listado-acciones {
+  display: flex;
+  align-items: center;
+
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.total-registros {
+  display: inline-flex;
+  align-items: center;
+
+  min-height: 35px;
+
+  padding: 8px 12px;
+
+  border-radius: 20px;
+
+  background: #eee9ff;
+  color: #5946c9;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+
+/* ==========================================================
+   15. BUSCADOR Y FILTROS
+   ========================================================== */
+
+.filtros-card {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 2fr)
+    minmax(170px, 1fr)
+    minmax(180px, 1fr);
+
+  gap: 18px;
+
+  margin-bottom: 25px;
+  padding: 20px;
+
+  border: 1px solid #ece8fa;
+  border-radius: 15px;
+
+  background: #ffffff;
+}
+
+.filtro-grupo {
+  min-width: 0;
+}
+
+
+/* ETIQUETAS DE FILTROS */
+
+.filtro-grupo label {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: #39364d;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+
+/* CAMPOS DE BÚSQUEDA */
+
+.filtro-grupo input,
+.filtro-grupo select {
+  display: block;
+
+  width: 100%;
+  min-height: 46px;
+
+  padding: 11px 13px;
+
+  border: 1px solid #d8d8e5;
   border-radius: 9px;
 
-  color: #4e4b60;
+  outline: none;
 
-  background-color: #eeeef7;
+  background: #fafafe;
+  color: #302d4f;
 
-  font-weight: 600;
-
-  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
 }
 
-
-.btn-cancelar:hover {
-  background-color: #dfdfeb;
+.filtro-grupo input::placeholder {
+  color: #77738a;
 }
 
+.filtro-grupo input:focus,
+.filtro-grupo select:focus {
+  border-color: #6254e8;
 
-/* =========================================================
-   SIN MASCOTAS
-   ========================================================= */
-
-.sin-mascotas {
-  background-color: white;
+  background: #ffffff;
 
   box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.07);
+    0 0 0 3px rgba(98, 84, 232, 0.15);
 }
 
+
+/* ==========================================================
+   16. SIN MASCOTAS O SIN RESULTADOS
+   ========================================================== */
+
+.sin-mascotas,
+.sin-resultados {
+  padding: 35px 25px;
+
+  border: 1px solid #ece8fa;
+  border-radius: 17px;
+
+  background: #ffffff;
+
+  text-align: center;
+
+  box-shadow:
+    0 8px 25px rgba(53, 42, 105, 0.05);
+}
 
 .sin-icono {
-  font-size: 55px;
+  margin-bottom: 12px;
 
-  margin-bottom: 10px;
+  font-size: 48px;
 }
 
+.sin-mascotas h3,
+.sin-resultados h3 {
+  margin: 0 0 10px;
 
-.sin-mascotas h2 {
   color: #302d4f;
+
+  font-size: 20px;
+}
+
+.sin-mascotas p,
+.sin-resultados p {
+  max-width: 470px;
+
+  margin: 0 auto;
+
+  color: #68647d;
+
+  font-size: 13px;
+  line-height: 1.7;
 }
 
 
-.sin-mascotas p {
-  color: #77758a;
+/* LIMPIAR FILTROS */
+
+.btn-limpiar {
+  margin-top: 20px;
+
+  border: 1px solid #6254e8;
+
+  background: #ffffff;
+  color: #5946d5;
+}
+
+.btn-limpiar:hover {
+  background: #f3f0ff;
 }
 
 
-/* =========================================================
-   GRID
-   ========================================================= */
+/* ==========================================================
+   17. GRID DE MASCOTAS
+   ========================================================== */
 
 .mascotas-grid {
   display: grid;
 
   grid-template-columns:
-    repeat(
-      auto-fit,
-      minmax(290px, 1fr)
-    );
+    repeat(auto-fit, minmax(280px, 1fr));
 
-  gap: 24px;
+  gap: 22px;
 }
 
 
-/* =========================================================
-   TARJETA
-   ========================================================= */
+/* ==========================================================
+   18. TARJETA DE MASCOTA
+   ========================================================== */
 
 .mascota-card {
-  padding: 28px;
+  display: flex;
+  flex-direction: column;
 
-  background-color: white;
+  min-width: 0;
+  padding: 24px;
 
+  border: 1px solid #ece8fa;
   border-radius: 18px;
 
+  background: #ffffff;
+
   box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.08);
+    0 8px 25px rgba(53, 42, 105, 0.06);
 
-  transition: 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
-
 
 .mascota-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-3px);
 
   box-shadow:
-    0 15px 35px rgba(0, 0, 0, 0.12);
+    0 13px 30px rgba(74, 56, 139, 0.12);
 }
 
+
+/* ==========================================================
+   19. CABECERA DE CADA MASCOTA
+   ========================================================== */
+
+.tarjeta-superior {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  margin-bottom: 18px;
+}
+
+
+/* ICONO DE MASCOTA */
 
 .mascota-icono {
-  width: 55px;
-  height: 55px;
-
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 
-  margin-bottom: 18px;
+  width: 60px;
+  height: 60px;
 
-  border-radius: 14px;
+  flex-shrink: 0;
 
-  background:
-    linear-gradient(
-      135deg,
-      #ede9fe,
-      #ddd6fe
-    );
+  border-radius: 15px;
 
-  font-size: 28px;
+  background: linear-gradient(
+    135deg,
+    #ede9fe,
+    #ddd6fe
+  );
+
+  font-size: 29px;
 }
 
 
-.mascota-card h2 {
-  margin-top: 0;
-  margin-bottom: 18px;
+/* ETIQUETA */
+
+.etiqueta-mascota {
+  max-width: 155px;
+
+  padding: 7px 11px;
+
+  border-radius: 20px;
+
+  background: #f3f0ff;
+  color: #604acb;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  text-align: center;
+}
+
+
+/* NOMBRE */
+
+.nombre-mascota {
+  margin: 0 0 18px;
 
   color: #302d4f;
 
   font-size: 22px;
+  font-weight: 700;
+
+  overflow-wrap: anywhere;
 }
 
 
-/* =========================================================
-   INFORMACIÓN DE MASCOTA
-   ========================================================= */
+/* ==========================================================
+   20. INFORMACIÓN DE LA MASCOTA
+   ========================================================== */
 
 .mascota-info {
-  margin-bottom: 18px;
+  margin-bottom: 20px;
+}
+
+.info-fila {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  flex-wrap: wrap;
+  gap: 8px;
+
+  padding: 12px 0;
+
+  border-bottom: 1px solid #f0edfa;
+
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.info-fila strong {
+  color: #38364c;
+
+  font-weight: 600;
+}
+
+.info-fila span {
+  max-width: 100%;
+
+  color: #625e78;
+
+  text-align: right;
+  overflow-wrap: anywhere;
 }
 
 
-.mascota-info p {
-  margin: 9px 0;
+/* ==========================================================
+   21. INFORMACIÓN DEL PROPIETARIO
+   ========================================================== */
 
-  color: #686579;
-
-  line-height: 1.4;
-}
-
-
-.mascota-info strong {
-  color: #39364d;
-}
-
-
-/* =========================================================
-   PROPIETARIO
-   ========================================================= */
+/*
+  Cada tarjeta de mascota muestra los datos
+  del propietario que devuelve la API.
+*/
 
 .propietario {
-  margin-bottom: 22px;
+  margin-bottom: 21px;
+  padding: 16px;
 
-  padding: 15px;
-
+  border: 1px solid #eae4ff;
   border-radius: 12px;
 
-  background-color: #f7f5ff;
-
-  border: 1px solid #e4dfff;
+  background: #f9f7ff;
 }
 
+.propietario-header {
+  display: flex;
+  align-items: center;
 
-.propietario h3 {
-  margin-top: 0;
-  margin-bottom: 12px;
+  gap: 9px;
 
-  color: #514b7a;
-
-  font-size: 16px;
+  margin-bottom: 10px;
 }
 
+.propietario-header span {
+  font-size: 20px;
+}
+
+.propietario-header strong {
+  color: #5141b8;
+
+  font-size: 13px;
+}
 
 .propietario p {
-  margin: 7px 0;
+  margin: 6px 0;
 
-  color: #69667b;
+  color: #39364d;
 
-  word-break: break-word;
+  font-size: 13px;
+  font-weight: 600;
+
+  overflow-wrap: anywhere;
+}
+
+.propietario small {
+  display: block;
+
+  margin-top: 6px;
+
+  color: #68647d;
+
+  font-size: 12px;
+  line-height: 1.5;
+
+  overflow-wrap: anywhere;
+}
+
+.propietario-id {
+  color: #5946d5 !important;
 }
 
 
-.propietario strong {
-  color: #3f3b57;
-}
-
-
-/* =========================================================
-   ACCIONES
-   ========================================================= */
+/* ==========================================================
+   22. BOTONES EDITAR Y ELIMINAR
+   ========================================================== */
 
 .acciones-card {
   display: flex;
 
   gap: 10px;
-}
 
+  margin-top: auto;
+}
 
 .btn-editar,
 .btn-eliminar {
   flex: 1;
 
-  padding: 10px 14px;
+  min-height: 44px;
+
+  padding: 10px 13px;
 
   border-radius: 9px;
 
-  font-weight: 600;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
 
   cursor: pointer;
 
-  transition: 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 
@@ -518,78 +1142,280 @@
 .btn-editar {
   border: 1px solid #6254e8;
 
-  color: #6254e8;
-
-  background-color: white;
+  background: #ffffff;
+  color: #5843d5;
 }
 
-
-.btn-editar:hover {
-  color: white;
-
-  background-color: #6254e8;
+.btn-editar:hover:not(:disabled) {
+  background: #6254e8;
+  color: #ffffff;
 }
 
 
 /* ELIMINAR */
 
 .btn-eliminar {
-  border: 1px solid #dc3545;
+  border: 1px solid #bc3045;
 
-  color: #dc3545;
+  background: #ffffff;
+  color: #bc3045;
+}
 
-  background-color: white;
+.btn-eliminar:hover:not(:disabled) {
+  background: #bc3045;
+  color: #ffffff;
 }
 
 
-.btn-eliminar:hover {
-  color: white;
+/* ==========================================================
+   23. ACCESIBILIDAD
+   ========================================================== */
 
-  background-color: #dc3545;
+/* Resalta el control cuando se utiliza TAB. */
+
+.mascotas-container button:focus-visible,
+.mascotas-container input:focus-visible,
+.mascotas-container select:focus-visible {
+  outline: 3px solid #6952e6;
+  outline-offset: 3px;
 }
 
 
-/* =========================================================
-   RESPONSIVO
-   ========================================================= */
+/* Texto accesible solo para lectores de pantalla. */
 
-@media (max-width: 700px) {
+.solo-lectores {
+  position: absolute;
 
-  .mascotas-container {
-    padding: 20px;
+  width: 1px;
+  height: 1px;
+
+  padding: 0;
+  margin: -1px;
+
+  overflow: hidden;
+
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+
+  border: 0;
+}
+
+
+/* ==========================================================
+   24. PANTALLAS MEDIANAS
+   ========================================================== */
+
+@media (max-width: 1250px) {
+
+  /* Los dos contadores se mantienen. */
+
+  .resumen-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
   }
 
+  /* Los filtros se acomodan en dos columnas. */
+
+  .filtros-card {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .filtro-grupo:first-child {
+    grid-column: 1 / -1;
+  }
+
+}
+
+
+/* ==========================================================
+   25. TABLETS
+   ========================================================== */
+
+@media (max-width: 800px) {
 
   .mascotas-header {
     flex-direction: column;
-
     align-items: flex-start;
+
+    padding: 24px;
   }
 
+  .formulario-card {
+    padding: 24px;
+  }
+
+  .btn-volver {
+    align-self: flex-start;
+  }
+
+}
+
+
+/* ==========================================================
+   26. CELULARES
+   ========================================================== */
+
+@media (max-width: 600px) {
+
+  /* CABECERA */
+
+  .mascotas-header {
+    padding: 20px;
+  }
+
+  .mascotas-header h1 {
+    font-size: 24px;
+  }
 
   .btn-volver {
     width: 100%;
   }
 
 
-  .formulario-card {
-    padding: 22px;
+  /* RESUMEN DE DOS TARJETAS */
+
+  /*
+    En celulares:
+    1. Total de mascotas.
+    2. Propietarios.
+
+    Una debajo de la otra.
+  */
+
+  .resumen-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .resumen-card {
+    padding: 18px;
   }
 
 
-  .form-acciones {
+  /* FORMULARIO */
+
+  .formulario-card {
+    padding: 20px;
+  }
+
+  .formulario-header {
+    align-items: flex-start;
+  }
+
+  .formulario-header h2 {
+    font-size: 20px;
+  }
+
+  .form-grid,
+  .filtros-card {
+    grid-template-columns: 1fr;
+  }
+
+  .campo-ancho,
+  .filtro-grupo:first-child {
+    grid-column: auto;
+  }
+
+
+  /* CAMPOS */
+
+  .form-group input,
+  .form-group select,
+  .filtro-grupo input,
+  .filtro-grupo select {
+    font-size: 16px;
+  }
+
+
+  /* BOTONES */
+
+  .form-acciones,
+  .acciones-card {
     flex-direction: column;
   }
 
-
   .btn-guardar,
-  .btn-cancelar {
+  .btn-cancelar,
+  .btn-editar,
+  .btn-eliminar {
     width: 100%;
   }
 
 
-  .acciones-card {
+  /* FILTROS */
+
+  .filtros-card {
+    padding: 16px;
+  }
+
+
+  /* ENCABEZADO DEL LISTADO */
+
+  .listado-header {
     flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .listado-acciones {
+    width: 100%;
+  }
+
+
+  /* TARJETAS DE MASCOTAS */
+
+  .mascotas-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mascota-card {
+    padding: 20px;
+  }
+
+}
+
+
+/* ==========================================================
+   27. CELULARES PEQUEÑOS
+   ========================================================== */
+
+@media (max-width: 370px) {
+
+  .mascotas-header,
+  .mascota-card,
+  .formulario-card {
+    padding: 16px;
+  }
+
+  .mascotas-header h1 {
+    font-size: 22px;
+  }
+
+  .tarjeta-superior {
+    flex-wrap: wrap;
+  }
+
+}
+
+
+/* ==========================================================
+   28. REDUCIR MOVIMIENTO
+   ========================================================== */
+
+/* Respeta las preferencias de accesibilidad. */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .mascotas-container *,
+  .mascotas-container *::before,
+  .mascotas-container *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .mascota-card:hover,
+  .btn-guardar:hover {
+    transform: none;
   }
 
 }

@@ -1,191 +1,212 @@
+
+/* ==========================================================
+   VETERINARIA AREVALO - MIS CITAS (USER)
+
+   FUNCIONALIDADES:
+   - Consultar las citas del usuario autenticado.
+   - Registrar nuevas citas.
+   - Editar citas existentes.
+   - Cancelar citas con confirmación.
+   - Buscar y filtrar citas.
+   - Mostrar estados de carga, éxito y error.
+   - Enviar avisos a las notificaciones globales.
+
+   Se conservan los endpoints del CitaServicio.
+   ========================================================== */
+
+
 // ==========================================================
-// IMPORTACIONES
+// IMPORTACIONES DE ANGULAR
 // ==========================================================
 
-// Component permite crear el componente.
-// OnInit ejecuta código automáticamente al abrir la página.
-// ChangeDetectorRef permite actualizar la vista cuando
-// recibimos información desde Spring Boot.
 import {
   Component,
   OnInit,
-  ChangeDetectorRef
+  ChangeDetectorRef,
+  ViewChild,
+  ElementRef
 } from '@angular/core';
 
-// CommonModule permite utilizar *ngIf y *ngFor.
 import { CommonModule } from '@angular/common';
 
-// Herramientas para trabajar con formularios reactivos.
 import {
   FormBuilder,
   FormGroup,
+  FormsModule,
   ReactiveFormsModule,
   Validators
 } from '@angular/forms';
 
-// Router permite navegar entre páginas.
 import { Router } from '@angular/router';
 
-// forkJoin permite ejecutar varias peticiones
-// al backend al mismo tiempo.
 import { forkJoin } from 'rxjs';
 
 
 // ==========================================================
-// SERVICIOS
+// SERVICIOS DE LA API REST
 // ==========================================================
 
-// Servicio para gestionar citas.
 import { CitaServicio }
   from '../../../Servicios/cita-servicio';
 
-// Servicio para obtener las mascotas del USER.
 import { MascotaServicio }
   from '../../../Servicios/mascota-servicio';
 
-// Servicio para consultar los servicios de la veterinaria.
 import { ServicioServicio }
   from '../../../Servicios/servicio-servicio';
 
-// Servicio para consultar veterinarios.
 import { VeterinarioServicio }
   from '../../../Servicios/veterinario-servicio';
 
 
+// ==========================================================
+// NOTIFICACIONES COMPARTIDAS
+// ==========================================================
+
+// Este servicio se creó con el menú lateral permanente.
+// Los avisos aparecerán en la campana del layout.
+import { NotificacionesServicio }
+  from '../../../Servicios/notificaciones-servicio';
+
+
+// ==========================================================
+// COMPONENTE
+// ==========================================================
 
 @Component({
 
-  // Nombre interno del componente.
   selector: 'app-citas',
 
-  // Componente standalone.
   standalone: true,
 
-  // Módulos necesarios para el HTML.
   imports: [
     CommonModule,
+    FormsModule,
     ReactiveFormsModule
   ],
 
-  // Archivo HTML.
   templateUrl: './citas.html',
 
-  // Archivo SCSS.
   styleUrl: './citas.scss'
 
 })
 export class Citas implements OnInit {
 
 
-  // ==========================================================
-  // LISTAS
-  // ==========================================================
+  // ========================================================
+  // INFORMACIÓN RECIBIDA DE SPRING BOOT
+  // ========================================================
 
-  // Citas pertenecientes al usuario autenticado.
   citas: any[] = [];
 
-  // Mascotas pertenecientes al usuario.
   mascotas: any[] = [];
 
-  // Servicios disponibles en la veterinaria.
   servicios: any[] = [];
 
-  // Veterinarios disponibles.
   veterinarios: any[] = [];
 
 
+  // ========================================================
+  // ESTADOS DE LA PÁGINA
+  // ========================================================
 
-  // ==========================================================
-  // VARIABLES DE ESTADO
-  // ==========================================================
-
-  // Indica si estamos cargando información.
+  // Consulta de información.
   cargando: boolean = false;
 
-  // Mensaje utilizado cuando ocurre un error.
+  // Creación o edición de una cita.
+  guardando: boolean = false;
+
+  // ID de la cita que se está cancelando.
+  cancelandoId: number | null = null;
+
+  // Indica que falló la consulta inicial.
+  errorCarga: boolean = false;
+
   mensajeError: string = '';
 
-  // Mensaje utilizado cuando una operación funciona.
   mensajeExito: string = '';
 
-  // Controla si se muestra el formulario.
-  mostrarFormulario: boolean = false;
 
-  // Si contiene un ID estamos editando una cita.
-  // Si es null estamos registrando una cita nueva.
-  citaEditandoId: number | null = null;
+  // ========================================================
+  // FILTROS DE BÚSQUEDA
+  // ========================================================
+
+  busqueda: string = '';
+
+  filtroEstado: string = 'TODOS';
 
 
-
-  // ==========================================================
+  // ========================================================
   // FORMULARIO
-  // ==========================================================
+  // ========================================================
 
   citaForm: FormGroup;
 
+  mostrarFormulario: boolean = false;
+
+  // null: registrar.
+  // número: editar.
+  citaEditandoId: number | null = null;
+
+  // Fecha mínima sugerida al registrar.
+  fechaMinima: string = '';
+
+  // Campo que recibe el foco al abrir el formulario.
+  @ViewChild('selectorMascota')
+  selectorMascota?: ElementRef<HTMLSelectElement>;
 
 
-  // ==========================================================
+  // ========================================================
   // CONSTRUCTOR
-  // ==========================================================
+  // ========================================================
 
   constructor(
 
-    // Servicio de citas.
     private citaServicio: CitaServicio,
 
-    // Servicio de mascotas.
     private mascotaServicio: MascotaServicio,
 
-    // Servicio del catálogo de servicios.
     private servicioServicio: ServicioServicio,
 
-    // Servicio de veterinarios.
     private veterinarioServicio: VeterinarioServicio,
 
-    // Permite construir el formulario.
+    private notificacionesServicio: NotificacionesServicio,
+
     private fb: FormBuilder,
 
-    // Permite navegar entre páginas.
     private router: Router,
 
-    // Permite actualizar manualmente la vista.
     private cd: ChangeDetectorRef
 
   ) {
 
 
-    // ========================================================
-    // CREACIÓN DEL FORMULARIO
-    // ========================================================
+    // ======================================================
+    // CREACIÓN DEL FORMULARIO REACTIVO
+    // ======================================================
 
     this.citaForm = this.fb.group({
 
-      // Mascota seleccionada.
       mascotaId: [
         '',
         Validators.required
       ],
 
-      // Servicio seleccionado.
       servicioId: [
         '',
         Validators.required
       ],
 
-      // Veterinario seleccionado.
       veterinarioId: [
         '',
         Validators.required
       ],
 
-      // Fecha y hora de la cita.
       fechaHora: [
         '',
         Validators.required
       ],
 
-      // Motivo de la cita.
       motivo: [
         '',
         Validators.required
@@ -196,43 +217,39 @@ export class Citas implements OnInit {
   }
 
 
-
-  // ==========================================================
-  // AL ABRIR LA PÁGINA
-  // ==========================================================
+  // ========================================================
+  // INICIAR PÁGINA
+  // ========================================================
 
   ngOnInit(): void {
 
-    // Cargamos toda la información necesaria
-    // cuando el usuario entra a Mis Citas.
+    this.actualizarFechaMinima();
+
     this.cargarDatos();
 
   }
 
 
-
-  // ==========================================================
-  // CARGAR INFORMACIÓN
-  // ==========================================================
-  //
-  // Aquí cargamos al mismo tiempo:
-  //
-  // - Mis citas
-  // - Mis mascotas
-  // - Servicios
-  // - Veterinarios
-  //
-  // ==========================================================
+  // ========================================================
+  // CONSULTAR INFORMACIÓN DESDE SPRING BOOT
+  // ========================================================
 
   cargarDatos(): void {
 
+    // Evita consultas duplicadas mientras carga.
+    if (this.cargando) {
+      return;
+    }
+
     this.cargando = true;
+
+    this.errorCarga = false;
 
     this.mensajeError = '';
 
 
-    // forkJoin permite ejecutar varias consultas HTTP
-    // y esperar a que todas terminen.
+    // forkJoin obtiene las cuatro listas
+    // mediante los servicios originales.
     forkJoin({
 
       citas:
@@ -250,71 +267,62 @@ export class Citas implements OnInit {
     }).subscribe({
 
 
-      // ======================================================
-      // RESPUESTA CORRECTA
-      // ======================================================
+      // ====================================================
+      // CONSULTA CORRECTA
+      // ====================================================
 
       next: (respuesta) => {
 
-        // Guardamos los datos recibidos.
-        this.citas = respuesta.citas;
+        // Verificamos que la API entregue listas.
+        this.citas = Array.isArray(respuesta.citas)
+          ? respuesta.citas
+          : [];
 
-        this.mascotas = respuesta.mascotas;
+        this.mascotas = Array.isArray(respuesta.mascotas)
+          ? respuesta.mascotas
+          : [];
 
-        this.servicios = respuesta.servicios;
+        this.servicios = Array.isArray(respuesta.servicios)
+          ? respuesta.servicios
+          : [];
 
-        this.veterinarios = respuesta.veterinarios;
+        this.veterinarios = Array.isArray(respuesta.veterinarios)
+          ? respuesta.veterinarios
+          : [];
 
-
-        // Terminamos el estado de carga.
         this.cargando = false;
 
+        this.errorCarga = false;
 
-        console.log(
-          'Citas:',
-          this.citas
-        );
-
-        console.log(
-          'Mascotas:',
-          this.mascotas
-        );
-
-        console.log(
-          'Servicios:',
-          this.servicios
-        );
-
-        console.log(
-          'Veterinarios:',
-          this.veterinarios
-        );
-
-
-        // Actualizamos la pantalla.
         this.cd.detectChanges();
 
       },
 
 
-      // ======================================================
-      // ERROR
-      // ======================================================
+      // ====================================================
+      // ERROR DE CONSULTA
+      // ====================================================
 
       error: (error) => {
 
         console.error(
-          'Error al cargar datos de citas:',
+          'Error al consultar Mis Citas:',
           error
         );
 
-
-        this.mensajeError =
-          'No se pudo cargar la información de las citas.';
-
-
         this.cargando = false;
 
+        this.errorCarga = true;
+
+        this.mensajeError =
+          'No se pudo cargar la información de las citas. Intenta nuevamente.';
+
+        // Aviso en la campana global.
+        this.notificacionesServicio.agregar(
+          'Error al consultar citas',
+          'No fue posible obtener la información desde el servidor.',
+          'error'
+        );
 
         this.cd.detectChanges();
 
@@ -325,283 +333,537 @@ export class Citas implements OnInit {
   }
 
 
+  // ========================================================
+  // LISTA DE CITAS FILTRADAS
+  // ========================================================
 
-  // ==========================================================
-  // NUEVA CITA
-  // ==========================================================
+  get citasFiltradas(): any[] {
 
-  nuevaCita(): void {
+    const texto = this.busqueda
+      .trim()
+      .toLowerCase();
 
-    // Indicamos que estamos creando,
-    // no editando.
-    this.citaEditandoId = null;
+    return this.citas.filter(cita => {
 
-    // Limpiamos el formulario.
-    this.citaForm.reset();
+      // ====================================================
+      // FILTRAR POR ESTADO
+      // ====================================================
 
-    // Limpiamos mensajes anteriores.
-    this.mensajeError = '';
-    this.mensajeExito = '';
+      const estado = String(
+        cita.estado ?? ''
+      ).toUpperCase();
 
-    // Mostramos el formulario.
-    this.mostrarFormulario = true;
-
-  }
-
-
-
-  // ==========================================================
-  // EDITAR CITA
-  // ==========================================================
-
-  editarCita(cita: any): void {
-
-    // Guardamos el ID de la cita.
-    this.citaEditandoId = cita.id;
+      const coincideEstado =
+        this.filtroEstado === 'TODOS' ||
+        estado === this.filtroEstado;
 
 
-    // Cargamos los datos actuales dentro del formulario.
-    this.citaForm.patchValue({
+      // ====================================================
+      // FILTRAR POR TEXTO
+      // ====================================================
 
-      mascotaId:
-        cita.mascota?.id,
+      const contenido = [
 
-      servicioId:
-        cita.servicio?.id,
+        cita.mascota?.nombre,
 
-      veterinarioId:
-        cita.veterinario?.id,
+        cita.servicio?.nombre,
 
-      // datetime-local necesita:
-      // YYYY-MM-DDTHH:mm
-      fechaHora:
-        this.formatearFechaParaInput(
-          cita.fechaHora
-        ),
+        cita.veterinario?.nombre,
 
-      motivo:
         cita.motivo
+
+      ]
+        .map(valor => String(valor ?? ''))
+        .join(' ')
+        .toLowerCase();
+
+      const coincideBusqueda =
+        contenido.includes(texto);
+
+      return coincideEstado && coincideBusqueda;
 
     });
 
+  }
 
-    // Limpiamos mensajes.
-    this.mensajeError = '';
-    this.mensajeExito = '';
 
-    // Mostramos el formulario.
-    this.mostrarFormulario = true;
+  // ========================================================
+  // ESTADOS DISPONIBLES PARA EL FILTRO
+  // ========================================================
+
+  get estadosDisponibles(): string[] {
+
+    // Usamos los estados reales devueltos por la API.
+    return Array.from(
+
+      new Set(
+
+        this.citas
+          .map(cita =>
+            String(cita.estado ?? '').toUpperCase()
+          )
+          .filter(estado => estado.length > 0)
+
+      )
+
+    ).sort();
 
   }
 
 
+  // ========================================================
+  // TOTALES PARA LAS TARJETAS DE RESUMEN
+  // ========================================================
 
-  // ==========================================================
-  // GUARDAR CITA
-  // ==========================================================
-  //
-  // Este mismo método sirve para:
-  //
-  // NUEVA CITA → POST
-  // EDITAR     → PUT
-  //
-  // ==========================================================
+  get totalPendientes(): number {
+
+    return this.citas.filter(
+      cita => cita.estado === 'PENDIENTE'
+    ).length;
+
+  }
+
+
+  get totalCanceladas(): number {
+
+    return this.citas.filter(
+      cita => cita.estado === 'CANCELADA'
+    ).length;
+
+  }
+
+
+  // ========================================================
+  // IDENTIFICAR CITAS EN EL HTML
+  // ========================================================
+
+  trackByCita(
+    index: number,
+    cita: any
+  ): number {
+
+    return cita.id ?? index;
+
+  }
+
+
+  // ========================================================
+  // OBTENER FECHA LOCAL PARA EL INPUT
+  // ========================================================
+
+  private actualizarFechaMinima(): void {
+
+    const ahora = new Date();
+
+    const anio = ahora.getFullYear();
+
+    const mes = String(
+      ahora.getMonth() + 1
+    ).padStart(2, '0');
+
+    const dia = String(
+      ahora.getDate()
+    ).padStart(2, '0');
+
+    const hora = String(
+      ahora.getHours()
+    ).padStart(2, '0');
+
+    const minuto = String(
+      ahora.getMinutes()
+    ).padStart(2, '0');
+
+    this.fechaMinima =
+      `${anio}-${mes}-${dia}T${hora}:${minuto}`;
+
+  }
+
+
+  // ========================================================
+  // ABRIR FORMULARIO PARA NUEVA CITA
+  // ========================================================
+
+  nuevaCita(): void {
+
+    if (this.guardando) {
+      return;
+    }
+
+    this.citaEditandoId = null;
+
+    this.actualizarFechaMinima();
+
+    // Restablecemos los cinco campos.
+    this.citaForm.reset({
+
+      mascotaId: '',
+
+      servicioId: '',
+
+      veterinarioId: '',
+
+      fechaHora: '',
+
+      motivo: ''
+
+    });
+
+    this.mensajeError = '';
+
+    this.mensajeExito = '';
+
+    this.mostrarFormulario = true;
+
+    this.enfocarFormulario();
+
+  }
+
+
+  // ========================================================
+  // ABRIR FORMULARIO PARA EDITAR
+  // ========================================================
+
+  editarCita(cita: any): void {
+
+    // Las citas canceladas no se editan desde USER.
+    if (
+      this.guardando ||
+      cita.estado === 'CANCELADA'
+    ) {
+      return;
+    }
+
+    this.citaEditandoId = cita.id;
+
+    this.actualizarFechaMinima();
+
+    // Mantener los IDs de los objetos relacionados.
+    this.citaForm.reset({
+
+      mascotaId:
+        cita.mascota?.id ?? '',
+
+      servicioId:
+        cita.servicio?.id ?? '',
+
+      veterinarioId:
+        cita.veterinario?.id ?? '',
+
+      fechaHora:
+        this.formatearFechaParaInput(cita.fechaHora),
+
+      motivo:
+        cita.motivo ?? ''
+
+    });
+
+    this.mensajeError = '';
+
+    this.mensajeExito = '';
+
+    this.mostrarFormulario = true;
+
+    this.enfocarFormulario();
+
+  }
+
+
+  // ========================================================
+  // MEJORA DE ACCESIBILIDAD: ENFOCAR EL FORMULARIO
+  // ========================================================
+
+  private enfocarFormulario(): void {
+
+    // Actualiza el *ngIf del formulario.
+    this.cd.detectChanges();
+
+    // Enfoca el primer campo.
+    this.selectorMascota?.nativeElement.focus();
+
+  }
+
+
+  // ========================================================
+  // GUARDAR CITA - REGISTRAR O EDITAR
+  // ========================================================
 
   guardarCita(): void {
 
+    // Evitar dos peticiones simultáneas.
+    if (this.guardando) {
+      return;
+    }
 
-    // Si falta algún campo obligatorio,
-    // no continuamos.
+    this.mensajeError = '';
+
+    this.mensajeExito = '';
+
+
+    // ======================================================
+    // VALIDAR CAMPOS OBLIGATORIOS
+    // ======================================================
+
     if (this.citaForm.invalid) {
 
       this.citaForm.markAllAsTouched();
 
       return;
+    }
+
+
+    // ======================================================
+    // OBTENER LOS VALORES
+    // ======================================================
+
+    const valores =
+      this.citaForm.getRawValue();
+
+    const motivo =
+      String(valores.motivo ?? '').trim();
+
+    const fechaHora =
+      String(valores.fechaHora ?? '');
+
+
+    // Impedir motivos compuestos solo por espacios.
+    if (!motivo) {
+
+      this.citaForm.get('motivo')?.setErrors({
+        required: true
+      });
+
+      this.citaForm.get('motivo')?.markAsTouched();
+
+      return;
+    }
+
+
+    // ======================================================
+    // PREVENIR FECHAS PASADAS EN NUEVAS CITAS
+    // ======================================================
+
+    if (this.citaEditandoId === null) {
+
+      const fechaElegida =
+        new Date(fechaHora).getTime();
+
+      const ahora =
+        Date.now();
+
+      if (
+        !Number.isFinite(fechaElegida) ||
+        fechaElegida <= ahora
+      ) {
+
+        const control =
+          this.citaForm.get('fechaHora');
+
+        control?.setErrors({
+          fechaPasada: true
+        });
+
+        control?.markAsTouched();
+
+        return;
+      }
 
     }
 
 
-    // ========================================================
-    // CREAR EL JSON QUE NECESITA SPRING BOOT
-    // ========================================================
+    // ======================================================
+    // ESTRUCTURA QUE ESPERA SPRING BOOT
+    // ======================================================
 
+    // Mantenemos exactamente las relaciones por ID
+    // del formulario original.
     const datosCita = {
 
-      fechaHora:
-        this.citaForm.value.fechaHora,
+      fechaHora: fechaHora,
 
-      motivo:
-        this.citaForm.value.motivo,
+      motivo: motivo,
 
       mascota: {
-
-        id:
-          this.citaForm.value.mascotaId
-
+        id: valores.mascotaId
       },
 
       veterinario: {
-
-        id:
-          this.citaForm.value.veterinarioId
-
+        id: valores.veterinarioId
       },
 
       servicio: {
-
-        id:
-          this.citaForm.value.servicioId
-
+        id: valores.servicioId
       }
 
     };
 
 
-    // ========================================================
-    // EDITAR CITA
-    // ========================================================
+    // ======================================================
+    // DETERMINAR SI REGISTRAMOS O EDITAMOS
+    // ======================================================
 
-    if (this.citaEditandoId !== null) {
+    const esEdicion =
+      this.citaEditandoId !== null;
 
+    // Usamos los métodos del CitaServicio original.
+    const peticion = esEdicion
 
-      this.citaServicio
-        .actualizarCita(
-          this.citaEditandoId,
+      ? this.citaServicio.actualizarCita(
+          this.citaEditandoId!,
           datosCita
         )
-        .subscribe({
+
+      : this.citaServicio.crearCita(
+          datosCita
+        );
 
 
-          next: () => {
-
-            this.mensajeExito =
-              'Cita actualizada correctamente.';
+    this.guardando = true;
 
 
-            // Cerramos el formulario.
-            this.cerrarFormulario();
+    // ======================================================
+    // EJECUTAR LA OPERACIÓN
+    // ======================================================
+
+    peticion.subscribe({
 
 
-            // Volvemos a cargar la información.
-            this.cargarDatos();
+      // ====================================================
+      // GUARDADO CORRECTO
+      // ====================================================
 
-          },
+      next: () => {
 
+        this.guardando = false;
 
-          error: (error) => {
+        this.mensajeExito = esEdicion
+          ? 'Cita actualizada correctamente.'
+          : 'Cita agendada correctamente.';
 
-            console.error(
-              'Error al actualizar cita:',
-              error
-            );
+        // Se envía el aviso a la campana global.
+        this.notificacionesServicio.agregar(
 
+          esEdicion
+            ? 'Cita actualizada'
+            : 'Nueva cita registrada',
 
-            this.mensajeError =
-              'No se pudo actualizar la cita.';
+          esEdicion
+            ? 'Los cambios de la cita se guardaron correctamente.'
+            : 'Tu cita veterinaria fue registrada correctamente.',
 
+          'exito'
 
-            this.cd.detectChanges();
+        );
 
-          }
+        this.cerrarFormulario();
 
-        });
+        // Consultamos los datos actualizados.
+        // NO recargamos la página completa.
+        this.cargarDatos();
 
-
-      return;
-
-    }
-
-
-
-    // ========================================================
-    // CREAR NUEVA CITA
-    // ========================================================
-
-    this.citaServicio
-      .crearCita(datosCita)
-      .subscribe({
+      },
 
 
-        next: () => {
+      // ====================================================
+      // ERROR AL GUARDAR
+      // ====================================================
 
-          this.mensajeExito =
-            'Cita agendada correctamente.';
+      error: (error) => {
 
+        console.error(
+          'Error al guardar cita:',
+          error
+        );
 
-          // Cerramos el formulario.
-          this.cerrarFormulario();
+        this.guardando = false;
 
+        this.mensajeError =
+          error?.error?.mensaje ||
+          error?.error?.message ||
+          'No se pudo guardar la cita. Revisa los datos e intenta nuevamente.';
 
-          // Recargamos las citas.
-          this.cargarDatos();
+        this.notificacionesServicio.agregar(
 
-        },
+          'Error al guardar cita',
 
+          'No se pudieron guardar los datos de la cita.',
 
-        error: (error) => {
+          'error'
 
-          console.error(
-            'Error al crear cita:',
-            error
-          );
+        );
 
+        this.cd.detectChanges();
 
-          this.mensajeError =
-            'No se pudo agendar la cita.';
+      }
 
-
-          this.cd.detectChanges();
-
-        }
-
-      });
+    });
 
   }
 
 
-
-  // ==========================================================
+  // ========================================================
   // CANCELAR CITA
-  // ==========================================================
+  // ========================================================
 
   cancelarCita(cita: any): void {
 
-
-    // Pedimos confirmación antes de cancelar.
-    const confirmar = window.confirm(
-      '¿Estás seguro de que deseas cancelar esta cita?'
-    );
-
-
-    // Si el usuario selecciona Cancelar,
-    // no hacemos nada.
-    if (!confirmar) {
-
+    // Impedir cancelar una cita ya cancelada.
+    if (
+      cita.estado === 'CANCELADA' ||
+      this.cancelandoId !== null
+    ) {
       return;
-
     }
 
 
-    // Ejecutamos:
-    //
+    // Se conserva la confirmación de seguridad.
+    const confirmado = window.confirm(
+      `¿Deseas cancelar la cita de ${cita.mascota?.nombre ?? 'tu mascota'}?`
+    );
+
+    if (!confirmado) {
+      return;
+    }
+
+
+    this.cancelandoId = cita.id;
+
+    this.mensajeError = '';
+
+    this.mensajeExito = '';
+
+
+    // Endpoint original:
     // PUT /api/citas/{id}/cancelar
     this.citaServicio
       .cancelarCita(cita.id)
       .subscribe({
 
 
+        // ==================================================
+        // CANCELACIÓN CORRECTA
+        // ==================================================
+
         next: () => {
 
+          this.cancelandoId = null;
+
           this.mensajeExito =
-            'Cita cancelada correctamente.';
+            'La cita fue cancelada correctamente.';
 
+          this.notificacionesServicio.agregar(
+            'Cita cancelada',
+            `Se canceló la cita de ${cita.mascota?.nombre ?? 'tu mascota'}.`,
+            'exito'
+          );
 
-          // Recargamos las citas para mostrar
-          // el nuevo estado CANCELADA.
           this.cargarDatos();
 
         },
 
+
+        // ==================================================
+        // ERROR AL CANCELAR
+        // ==================================================
 
         error: (error) => {
 
@@ -610,10 +872,18 @@ export class Citas implements OnInit {
             error
           );
 
+          this.cancelandoId = null;
 
           this.mensajeError =
+            error?.error?.mensaje ||
+            error?.error?.message ||
             'No se pudo cancelar la cita.';
 
+          this.notificacionesServicio.agregar(
+            'Error al cancelar',
+            'No fue posible cancelar la cita.',
+            'error'
+          );
 
           this.cd.detectChanges();
 
@@ -624,12 +894,15 @@ export class Citas implements OnInit {
   }
 
 
-
-  // ==========================================================
+  // ========================================================
   // CERRAR FORMULARIO
-  // ==========================================================
+  // ========================================================
 
   cerrarFormulario(): void {
+
+    if (this.guardando) {
+      return;
+    }
 
     this.mostrarFormulario = false;
 
@@ -642,48 +915,49 @@ export class Citas implements OnInit {
   }
 
 
-
-  // ==========================================================
-  // FORMATEAR FECHA
-  // ==========================================================
-  // Spring Boot puede devolver:
-  //
-  // 2026-10-20T10:30:00
-  //
-  // Pero input datetime-local utiliza:
-  //
-  // 2026-10-20T10:30
-  // ==========================================================
+  // ========================================================
+  // FORMATEAR FECHA PARA INPUT DATETIME-LOCAL
+  // ========================================================
 
   formatearFechaParaInput(
     fecha: string
   ): string {
 
-
     if (!fecha) {
-
       return '';
-
     }
 
-
-    return fecha.substring(
-      0,
-      16
-    );
+    // Convierte:
+    // 2026-10-25T10:30:00
+    //
+    // A:
+    // 2026-10-25T10:30
+    return String(fecha).substring(0, 16);
 
   }
 
 
-
-  // ==========================================================
-  // VOLVER AL DASHBOARD
-  // ==========================================================
+  // ========================================================
+  // VOLVER AL DASHBOARD USER
+  // ========================================================
 
   volverDashboard(): void {
 
-    this.router.navigate([
+    void this.router.navigate([
       '/usuario/dashboard'
+    ]);
+
+  }
+
+
+  // ========================================================
+  // IR A MIS MASCOTAS
+  // ========================================================
+
+  irMascotas(): void {
+
+    void this.router.navigate([
+      '/usuario/mascotas'
     ]);
 
   }

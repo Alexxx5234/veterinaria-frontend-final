@@ -1,14 +1,21 @@
+
 // ==========================================================
-// IMPORTACIONES
+// VETERINARIA AREVALO
+// LOGIN - MEJORAS DE USABILIDAD
 // ==========================================================
 
+// Component crea el componente Angular.
+// ChangeDetectorRef permite actualizar los mensajes
+// después de recibir una respuesta de Spring Boot.
 import {
   Component,
   ChangeDetectorRef
 } from '@angular/core';
 
+// Permite usar *ngIf en el HTML.
 import { CommonModule } from '@angular/common';
 
+// Herramientas para el formulario reactivo.
 import {
   FormBuilder,
   FormGroup,
@@ -16,70 +23,77 @@ import {
   Validators
 } from '@angular/forms';
 
-import { Router } from '@angular/router';
+// Router permite cambiar de página.
+// RouterLink permite ir al registro sin recargar la web.
+import {
+  Router,
+  RouterLink
+} from '@angular/router';
 
-import { AuthServicio }
-  from '../../../Servicios/auth-servicio';
+// Servicio existente de autenticación.
+import {
+  AuthServicio
+} from '../../../Servicios/auth-servicio';
 
+
+// ==========================================================
+// COMPONENTE LOGIN
+// ==========================================================
 
 @Component({
-
   selector: 'app-login-compents',
 
   standalone: true,
 
   imports: [
     CommonModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    RouterLink
   ],
 
   templateUrl: './login-compents.html',
 
   styleUrl: './login-compents.scss'
-
 })
 export class LoginCompents {
 
 
-  // ==========================================================
-  // FORMULARIO
-  // ==========================================================
+  // ========================================================
+  // FORMULARIO REACTIVO
+  // ========================================================
 
   loginForm: FormGroup;
 
 
-  // ==========================================================
-  // VARIABLES DE CONTROL
-  // ==========================================================
+  // ========================================================
+  // VARIABLES DE LA INTERFAZ
+  // ========================================================
 
+  // Presenta errores de autenticación.
   mensajeError: string = '';
 
+  // Evita enviar varias peticiones simultáneamente.
   cargando: boolean = false;
 
-
-  // Controla si la contraseña se muestra.
+  // Controla si se muestra u oculta la contraseña.
   mostrarPassword: boolean = false;
 
 
-  // ==========================================================
+  // ========================================================
   // CONSTRUCTOR
-  // ==========================================================
+  // ========================================================
 
   constructor(
-
     private fb: FormBuilder,
-
     private authServicio: AuthServicio,
-
     private router: Router,
-
     private cd: ChangeDetectorRef
-
   ) {
 
-
+    // Definimos los campos y sus validaciones.
     this.loginForm = this.fb.group({
 
+      // Correo obligatorio y con formato válido.
       correo: [
         '',
         [
@@ -88,6 +102,7 @@ export class LoginCompents {
         ]
       ],
 
+      // Contraseña obligatoria.
       password: [
         '',
         Validators.required
@@ -98,180 +113,165 @@ export class LoginCompents {
   }
 
 
-  // ==========================================================
-  // MOSTRAR / OCULTAR CONTRASEÑA
-  // ==========================================================
+  // ========================================================
+  // MOSTRAR Y OCULTAR CONTRASEÑA
+  // ========================================================
 
   cambiarVisibilidadPassword(): void {
 
-    this.mostrarPassword =
-      !this.mostrarPassword;
+    this.mostrarPassword = !this.mostrarPassword;
 
   }
 
 
-  // ==========================================================
+  // ========================================================
   // INICIAR SESIÓN
-  // ==========================================================
+  // ========================================================
 
   iniciarSesion(): void {
 
+    // Evitamos hacer clic repetidamente mientras carga.
+    if (this.cargando) {
+      return;
+    }
 
+    // Limpiar mensajes anteriores.
     this.mensajeError = '';
 
-
+    // Comprobar el formulario antes de enviarlo.
     if (this.loginForm.invalid) {
 
+      // Mostrar errores debajo de los campos.
       this.loginForm.markAllAsTouched();
 
       return;
-
     }
 
-
+    // Activar el estado de carga.
     this.cargando = true;
 
+    // Eliminar espacios accidentales del correo.
+    const correo = String(
+      this.loginForm.get('correo')?.value ?? ''
+    ).trim();
 
-    const correo =
-      this.loginForm.value.correo;
+    // No modificar los caracteres de la contraseña.
+    const password = String(
+      this.loginForm.get('password')?.value ?? ''
+    );
 
-    const password =
-      this.loginForm.value.password;
 
+    // ======================================================
+    // CONSUMIR API REST DE SPRING BOOT
+    // ======================================================
 
     this.authServicio
-      .login(
-        correo,
-        password
-      )
+      .login(correo, password)
       .subscribe({
 
+        // ==================================================
+        // RESPUESTA CORRECTA
+        // ==================================================
 
-        // ====================================================
-        // LOGIN CORRECTO
-        // ====================================================
+        next: (respuesta: any) => {
 
-        next: (respuesta) => {
+          this.cargando = false;
 
+          // Comprobar que la respuesta tenga token y rol.
+          if (
+            !respuesta?.token ||
+            (
+              respuesta?.rol !== 'ADMIN' &&
+              respuesta?.rol !== 'USER'
+            )
+          ) {
 
-          console.log(
-            'Login correcto:',
-            respuesta
-          );
+            this.mensajeError =
+              'No se pudo validar la sesión. Intenta nuevamente.';
 
+            this.cd.detectChanges();
 
+            return;
+          }
+
+          // Guardar el JWT y el rol.
           this.authServicio.guardarSesion(
             respuesta.token,
             respuesta.rol
           );
 
-
-          this.cargando = false;
-
-          this.cd.detectChanges();
-
-
-          if (respuesta.rol === 'ADMIN') {
-
-            this.router.navigate([
-              '/admin/dashboard'
-            ]);
-
-            return;
-
-          }
-
-
-          if (respuesta.rol === 'USER') {
-
-            this.router.navigate([
-              '/usuario/dashboard'
-            ]);
-
-            return;
-
-          }
-
-
-          this.mensajeError =
-            'El rol del usuario no es válido.';
-
+          // Redirigir según el rol autenticado.
+          const ruta = respuesta.rol === 'ADMIN'
+            ? '/admin/dashboard'
+            : '/usuario/dashboard';
 
           this.cd.detectChanges();
+
+          void this.router.navigateByUrl(ruta);
 
         },
 
 
-        // ====================================================
-        // ERROR
-        // ====================================================
+        // ==================================================
+        // ERROR DE INICIO DE SESIÓN
+        // ==================================================
 
-        error: (error) => {
-
-
-          console.error(
-            'Error completo al iniciar sesión:',
-            error
-          );
-
+        error: (error: any) => {
 
           this.cargando = false;
 
-
+          // Obtener el mensaje que devuelve Spring Boot.
           const mensajeBackend =
-
-            error?.error?.mensaje ||
-
-            error?.error?.message ||
-
-            error?.error?.detalle ||
-
-            error?.error?.detail ||
-
-            '';
-
+            this.obtenerMensajeBackend(error);
 
           const mensaje =
             mensajeBackend.toLowerCase();
 
 
-          // CUENTA PENDIENTE
-          if (
-            mensaje.includes('aprobada')
-          ) {
+          // Error de conexión con la API.
+          if (error?.status === 0) {
 
             this.mensajeError =
-              '⏳ Tu cuenta todavía está pendiente de aprobación por el administrador.';
+              'No se pudo conectar con el servidor. Intenta nuevamente.';
 
           }
 
-
-          // CUENTA NO VERIFICADA
+          // Usuario pendiente de aprobación.
           else if (
-            mensaje.includes('verificada')
+            mensaje.includes('aprobada') ||
+            mensaje.includes('pendiente')
           ) {
 
             this.mensajeError =
-              '📧 Tu cuenta todavía no ha sido verificada. Revisa el código enviado a tu correo.';
+              '⏳ Tu cuenta está pendiente de aprobación por el administrador.';
 
           }
 
-
-          // CUENTA RECHAZADA
+          // Usuario sin verificar.
           else if (
-            mensaje.includes('rechazada')
+            mensaje.includes('verificada') ||
+            mensaje.includes('verificado')
           ) {
+
+            this.mensajeError =
+              '📧 Debes verificar tu cuenta antes de ingresar.';
+
+          }
+
+          // Cuenta rechazada.
+          else if (mensaje.includes('rechazada')) {
 
             this.mensajeError =
               '❌ Tu cuenta fue rechazada por el administrador.';
 
           }
 
-
-          // BLOQUEADA / DESACTIVADA
+          // Cuenta bloqueada o desactivada.
           else if (
             mensaje.includes('bloqueada') ||
-            mensaje.includes('desactivada')
+            mensaje.includes('bloqueado') ||
+            mensaje.includes('desactivada') ||
+            mensaje.includes('inactiva')
           ) {
 
             this.mensajeError =
@@ -279,8 +279,7 @@ export class LoginCompents {
 
           }
 
-
-          // CONTRASEÑA
+          // Contraseña incorrecta.
           else if (
             mensaje.includes('contraseña incorrecta')
           ) {
@@ -290,8 +289,7 @@ export class LoginCompents {
 
           }
 
-
-          // USUARIO
+          // Usuario inexistente.
           else if (
             mensaje.includes('usuario no encontrado')
           ) {
@@ -301,21 +299,55 @@ export class LoginCompents {
 
           }
 
-
+          // Mensaje general.
           else {
 
             this.mensajeError =
               mensajeBackend ||
-              'No fue posible iniciar sesión.';
+              'No fue posible iniciar sesión. Revisa tus datos e intenta nuevamente.';
 
           }
 
-
+          // Mostrar el mensaje inmediatamente.
           this.cd.detectChanges();
 
         }
 
       });
+
+  }
+
+
+  // ========================================================
+  // OBTENER MENSAJE DE ERROR DEL BACKEND
+  // ========================================================
+
+  /**
+   * Algunos errores de Spring Boot contienen
+   * un mensaje en diferentes propiedades.
+   *
+   * Comprobamos que sea texto antes de utilizarlo.
+   */
+  private obtenerMensajeBackend(error: any): string {
+
+    const respuesta = error?.error;
+
+    // Si Spring Boot devuelve un texto directamente.
+    if (typeof respuesta === 'string') {
+      return respuesta;
+    }
+
+    // Si devuelve un objeto JSON.
+    const mensaje =
+      respuesta?.mensaje ??
+      respuesta?.message ??
+      respuesta?.detalle ??
+      respuesta?.detail ??
+      '';
+
+    return typeof mensaje === 'string'
+      ? mensaje
+      : '';
 
   }
 

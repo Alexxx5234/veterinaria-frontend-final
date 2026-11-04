@@ -1,19 +1,43 @@
+
+<!-- ==========================================================
+     VETERINARIA AREVALO
+     ADMINISTRACIÓN DE VETERINARIOS (ADMIN)
+
+     SECCIONES:
+     1. Cabecera administrativa.
+     2. Mensajes del sistema.
+     3. Total de veterinarios.
+     4. Formulario de registro y edición.
+     5. Búsqueda, filtros y ordenamiento.
+     6. Listado de profesionales.
+     7. Acciones de editar y eliminar.
+
+     El menú lateral, la campana y la accesibilidad
+     global pertenecen a LayoutPrivado.
+     ========================================================== -->
+
 <div class="veterinarios-container">
 
 
-  <!-- =====================================================
-       CABECERA
-       ===================================================== -->
+  <!-- ========================================================
+       1. CABECERA PRINCIPAL
+       ======================================================== -->
 
   <header class="veterinarios-header">
 
-    <div>
+    <div class="header-texto">
 
-      <h1>👨‍⚕️ Administración de Veterinarios</h1>
+      <span class="etiqueta-pagina">
+        PANEL ADMINISTRATIVO
+      </span>
+
+      <h1>
+        Administración de Veterinarios 👨‍⚕️
+      </h1>
 
       <p>
-        Registra, edita y elimina veterinarios
-        disponibles en el sistema.
+        Registra, consulta y administra los profesionales
+        veterinarios de la clínica.
       </p>
 
     </div>
@@ -21,21 +45,24 @@
 
     <div class="acciones-header">
 
+      <!-- ABRIR FORMULARIO PARA REGISTRAR -->
       <button
         type="button"
         class="btn-nuevo"
         (click)="nuevoVeterinario()"
+        [disabled]="cargando || hayOperacionEnCurso"
       >
         + Nuevo veterinario
       </button>
 
 
+      <!-- REGRESAR AL PANEL -->
       <button
         type="button"
         class="btn-volver"
         (click)="volverDashboard()"
       >
-        ← Volver
+        ← Volver al panel
       </button>
 
     </div>
@@ -43,237 +70,510 @@
   </header>
 
 
-  <!-- =====================================================
-       MENSAJES
-       ===================================================== -->
+  <!-- ========================================================
+       2. MENSAJES DEL SISTEMA
+       ======================================================== -->
 
+  <!-- MENSAJE DE ÉXITO -->
   <div
     class="mensaje-exito"
     *ngIf="mensajeExito"
+    role="status"
+    aria-live="polite"
   >
-    {{ mensajeExito }}
+    ✅ {{ mensajeExito }}
   </div>
 
 
+  <!-- MENSAJE DE ERROR -->
   <div
     class="mensaje-error"
     *ngIf="mensajeError"
+    role="alert"
   >
-    {{ mensajeError }}
+
+    ⚠️ {{ mensajeError }}
+
+
+    <!-- REINTENTAR SI FALLÓ LA CONSULTA -->
+    <button
+      type="button"
+      class="btn-reintentar"
+      *ngIf="errorCarga"
+      (click)="cargarVeterinarios()"
+    >
+      Reintentar
+    </button>
+
   </div>
 
 
-  <!-- =====================================================
-       FORMULARIO
-       ===================================================== -->
+  <!-- ========================================================
+       3. RESUMEN GENERAL
+       ======================================================== -->
+
+  <!--
+    Se muestra únicamente el total de profesionales.
+
+    No se crean tarjetas adicionales por especialidad.
+  -->
+
+  <section
+    class="resumen-grid"
+    *ngIf="!cargando && !errorCarga"
+    aria-label="Resumen de veterinarios registrados"
+  >
+
+    <article class="resumen-card">
+
+      <div
+        class="resumen-icono"
+        aria-hidden="true"
+      >
+        👨‍⚕️
+      </div>
+
+      <div class="resumen-datos">
+
+        <span>
+          Total de veterinarios registrados
+        </span>
+
+        <strong>
+          {{ totalVeterinarios }}
+        </strong>
+
+      </div>
+
+    </article>
+
+  </section>
+
+
+  <!-- ========================================================
+       4. FORMULARIO DE VETERINARIO
+       ======================================================== -->
+
+  <!--
+    El formulario permite registrar o editar.
+
+    veterinarioEditandoId === null:
+      Registrar nuevo veterinario.
+
+    veterinarioEditandoId !== null:
+      Actualizar veterinario existente.
+  -->
 
   <section
     class="formulario-card"
     *ngIf="mostrarFormulario"
+    aria-labelledby="titulo-formulario"
   >
 
 
-    <h2 *ngIf="veterinarioEditandoId === null">
-      Registrar nuevo veterinario
-    </h2>
+    <!-- CABECERA DEL FORMULARIO -->
+    <div class="formulario-header">
+
+      <div
+        class="formulario-icono"
+        aria-hidden="true"
+      >
+        {{
+          veterinarioEditandoId === null
+            ? '👨‍⚕️'
+            : '✏️'
+        }}
+      </div>
 
 
-    <h2 *ngIf="veterinarioEditandoId !== null">
-      Editar veterinario
-    </h2>
+      <div>
 
+        <h2 id="titulo-formulario">
+          {{
+            veterinarioEditandoId === null
+              ? 'Registrar nuevo veterinario'
+              : 'Editar veterinario'
+          }}
+        </h2>
+
+        <p>
+          Completa la información del profesional.
+          Todos los campos son obligatorios.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <!-- ======================================================
+         FORMULARIO REACTIVO
+         ====================================================== -->
 
     <form
       [formGroup]="veterinarioForm"
       (ngSubmit)="guardarVeterinario()"
+      novalidate
+      [attr.aria-busy]="guardando"
     >
 
+      <!-- Bloquea la edición mientras se guarda. -->
+      <fieldset
+        class="campos-formulario"
+        [disabled]="guardando"
+      >
 
-      <!-- CÉDULA -->
-      <div class="form-group">
-
-        <label for="cedula">
-          Cédula
-        </label>
-
-        <input
-          id="cedula"
-          type="text"
-          maxlength="10"
-          formControlName="cedula"
-          placeholder="Ejemplo: 0102030405"
-        >
-
-        <small
-          class="error-validacion"
-          *ngIf="
-            veterinarioForm.get('cedula')?.touched &&
-            veterinarioForm.get('cedula')?.invalid
-          "
-        >
-          La cédula debe tener 10 caracteres.
-        </small>
-
-      </div>
+        <legend class="solo-lectores">
+          Datos del veterinario
+        </legend>
 
 
-      <!-- NOMBRE -->
-      <div class="form-group">
-
-        <label for="nombre">
-          Nombre
-        </label>
-
-        <input
-          id="nombre"
-          type="text"
-          formControlName="nombre"
-          placeholder="Ejemplo: Carlos"
-        >
-
-        <small
-          class="error-validacion"
-          *ngIf="
-            veterinarioForm.get('nombre')?.touched &&
-            veterinarioForm.get('nombre')?.hasError('required')
-          "
-        >
-          El nombre es obligatorio.
-        </small>
-
-      </div>
+        <div class="form-grid">
 
 
-      <!-- APELLIDO -->
-      <div class="form-group">
+          <!-- ================================================
+               CÉDULA
+               ================================================ -->
 
-        <label for="apellido">
-          Apellido
-        </label>
+          <div class="form-group">
 
-        <input
-          id="apellido"
-          type="text"
-          formControlName="apellido"
-          placeholder="Ejemplo: Pérez"
-        >
+            <label for="cedulaVeterinarioAdmin">
+              Cédula
 
-        <small
-          class="error-validacion"
-          *ngIf="
-            veterinarioForm.get('apellido')?.touched &&
-            veterinarioForm.get('apellido')?.hasError('required')
-          "
-        >
-          El apellido es obligatorio.
-        </small>
+              <span
+                class="obligatorio"
+                aria-hidden="true"
+              >
+                *
+              </span>
 
-      </div>
+            </label>
 
 
-      <!-- ESPECIALIDAD -->
-      <div class="form-group">
-
-        <label for="especialidad">
-          Especialidad
-        </label>
-
-        <input
-          id="especialidad"
-          type="text"
-          formControlName="especialidad"
-          placeholder="Ejemplo: Medicina general"
-        >
-
-        <small
-          class="error-validacion"
-          *ngIf="
-            veterinarioForm.get('especialidad')?.touched &&
-            veterinarioForm.get('especialidad')?.hasError('required')
-          "
-        >
-          La especialidad es obligatoria.
-        </small>
-
-      </div>
+            <input
+              #campoCedula
+              id="cedulaVeterinarioAdmin"
+              type="text"
+              inputmode="numeric"
+              maxlength="10"
+              formControlName="cedula"
+              placeholder="Ejemplo: 0102030405"
+              autocomplete="off"
+              required
+              [class.input-error]="campoInvalido('cedula')"
+              [attr.aria-invalid]="campoInvalido('cedula')"
+              [attr.aria-describedby]="
+                campoInvalido('cedula')
+                  ? 'error-cedula'
+                  : 'ayuda-cedula'
+              "
+            >
 
 
-      <!-- TELÉFONO -->
-      <div class="form-group">
-
-        <label for="telefono">
-          Teléfono
-        </label>
-
-        <input
-          id="telefono"
-          type="text"
-          formControlName="telefono"
-          placeholder="Ejemplo: 0998765432"
-        >
-
-        <small
-          class="error-validacion"
-          *ngIf="
-            veterinarioForm.get('telefono')?.touched &&
-            veterinarioForm.get('telefono')?.hasError('required')
-          "
-        >
-          El teléfono es obligatorio.
-        </small>
-
-      </div>
+            <small
+              id="ayuda-cedula"
+              class="texto-ayuda"
+            >
+              Ingresa exactamente 10 dígitos numéricos.
+            </small>
 
 
-      <!-- EMAIL -->
-      <div class="form-group">
+            <small
+              id="error-cedula"
+              class="error-validacion"
+              *ngIf="campoInvalido('cedula')"
+            >
 
-        <label for="email">
-          Correo electrónico
-        </label>
-
-        <input
-          id="email"
-          type="email"
-          formControlName="email"
-          placeholder="Ejemplo: veterinario@gmail.com"
-        >
-
-        <small
-          class="error-validacion"
-          *ngIf="
-            veterinarioForm.get('email')?.touched &&
-            veterinarioForm.get('email')?.hasError('required')
-          "
-        >
-          El correo es obligatorio.
-        </small>
+              <span
+                *ngIf="
+                  veterinarioForm.get('cedula')?.hasError('required')
+                "
+              >
+                La cédula es obligatoria.
+              </span>
 
 
-        <small
-          class="error-validacion"
-          *ngIf="
-            veterinarioForm.get('email')?.touched &&
-            veterinarioForm.get('email')?.hasError('email')
-          "
-        >
-          Ingresa un correo válido.
-        </small>
+              <span
+                *ngIf="
+                  veterinarioForm.get('cedula')?.hasError('pattern')
+                "
+              >
+                La cédula debe contener exactamente 10 números.
+              </span>
 
-      </div>
+            </small>
+
+          </div>
 
 
-      <!-- BOTONES -->
+          <!-- ================================================
+               NOMBRE
+               ================================================ -->
+
+          <div class="form-group">
+
+            <label for="nombreVeterinarioAdmin">
+              Nombre
+
+              <span
+                class="obligatorio"
+                aria-hidden="true"
+              >
+                *
+              </span>
+            </label>
+
+
+            <input
+              id="nombreVeterinarioAdmin"
+              type="text"
+              formControlName="nombre"
+              placeholder="Ejemplo: Carlos"
+              autocomplete="given-name"
+              required
+              [class.input-error]="campoInvalido('nombre')"
+              [attr.aria-invalid]="campoInvalido('nombre')"
+              [attr.aria-describedby]="
+                campoInvalido('nombre')
+                  ? 'error-nombre'
+                  : null
+              "
+            >
+
+
+            <small
+              id="error-nombre"
+              class="error-validacion"
+              *ngIf="campoInvalido('nombre')"
+            >
+              El nombre es obligatorio.
+            </small>
+
+          </div>
+
+
+          <!-- ================================================
+               APELLIDO
+               ================================================ -->
+
+          <div class="form-group">
+
+            <label for="apellidoVeterinarioAdmin">
+              Apellido
+
+              <span
+                class="obligatorio"
+                aria-hidden="true"
+              >
+                *
+              </span>
+            </label>
+
+
+            <input
+              id="apellidoVeterinarioAdmin"
+              type="text"
+              formControlName="apellido"
+              placeholder="Ejemplo: Mendoza"
+              autocomplete="family-name"
+              required
+              [class.input-error]="campoInvalido('apellido')"
+              [attr.aria-invalid]="campoInvalido('apellido')"
+              [attr.aria-describedby]="
+                campoInvalido('apellido')
+                  ? 'error-apellido'
+                  : null
+              "
+            >
+
+
+            <small
+              id="error-apellido"
+              class="error-validacion"
+              *ngIf="campoInvalido('apellido')"
+            >
+              El apellido es obligatorio.
+            </small>
+
+          </div>
+
+
+          <!-- ================================================
+               ESPECIALIDAD
+               ================================================ -->
+
+          <div class="form-group">
+
+            <label for="especialidadVeterinarioAdmin">
+              Especialidad
+
+              <span
+                class="obligatorio"
+                aria-hidden="true"
+              >
+                *
+              </span>
+            </label>
+
+
+            <!-- Campo libre para cualquier especialidad. -->
+            <input
+              id="especialidadVeterinarioAdmin"
+              type="text"
+              formControlName="especialidad"
+              placeholder="Ejemplo: Medicina general"
+              required
+              [class.input-error]="campoInvalido('especialidad')"
+              [attr.aria-invalid]="campoInvalido('especialidad')"
+              [attr.aria-describedby]="
+                campoInvalido('especialidad')
+                  ? 'error-especialidad'
+                  : null
+              "
+            >
+
+
+            <small
+              id="error-especialidad"
+              class="error-validacion"
+              *ngIf="campoInvalido('especialidad')"
+            >
+              La especialidad es obligatoria.
+            </small>
+
+          </div>
+
+
+          <!-- ================================================
+               TELÉFONO
+               ================================================ -->
+
+          <div class="form-group">
+
+            <label for="telefonoVeterinarioAdmin">
+              Teléfono
+
+              <span
+                class="obligatorio"
+                aria-hidden="true"
+              >
+                *
+              </span>
+            </label>
+
+
+            <input
+              id="telefonoVeterinarioAdmin"
+              type="tel"
+              formControlName="telefono"
+              placeholder="Ejemplo: 0998765432"
+              autocomplete="tel"
+              required
+              [class.input-error]="campoInvalido('telefono')"
+              [attr.aria-invalid]="campoInvalido('telefono')"
+              [attr.aria-describedby]="
+                campoInvalido('telefono')
+                  ? 'error-telefono'
+                  : null
+              "
+            >
+
+
+            <small
+              id="error-telefono"
+              class="error-validacion"
+              *ngIf="campoInvalido('telefono')"
+            >
+              El teléfono es obligatorio.
+            </small>
+
+          </div>
+
+
+          <!-- ================================================
+               CORREO ELECTRÓNICO
+               ================================================ -->
+
+          <div class="form-group">
+
+            <label for="emailVeterinarioAdmin">
+              Correo electrónico
+
+              <span
+                class="obligatorio"
+                aria-hidden="true"
+              >
+                *
+              </span>
+            </label>
+
+
+            <input
+              id="emailVeterinarioAdmin"
+              type="email"
+              formControlName="email"
+              placeholder="Ejemplo: profesional@gmail.com"
+              autocomplete="email"
+              required
+              [class.input-error]="campoInvalido('email')"
+              [attr.aria-invalid]="campoInvalido('email')"
+              [attr.aria-describedby]="
+                campoInvalido('email')
+                  ? 'error-email'
+                  : null
+              "
+            >
+
+
+            <small
+              id="error-email"
+              class="error-validacion"
+              *ngIf="campoInvalido('email')"
+            >
+
+              <span
+                *ngIf="
+                  veterinarioForm.get('email')?.hasError('required')
+                "
+              >
+                El correo electrónico es obligatorio.
+              </span>
+
+
+              <span
+                *ngIf="
+                  veterinarioForm.get('email')?.hasError('email')
+                "
+              >
+                Ingresa un correo electrónico válido.
+              </span>
+
+            </small>
+
+          </div>
+
+        </div>
+
+      </fieldset>
+
+
+      <!-- ====================================================
+           BOTONES DEL FORMULARIO
+           ==================================================== -->
+
       <div class="form-acciones">
 
         <button
           type="submit"
           class="btn-guardar"
+          [disabled]="guardando"
         >
           {{
-            veterinarioEditandoId === null
-              ? 'Registrar veterinario'
-              : 'Guardar cambios'
+            guardando
+              ? 'Guardando veterinario...'
+              : veterinarioEditandoId === null
+                ? 'Registrar veterinario'
+                : 'Guardar cambios'
           }}
         </button>
 
@@ -282,6 +582,7 @@
           type="button"
           class="btn-cancelar"
           (click)="cerrarFormulario()"
+          [disabled]="guardando"
         >
           Cancelar
         </button>
@@ -293,126 +594,465 @@
   </section>
 
 
-  <!-- =====================================================
-       CARGANDO
-       ===================================================== -->
-
-  <div
-    class="mensaje-info"
-    *ngIf="cargando"
-  >
-    Cargando veterinarios...
-  </div>
-
-
-  <!-- =====================================================
-       SIN VETERINARIOS
-       ===================================================== -->
-
-  <div
-    class="sin-veterinarios"
-    *ngIf="
-      !cargando &&
-      !mensajeError &&
-      veterinarios.length === 0
-    "
-  >
-
-    <div class="sin-icono">
-      👨‍⚕️
-    </div>
-
-    <h2>
-      No hay veterinarios registrados
-    </h2>
-
-    <p>
-      Presiona "Nuevo veterinario" para registrar el primero.
-    </p>
-
-  </div>
-
-
-  <!-- =====================================================
-       LISTADO
-       ===================================================== -->
+  <!-- ========================================================
+       5. ENCABEZADO DEL LISTADO
+       ======================================================== -->
 
   <section
-    class="veterinarios-grid"
-    *ngIf="
-      !cargando &&
-      veterinarios.length > 0
-    "
+    class="listado-section"
+    aria-labelledby="titulo-listado-veterinarios"
   >
 
+    <div class="listado-header">
 
-    <article
-      class="veterinario-card"
-      *ngFor="let veterinario of veterinarios"
+      <div>
+
+        <h2 id="titulo-listado-veterinarios">
+          Veterinarios registrados
+        </h2>
+
+        <p>
+          Consulta los datos y especialidades de
+          los profesionales de la veterinaria.
+        </p>
+
+      </div>
+
+
+      <div class="listado-acciones">
+
+        <!-- NÚMERO DE REGISTROS -->
+        <span
+          class="total-registros"
+          *ngIf="!cargando && !errorCarga"
+        >
+
+          {{ veterinarios.length }}
+
+          {{
+            veterinarios.length === 1
+              ? 'veterinario'
+              : 'veterinarios'
+          }}
+
+        </span>
+
+
+        <!-- CONSULTAR NUEVAMENTE LA API -->
+        <button
+          type="button"
+          class="btn-actualizar"
+          (click)="cargarVeterinarios(true)"
+          [disabled]="cargando || hayOperacionEnCurso"
+        >
+          {{
+            cargando
+              ? 'Consultando...'
+              : '↻ Actualizar'
+          }}
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- ======================================================
+         6. BUSCADOR Y FILTROS
+         ====================================================== -->
+
+    <div
+      class="filtros-card"
+      *ngIf="
+        !cargando &&
+        !errorCarga &&
+        veterinarios.length > 0
+      "
     >
 
 
-      <div class="veterinario-icono">
+      <!-- BUSCADOR -->
+      <div class="filtro-grupo">
+
+        <label for="buscarVeterinarioAdmin">
+          Buscar veterinario
+        </label>
+
+
+        <input
+          id="buscarVeterinarioAdmin"
+          type="search"
+          [(ngModel)]="busqueda"
+          placeholder="Nombre, cédula, especialidad..."
+          autocomplete="off"
+          aria-describedby="ayuda-busqueda"
+        >
+
+
+        <small
+          id="ayuda-busqueda"
+          class="texto-ayuda"
+        >
+          También puedes buscar por teléfono o correo.
+        </small>
+
+      </div>
+
+
+      <!-- FILTRO POR ESPECIALIDAD -->
+      <div class="filtro-grupo">
+
+        <label for="filtrarEspecialidadAdmin">
+          Especialidad
+        </label>
+
+
+        <select
+          id="filtrarEspecialidadAdmin"
+          [(ngModel)]="filtroEspecialidad"
+        >
+
+          <option value="TODAS">
+            Todas las especialidades
+          </option>
+
+
+          <option
+            *ngFor="let especialidad of especialidadesDisponibles"
+            [value]="especialidad"
+          >
+            {{ especialidad }}
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- ORDENAMIENTO -->
+      <div class="filtro-grupo">
+
+        <label for="ordenarVeterinariosAdmin">
+          Ordenar veterinarios
+        </label>
+
+
+        <select
+          id="ordenarVeterinariosAdmin"
+          [(ngModel)]="ordenarPor"
+        >
+
+          <option value="nombreAsc">
+            Nombre (A-Z)
+          </option>
+
+          <option value="nombreDesc">
+            Nombre (Z-A)
+          </option>
+
+          <option value="especialidadAsc">
+            Especialidad (A-Z)
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+
+    <!-- ======================================================
+         7. CARGANDO
+         ====================================================== -->
+
+    <div
+      class="mensaje-info"
+      *ngIf="cargando"
+      role="status"
+      aria-live="polite"
+    >
+      Consultando los veterinarios registrados...
+    </div>
+
+
+    <!-- ======================================================
+         8. SIN VETERINARIOS
+         ====================================================== -->
+
+    <div
+      class="sin-veterinarios"
+      *ngIf="
+        !cargando &&
+        !errorCarga &&
+        veterinarios.length === 0
+      "
+    >
+
+      <div
+        class="sin-icono"
+        aria-hidden="true"
+      >
         👨‍⚕️
       </div>
 
 
-      <h2>
-        {{ veterinario.nombre }}
-        {{ veterinario.apellido }}
-      </h2>
+      <h3>
+        No hay veterinarios registrados
+      </h3>
 
 
-      <div class="veterinario-info">
-
-        <p>
-          <strong>Cédula:</strong>
-          {{ veterinario.cedula }}
-        </p>
+      <p>
+        Todavía no existen profesionales
+        veterinarios registrados en el sistema.
+      </p>
 
 
-        <p>
-          <strong>Especialidad:</strong>
-          {{ veterinario.especialidad }}
-        </p>
+      <button
+        type="button"
+        class="btn-nuevo"
+        (click)="nuevoVeterinario()"
+      >
+        + Registrar primer veterinario
+      </button>
+
+    </div>
 
 
-        <p>
-          <strong>Teléfono:</strong>
-          {{ veterinario.telefono }}
-        </p>
+    <!-- ======================================================
+         9. SIN RESULTADOS
+         ====================================================== -->
 
+    <div
+      class="sin-resultados"
+      *ngIf="
+        !cargando &&
+        !errorCarga &&
+        veterinarios.length > 0 &&
+        veterinariosFiltrados.length === 0
+      "
+    >
 
-        <p>
-          <strong>Correo:</strong>
-          {{ veterinario.email }}
-        </p>
-
+      <div
+        class="sin-icono"
+        aria-hidden="true"
+      >
+        🔎
       </div>
 
 
-      <div class="acciones-card">
-
-        <button
-          type="button"
-          class="btn-editar"
-          (click)="editarVeterinario(veterinario)"
-        >
-          ✏️ Editar
-        </button>
+      <h3>
+        No encontramos veterinarios
+      </h3>
 
 
-        <button
-          type="button"
-          class="btn-eliminar"
-          (click)="eliminarVeterinario(veterinario)"
-        >
-          🗑 Eliminar
-        </button>
+      <p>
+        Intenta buscar otro nombre
+        o seleccionar otra especialidad.
+      </p>
 
-      </div>
 
-    </article>
+      <button
+        type="button"
+        class="btn-limpiar"
+        (click)="limpiarFiltros()"
+      >
+        Limpiar filtros
+      </button>
+
+    </div>
+
+
+    <!-- ======================================================
+         10. LISTADO DE VETERINARIOS
+         ====================================================== -->
+
+    <div
+      class="veterinarios-grid"
+      *ngIf="
+        !cargando &&
+        !errorCarga &&
+        veterinariosFiltrados.length > 0
+      "
+    >
+
+
+      <article
+        class="veterinario-card"
+        *ngFor="
+          let veterinario of veterinariosFiltrados;
+          trackBy: trackByVeterinario
+        "
+        [attr.aria-busy]="eliminandoId === veterinario.id"
+      >
+
+
+        <!-- ================================================
+             CABECERA DE TARJETA
+             ================================================ -->
+
+        <div class="tarjeta-superior">
+
+          <div
+            class="veterinario-icono"
+            aria-hidden="true"
+          >
+            👨‍⚕️
+          </div>
+
+
+          <span class="etiqueta-veterinario">
+            Profesional veterinario
+          </span>
+
+        </div>
+
+
+        <!-- NOMBRE COMPLETO -->
+        <h3 class="nombre-veterinario">
+          {{ veterinario.nombre }}
+          {{ veterinario.apellido }}
+        </h3>
+
+
+        <!-- ESPECIALIDAD DESTACADA -->
+        <div class="especialidad-box">
+
+          <span aria-hidden="true">
+            🩺
+          </span>
+
+          <div>
+
+            <small>
+              Especialidad
+            </small>
+
+            <strong>
+              {{
+                veterinario.especialidad ||
+                'No especificada'
+              }}
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        <!-- ================================================
+             INFORMACIÓN DEL VETERINARIO
+             ================================================ -->
+
+        <div class="veterinario-info">
+
+
+          <!-- CÉDULA -->
+          <div class="info-fila">
+
+            <strong>
+              Cédula
+            </strong>
+
+            <span>
+              {{ veterinario.cedula }}
+            </span>
+
+          </div>
+
+
+          <!-- TELÉFONO -->
+          <div class="info-fila">
+
+            <strong>
+              Teléfono
+            </strong>
+
+            <a
+              *ngIf="veterinario.telefono; else sinTelefono"
+              [href]="'tel:' + veterinario.telefono"
+            >
+              {{ veterinario.telefono }}
+            </a>
+
+            <ng-template #sinTelefono>
+              <span>No disponible</span>
+            </ng-template>
+
+          </div>
+
+
+          <!-- CORREO -->
+          <div class="info-fila">
+
+            <strong>
+              Correo
+            </strong>
+
+            <a
+              *ngIf="veterinario.email; else sinCorreo"
+              [href]="'mailto:' + veterinario.email"
+            >
+              {{ veterinario.email }}
+            </a>
+
+            <ng-template #sinCorreo>
+              <span>No disponible</span>
+            </ng-template>
+
+          </div>
+
+        </div>
+
+
+        <!-- ================================================
+             BOTONES ADMINISTRATIVOS
+             ================================================ -->
+
+        <div class="acciones-card">
+
+
+          <!-- EDITAR -->
+          <button
+            type="button"
+            class="btn-editar"
+            (click)="editarVeterinario(veterinario)"
+            [disabled]="cargando || hayOperacionEnCurso"
+            [attr.aria-label]="
+              'Editar veterinario ' +
+              veterinario.nombre + ' ' +
+              veterinario.apellido
+            "
+          >
+            ✏️ Editar
+          </button>
+
+
+          <!-- ELIMINAR -->
+          <button
+            type="button"
+            class="btn-eliminar"
+            (click)="eliminarVeterinario(veterinario)"
+            [disabled]="cargando || hayOperacionEnCurso"
+            [attr.aria-label]="
+              'Eliminar veterinario ' +
+              veterinario.nombre + ' ' +
+              veterinario.apellido
+            "
+          >
+
+            {{
+              eliminandoId === veterinario.id
+                ? 'Eliminando...'
+                : '🗑 Eliminar'
+            }}
+
+          </button>
+
+        </div>
+
+      </article>
+
+    </div>
 
   </section>
 

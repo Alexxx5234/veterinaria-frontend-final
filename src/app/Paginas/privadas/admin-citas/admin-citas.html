@@ -1,45 +1,67 @@
-<!-- =======================================================
-     ADMINISTRACIÓN DE CITAS
-     ======================================================= -->
+
+<!-- ==========================================================
+     VETERINARIA AREVALO
+     ADMINISTRACIÓN DE CITAS (ADMIN)
+
+     CONTENIDO:
+     1. Cabecera y acciones.
+     2. Mensajes del sistema.
+     3. Estadísticas por estado.
+     4. Formulario para registrar o editar.
+     5. Buscador, filtro y ordenamiento.
+     6. Tarjetas de citas.
+     7. Acciones administrativas.
+
+     LayoutPrivado controla:
+     - Menú lateral.
+     - Campana de notificaciones.
+     - Opciones de accesibilidad.
+     ========================================================== -->
 
 <div class="citas-container">
 
-
-  <!-- =====================================================
-       CABECERA
-       ===================================================== -->
+  <!-- ========================================================
+       1. CABECERA PRINCIPAL
+       ======================================================== -->
 
   <header class="citas-header">
 
-    <div>
+    <div class="header-texto">
 
-      <h1>📅 Administración de Citas</h1>
+      <span class="etiqueta-pagina">
+        PANEL ADMINISTRATIVO
+      </span>
+
+      <h1>
+        Administración de Citas 📅
+      </h1>
 
       <p>
-        Consulta, registra, edita, cancela
-        y elimina citas del sistema.
+        Registra, consulta y administra las citas
+        veterinarias del sistema.
       </p>
 
     </div>
 
-
     <div class="acciones-header">
 
+      <!-- NUEVA CITA -->
       <button
         type="button"
         class="btn-nuevo"
         (click)="nuevaCita()"
+        [disabled]="cargando || hayOperacionEnCurso"
       >
         + Nueva cita
       </button>
 
-
+      <!-- REGRESAR AL PANEL -->
       <button
         type="button"
         class="btn-volver"
         (click)="volverDashboard()"
       >
-        ← Volver
+        ← Volver al panel
       </button>
 
     </div>
@@ -47,283 +69,563 @@
   </header>
 
 
-  <!-- =====================================================
-       MENSAJE DE ÉXITO
-       ===================================================== -->
+  <!-- ========================================================
+       2. MENSAJES DEL SISTEMA
+       ======================================================== -->
 
+  <!-- MENSAJE DE ÉXITO -->
   <div
     class="mensaje-exito"
     *ngIf="mensajeExito"
+    role="status"
+    aria-live="polite"
   >
-    {{ mensajeExito }}
+    ✅ {{ mensajeExito }}
   </div>
 
-
-  <!-- =====================================================
-       MENSAJE DE ERROR
-       ===================================================== -->
-
+  <!-- MENSAJE DE ERROR -->
   <div
     class="mensaje-error"
     *ngIf="mensajeError"
+    role="alert"
   >
-    {{ mensajeError }}
+
+    ⚠️ {{ mensajeError }}
+
+    <!-- REINTENTAR SI FALLÓ LA CARGA -->
+    <button
+      type="button"
+      class="btn-reintentar"
+      *ngIf="errorCarga"
+      (click)="cargarDatos()"
+    >
+      Reintentar
+    </button>
+
   </div>
 
 
-  <!-- =====================================================
-       FORMULARIO
-       ===================================================== -->
+  <!-- ========================================================
+       3. RESUMEN GENERAL DE CITAS
+       ======================================================== -->
+
+  <!--
+    Estas tarjetas cuentan las citas según el
+    estado real que devuelve Spring Boot.
+  -->
+
+  <section
+    class="resumen-grid"
+    *ngIf="!cargando && !errorCarga"
+    aria-label="Estadísticas de citas"
+  >
+
+    <!-- TOTAL DE CITAS -->
+    <article class="resumen-card">
+
+      <div
+        class="resumen-icono icono-total"
+        aria-hidden="true"
+      >
+        📅
+      </div>
+
+      <div class="resumen-datos">
+
+        <span>Total de citas</span>
+
+        <strong>
+          {{ totalCitas }}
+        </strong>
+
+      </div>
+
+    </article>
+
+
+    <!-- CITAS PENDIENTES -->
+    <article class="resumen-card">
+
+      <div
+        class="resumen-icono icono-pendientes"
+        aria-hidden="true"
+      >
+        ⏳
+      </div>
+
+      <div class="resumen-datos">
+
+        <span>Pendientes</span>
+
+        <strong>
+          {{ totalPendientes }}
+        </strong>
+
+      </div>
+
+    </article>
+
+
+    <!-- CITAS CONFIRMADAS -->
+    <article class="resumen-card">
+
+      <div
+        class="resumen-icono icono-confirmadas"
+        aria-hidden="true"
+      >
+        ✔️
+      </div>
+
+      <div class="resumen-datos">
+
+        <span>Confirmadas</span>
+
+        <strong>
+          {{ totalConfirmadas }}
+        </strong>
+
+      </div>
+
+    </article>
+
+
+    <!-- CITAS COMPLETADAS -->
+    <article class="resumen-card">
+
+      <div
+        class="resumen-icono icono-completadas"
+        aria-hidden="true"
+      >
+        ✅
+      </div>
+
+      <div class="resumen-datos">
+
+        <span>Completadas</span>
+
+        <strong>
+          {{ totalCompletadas }}
+        </strong>
+
+      </div>
+
+    </article>
+
+
+    <!-- CITAS CANCELADAS -->
+    <article class="resumen-card">
+
+      <div
+        class="resumen-icono icono-canceladas"
+        aria-hidden="true"
+      >
+        🚫
+      </div>
+
+      <div class="resumen-datos">
+
+        <span>Canceladas</span>
+
+        <strong>
+          {{ totalCanceladas }}
+        </strong>
+
+      </div>
+
+    </article>
+
+  </section>
+
+
+  <!-- ========================================================
+       4. FORMULARIO DE CITA
+       ======================================================== -->
+
+  <!--
+    El mismo formulario permite registrar y editar.
+
+    citaEditandoId === null:
+      Nueva cita.
+
+    citaEditandoId !== null:
+      Modificar cita existente.
+  -->
 
   <section
     class="formulario-card"
     *ngIf="mostrarFormulario"
+    aria-labelledby="titulo-formulario"
   >
 
-    <h2 *ngIf="citaEditandoId === null">
-      Registrar nueva cita
-    </h2>
+    <!-- CABECERA DEL FORMULARIO -->
+    <div class="formulario-header">
+
+      <div
+        class="formulario-icono"
+        aria-hidden="true"
+      >
+        {{ citaEditandoId === null ? '📅' : '✏️' }}
+      </div>
+
+      <div>
+
+        <h2 id="titulo-formulario">
+
+          {{
+            citaEditandoId === null
+              ? 'Registrar nueva cita'
+              : 'Editar cita #' + citaEditandoId
+          }}
+
+        </h2>
+
+        <p>
+          Completa los datos obligatorios
+          para guardar la cita.
+        </p>
+
+      </div>
+
+    </div>
 
 
-    <h2 *ngIf="citaEditandoId !== null">
-      Editar cita
-    </h2>
-
+    <!-- ======================================================
+         FORMULARIO REACTIVO
+         ====================================================== -->
 
     <form
       [formGroup]="citaForm"
       (ngSubmit)="guardarCita()"
+      novalidate
+      [attr.aria-busy]="guardando"
     >
 
+      <fieldset
+        class="campos-formulario"
+        [disabled]="guardando"
+      >
 
-      <!-- FECHA Y HORA -->
-      <div class="form-group">
+        <legend class="solo-lectores">
+          Información de la cita veterinaria
+        </legend>
 
-        <label for="fechaHora">
-          Fecha y hora
-        </label>
-
-        <input
-          id="fechaHora"
-          type="datetime-local"
-          formControlName="fechaHora"
-        >
-
-        <small
-          class="error-validacion"
-          *ngIf="
-            citaForm.get('fechaHora')?.touched &&
-            citaForm.get('fechaHora')?.hasError('required')
-          "
-        >
-          La fecha y hora son obligatorias.
-        </small>
-
-      </div>
+        <div class="form-grid">
 
 
-      <!-- MOTIVO -->
-      <div class="form-group">
+          <!-- ================================================
+               FECHA Y HORA
+               ================================================ -->
 
-        <label for="motivo">
-          Motivo
-        </label>
+          <div class="form-group">
 
-        <textarea
-          id="motivo"
-          rows="4"
-          formControlName="motivo"
-          placeholder="Ejemplo: Vacunación anual"
-        ></textarea>
+            <label for="fechaHoraAdmin">
+              Fecha y hora
+              <span class="obligatorio" aria-hidden="true">
+                *
+              </span>
+            </label>
 
-        <small
-          class="error-validacion"
-          *ngIf="
-            citaForm.get('motivo')?.touched &&
-            citaForm.get('motivo')?.hasError('required')
-          "
-        >
-          El motivo es obligatorio.
-        </small>
+            <input
+              #campoFecha
+              id="fechaHoraAdmin"
+              type="datetime-local"
+              formControlName="fechaHora"
+              required
+              [class.input-error]="campoInvalido('fechaHora')"
+              [attr.aria-invalid]="campoInvalido('fechaHora')"
+              [attr.aria-describedby]="
+                campoInvalido('fechaHora')
+                  ? 'error-fecha'
+                  : null
+              "
+            >
 
-      </div>
+            <small
+              id="error-fecha"
+              class="error-validacion"
+              *ngIf="campoInvalido('fechaHora')"
+            >
+              La fecha y hora son obligatorias.
+            </small>
 
-
-      <!-- MASCOTA -->
-      <div class="form-group">
-
-        <label for="mascotaId">
-          Mascota
-        </label>
-
-        <select
-          id="mascotaId"
-          formControlName="mascotaId"
-        >
-
-          <option value="">
-            Selecciona una mascota
-          </option>
+          </div>
 
 
-          <option
-            *ngFor="let mascota of mascotas"
-            [value]="mascota.id"
-          >
-            {{ mascota.nombre }}
-            -
-            {{ mascota.usuario?.nombre }}
-            {{ mascota.usuario?.apellido || '' }}
-          </option>
+          <!-- ================================================
+               ESTADO
+               ================================================ -->
 
-        </select>
+          <div class="form-group">
 
-        <small
-          class="error-validacion"
-          *ngIf="
-            citaForm.get('mascotaId')?.touched &&
-            citaForm.get('mascotaId')?.hasError('required')
-          "
-        >
-          Debes seleccionar una mascota.
-        </small>
+            <label for="estadoAdmin">
+              Estado de la cita
+              <span class="obligatorio" aria-hidden="true">
+                *
+              </span>
+            </label>
 
-      </div>
+            <select
+              id="estadoAdmin"
+              formControlName="estado"
+              required
+              [class.input-error]="campoInvalido('estado')"
+              [attr.aria-invalid]="campoInvalido('estado')"
+            >
 
+              <option value="PENDIENTE">
+                PENDIENTE
+              </option>
 
-      <!-- VETERINARIO -->
-      <div class="form-group">
+              <option value="CONFIRMADA">
+                CONFIRMADA
+              </option>
 
-        <label for="veterinarioId">
-          Veterinario
-        </label>
+              <option value="COMPLETADA">
+                COMPLETADA
+              </option>
 
-        <select
-          id="veterinarioId"
-          formControlName="veterinarioId"
-        >
+              <option value="CANCELADA">
+                CANCELADA
+              </option>
 
-          <option value="">
-            Selecciona un veterinario
-          </option>
+            </select>
 
+            <small class="texto-ayuda">
+              El estado se guarda mediante la API.
+            </small>
 
-          <option
-            *ngFor="let veterinario of veterinarios"
-            [value]="veterinario.id"
-          >
-            {{ veterinario.nombre }}
-            {{ veterinario.apellido }}
-            -
-            {{ veterinario.especialidad }}
-          </option>
-
-        </select>
-
-        <small
-          class="error-validacion"
-          *ngIf="
-            citaForm.get('veterinarioId')?.touched &&
-            citaForm.get('veterinarioId')?.hasError('required')
-          "
-        >
-          Debes seleccionar un veterinario.
-        </small>
-
-      </div>
+          </div>
 
 
-      <!-- SERVICIO -->
-      <div class="form-group">
+          <!-- ================================================
+               MASCOTA
+               ================================================ -->
 
-        <label for="servicioId">
-          Servicio
-        </label>
+          <div class="form-group">
 
-        <select
-          id="servicioId"
-          formControlName="servicioId"
-        >
+            <label for="mascotaIdAdmin">
+              Mascota
+              <span class="obligatorio" aria-hidden="true">
+                *
+              </span>
+            </label>
 
-          <option value="">
-            Selecciona un servicio
-          </option>
+            <select
+              id="mascotaIdAdmin"
+              formControlName="mascotaId"
+              required
+              [class.input-error]="campoInvalido('mascotaId')"
+              [attr.aria-invalid]="campoInvalido('mascotaId')"
+              [attr.aria-describedby]="
+                campoInvalido('mascotaId')
+                  ? 'error-mascota'
+                  : null
+              "
+            >
 
+              <option value="">
+                Selecciona una mascota
+              </option>
 
-          <option
-            *ngFor="let servicio of servicios"
-            [value]="servicio.id"
-          >
-            {{ servicio.nombre }}
-            - ${{ servicio.precio }}
-          </option>
+              <!-- Todas las especies son válidas. -->
+              <option
+                *ngFor="let mascota of mascotas"
+                [value]="mascota.id"
+              >
+                {{ mascota.nombre }}
+                ({{ mascota.especie || 'Sin especie' }})
+                -
+                {{ mascota.usuario?.nombre || 'Sin propietario' }}
+              </option>
 
-        </select>
+            </select>
 
-        <small
-          class="error-validacion"
-          *ngIf="
-            citaForm.get('servicioId')?.touched &&
-            citaForm.get('servicioId')?.hasError('required')
-          "
-        >
-          Debes seleccionar un servicio.
-        </small>
+            <small
+              id="error-mascota"
+              class="error-validacion"
+              *ngIf="campoInvalido('mascotaId')"
+            >
+              Debes seleccionar una mascota.
+            </small>
 
-      </div>
-
-
-      <!-- ESTADO -->
-      <div class="form-group">
-
-        <label for="estado">
-          Estado
-        </label>
-
-        <select
-          id="estado"
-          formControlName="estado"
-        >
-
-          <option value="PENDIENTE">
-            PENDIENTE
-          </option>
-
-          <option value="CONFIRMADA">
-            CONFIRMADA
-          </option>
-
-          <option value="COMPLETADA">
-            COMPLETADA
-          </option>
-
-          <option value="CANCELADA">
-            CANCELADA
-          </option>
-
-        </select>
-
-      </div>
+          </div>
 
 
-      <!-- BOTONES DEL FORMULARIO -->
+          <!-- ================================================
+               VETERINARIO
+               ================================================ -->
+
+          <div class="form-group">
+
+            <label for="veterinarioIdAdmin">
+              Veterinario
+              <span class="obligatorio" aria-hidden="true">
+                *
+              </span>
+            </label>
+
+            <select
+              id="veterinarioIdAdmin"
+              formControlName="veterinarioId"
+              required
+              [class.input-error]="campoInvalido('veterinarioId')"
+              [attr.aria-invalid]="campoInvalido('veterinarioId')"
+              [attr.aria-describedby]="
+                campoInvalido('veterinarioId')
+                  ? 'error-veterinario'
+                  : null
+              "
+            >
+
+              <option value="">
+                Selecciona un veterinario
+              </option>
+
+              <option
+                *ngFor="let veterinario of veterinarios"
+                [value]="veterinario.id"
+              >
+                {{ veterinario.nombre }}
+                {{ veterinario.apellido }}
+                -
+                {{ veterinario.especialidad }}
+              </option>
+
+            </select>
+
+            <small
+              id="error-veterinario"
+              class="error-validacion"
+              *ngIf="campoInvalido('veterinarioId')"
+            >
+              Debes seleccionar un veterinario.
+            </small>
+
+          </div>
+
+
+          <!-- ================================================
+               SERVICIO
+               ================================================ -->
+
+          <div class="form-group campo-ancho">
+
+            <label for="servicioIdAdmin">
+              Servicio veterinario
+              <span class="obligatorio" aria-hidden="true">
+                *
+              </span>
+            </label>
+
+            <select
+              id="servicioIdAdmin"
+              formControlName="servicioId"
+              required
+              [class.input-error]="campoInvalido('servicioId')"
+              [attr.aria-invalid]="campoInvalido('servicioId')"
+              [attr.aria-describedby]="
+                campoInvalido('servicioId')
+                  ? 'error-servicio'
+                  : null
+              "
+            >
+
+              <option value="">
+                Selecciona un servicio
+              </option>
+
+              <option
+                *ngFor="let servicio of servicios"
+                [value]="servicio.id"
+              >
+                {{ servicio.nombre }}
+                -
+                {{ servicio.precio | currency:'USD':'symbol':'1.2-2' }}
+              </option>
+
+            </select>
+
+            <small
+              id="error-servicio"
+              class="error-validacion"
+              *ngIf="campoInvalido('servicioId')"
+            >
+              Debes seleccionar un servicio.
+            </small>
+
+          </div>
+
+
+          <!-- ================================================
+               MOTIVO DE LA CITA
+               ================================================ -->
+
+          <div class="form-group campo-ancho">
+
+            <label for="motivoAdmin">
+              Motivo de la cita
+              <span class="obligatorio" aria-hidden="true">
+                *
+              </span>
+            </label>
+
+            <textarea
+              id="motivoAdmin"
+              rows="4"
+              formControlName="motivo"
+              placeholder="Ejemplo: Consulta veterinaria de control"
+              required
+              [class.input-error]="campoInvalido('motivo')"
+              [attr.aria-invalid]="campoInvalido('motivo')"
+              [attr.aria-describedby]="
+                campoInvalido('motivo')
+                  ? 'error-motivo'
+                  : null
+              "
+            ></textarea>
+
+            <small
+              id="error-motivo"
+              class="error-validacion"
+              *ngIf="campoInvalido('motivo')"
+            >
+              El motivo de la cita es obligatorio.
+            </small>
+
+          </div>
+
+
+        </div>
+
+      </fieldset>
+
+
+      <!-- ====================================================
+           ACCIONES DEL FORMULARIO
+           ==================================================== -->
+
       <div class="form-acciones">
 
         <button
           type="submit"
           class="btn-guardar"
+          [disabled]="guardando"
         >
-          {{
-            citaEditandoId === null
-              ? 'Registrar cita'
-              : 'Guardar cambios'
-          }}
-        </button>
 
+          {{
+            guardando
+              ? 'Guardando cita...'
+              : citaEditandoId === null
+                  ? 'Registrar cita'
+                  : 'Guardar cambios'
+          }}
+
+        </button>
 
         <button
           type="button"
           class="btn-cancelar-form"
+          [disabled]="guardando"
           (click)="cerrarFormulario()"
         >
           Cancelar
@@ -336,276 +638,581 @@
   </section>
 
 
-  <!-- =====================================================
-       CARGANDO
-       ===================================================== -->
-
-  <div
-    class="mensaje-info"
-    *ngIf="cargando"
-  >
-    Cargando citas...
-  </div>
-
-
-  <!-- =====================================================
-       SIN CITAS
-       ===================================================== -->
-
-  <div
-    class="sin-citas"
-    *ngIf="
-      !cargando &&
-      !mensajeError &&
-      citas.length === 0
-    "
-  >
-
-    <div class="sin-icono">
-      📅
-    </div>
-
-    <h2>
-      No hay citas registradas
-    </h2>
-
-    <p>
-      Todavía no existen citas registradas
-      en el sistema.
-    </p>
-
-  </div>
-
-
-  <!-- =====================================================
-       LISTADO DE CITAS
-       ===================================================== -->
+  <!-- ========================================================
+       5. ENCABEZADO DEL LISTADO
+       ======================================================== -->
 
   <section
-    class="citas-grid"
-    *ngIf="
-      !cargando &&
-      citas.length > 0
-    "
+    class="listado-section"
+    aria-labelledby="titulo-listado-citas"
   >
 
+    <div class="listado-header">
 
-    <article
-      class="cita-card"
-      *ngFor="let cita of citas"
+      <div>
+
+        <h2 id="titulo-listado-citas">
+          Citas registradas
+        </h2>
+
+        <p>
+          Consulta las citas, sus participantes
+          y el estado de cada atención.
+        </p>
+
+      </div>
+
+      <div class="listado-acciones">
+
+        <span
+          class="total-registros"
+          *ngIf="!cargando && !errorCarga"
+        >
+          {{ citas.length }}
+          {{ citas.length === 1 ? 'cita' : 'citas' }}
+        </span>
+
+        <button
+          type="button"
+          class="btn-actualizar"
+          (click)="cargarDatos(true)"
+          [disabled]="cargando || hayOperacionEnCurso"
+        >
+          {{
+            cargando
+              ? 'Consultando...'
+              : '↻ Actualizar'
+          }}
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- ======================================================
+         6. BÚSQUEDA, FILTROS Y ORDENAMIENTO
+         ====================================================== -->
+
+    <div
+      class="filtros-card"
+      *ngIf="
+        !cargando &&
+        !errorCarga &&
+        citas.length > 0
+      "
     >
 
+      <!-- BUSCADOR -->
+      <div class="filtro-grupo">
 
-      <!-- CABECERA DE LA CITA -->
-      <div class="cita-superior">
+        <label for="buscarCitaAdmin">
+          Buscar cita
+        </label>
 
-        <div class="cita-icono">
-          📅
-        </div>
+        <input
+          id="buscarCitaAdmin"
+          type="search"
+          [(ngModel)]="busqueda"
+          placeholder="Mascota, propietario, servicio, motivo..."
+          autocomplete="off"
+          aria-describedby="ayuda-busqueda-citas"
+        >
+
+        <small
+          id="ayuda-busqueda-citas"
+          class="texto-ayuda"
+        >
+          Busca por nombre, correo, veterinario o ID.
+        </small>
+
+      </div>
 
 
-        <div>
+      <!-- FILTRO POR ESTADO -->
+      <div class="filtro-grupo">
 
-          <h2>
-            Cita #{{ cita.id }}
-          </h2>
+        <label for="filtroEstadoCita">
+          Estado
+        </label>
+
+        <select
+          id="filtroEstadoCita"
+          [(ngModel)]="filtroEstado"
+        >
+
+          <option value="TODOS">
+            Todos los estados
+          </option>
+
+          <option value="PENDIENTE">
+            Pendientes
+          </option>
+
+          <option value="CONFIRMADA">
+            Confirmadas
+          </option>
+
+          <option value="COMPLETADA">
+            Completadas
+          </option>
+
+          <option value="CANCELADA">
+            Canceladas
+          </option>
+
+        </select>
+
+      </div>
 
 
-          <span
-            class="estado"
-            [class.pendiente]="cita.estado === 'PENDIENTE'"
-            [class.confirmada]="cita.estado === 'CONFIRMADA'"
-            [class.completada]="cita.estado === 'COMPLETADA'"
-            [class.cancelada]="cita.estado === 'CANCELADA'"
+      <!-- ORDENAMIENTO -->
+      <div class="filtro-grupo">
+
+        <label for="ordenarCitasAdmin">
+          Ordenar citas
+        </label>
+
+        <select
+          id="ordenarCitasAdmin"
+          [(ngModel)]="ordenarPor"
+        >
+
+          <option value="fechaDesc">
+            Fecha más reciente
+          </option>
+
+          <option value="fechaAsc">
+            Fecha más antigua
+          </option>
+
+          <option value="idDesc">
+            ID más alto
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+
+    <!-- ======================================================
+         7. CARGANDO
+         ====================================================== -->
+
+    <div
+      class="mensaje-info"
+      *ngIf="cargando"
+      role="status"
+      aria-live="polite"
+    >
+      Consultando las citas registradas...
+    </div>
+
+
+    <!-- ======================================================
+         8. SIN CITAS REGISTRADAS
+         ====================================================== -->
+
+    <div
+      class="sin-citas"
+      *ngIf="
+        !cargando &&
+        !errorCarga &&
+        citas.length === 0
+      "
+    >
+
+      <div class="sin-icono" aria-hidden="true">
+        📅
+      </div>
+
+      <h3>
+        No hay citas registradas
+      </h3>
+
+      <p>
+        Todavía no existen citas veterinarias
+        registradas en el sistema.
+      </p>
+
+      <button
+        type="button"
+        class="btn-nuevo"
+        (click)="nuevaCita()"
+      >
+        + Registrar primera cita
+      </button>
+
+    </div>
+
+
+    <!-- ======================================================
+         9. SIN RESULTADOS DE FILTROS
+         ====================================================== -->
+
+    <div
+      class="sin-resultados"
+      *ngIf="
+        !cargando &&
+        !errorCarga &&
+        citas.length > 0 &&
+        citasFiltradas.length === 0
+      "
+    >
+
+      <div class="sin-icono" aria-hidden="true">
+        🔎
+      </div>
+
+      <h3>
+        No encontramos citas con esos filtros
+      </h3>
+
+      <p>
+        Cambia el término de búsqueda
+        o selecciona otro estado.
+      </p>
+
+      <button
+        type="button"
+        class="btn-limpiar"
+        (click)="limpiarFiltros()"
+      >
+        Limpiar filtros
+      </button>
+
+    </div>
+
+
+    <!-- ======================================================
+         10. LISTADO DE CITAS
+         ====================================================== -->
+
+    <div
+      class="citas-grid"
+      *ngIf="
+        !cargando &&
+        !errorCarga &&
+        citasFiltradas.length > 0
+      "
+    >
+
+      <article
+        class="cita-card"
+        *ngFor="
+          let cita of citasFiltradas;
+          trackBy: trackByCita
+        "
+        [attr.aria-busy]="procesandoId === cita.id"
+      >
+
+
+        <!-- ================================================
+             CABECERA DE CITA
+             ================================================ -->
+
+        <div class="cita-superior">
+
+          <div
+            class="cita-icono"
+            aria-hidden="true"
           >
-            {{ cita.estado }}
-          </span>
+            📅
+          </div>
+
+          <div class="cita-identidad">
+
+            <h3>
+              Cita #{{ cita.id }}
+            </h3>
+
+            <span
+              class="estado"
+              [class.pendiente]="cita.estado === 'PENDIENTE'"
+              [class.confirmada]="cita.estado === 'CONFIRMADA'"
+              [class.completada]="cita.estado === 'COMPLETADA'"
+              [class.cancelada]="cita.estado === 'CANCELADA'"
+            >
+              {{ cita.estado }}
+            </span>
+
+          </div>
 
         </div>
 
-      </div>
+
+        <!-- ================================================
+             FECHA Y MOTIVO
+             ================================================ -->
+
+        <div class="cita-info">
+
+          <div class="info-fila">
+
+            <strong>
+              Fecha y hora
+            </strong>
+
+            <span>
+              {{ cita.fechaHora | date:'dd/MM/yyyy HH:mm' }}
+            </span>
+
+          </div>
+
+          <div class="info-fila">
+
+            <strong>
+              Motivo
+            </strong>
+
+            <span>
+              {{ cita.motivo || 'Sin motivo registrado' }}
+            </span>
+
+          </div>
+
+        </div>
 
 
-      <!-- INFORMACIÓN GENERAL -->
-      <div class="cita-info">
+        <!-- ================================================
+             MASCOTA
+             ================================================ -->
 
-        <p>
-          <strong>Fecha y hora:</strong>
-
-          {{ cita.fechaHora | date:'dd/MM/yyyy HH:mm' }}
-        </p>
-
-
-        <p>
-          <strong>Motivo:</strong>
-
-          {{ cita.motivo }}
-        </p>
-
-      </div>
-
-
-      <!-- MASCOTA -->
-      <div
-        class="bloque-info"
-        *ngIf="cita.mascota"
-      >
-
-        <h3>
-          🐾 Mascota
-        </h3>
-
-
-        <p>
-          <strong>Nombre:</strong>
-
-          {{ cita.mascota.nombre }}
-        </p>
-
-
-        <p *ngIf="cita.mascota.especie">
-
-          <strong>Especie:</strong>
-
-          {{ cita.mascota.especie }}
-        </p>
-
-
-        <p *ngIf="cita.mascota.raza">
-
-          <strong>Raza:</strong>
-
-          {{ cita.mascota.raza }}
-        </p>
-
-      </div>
-
-
-      <!-- PROPIETARIO -->
-      <div
-        class="bloque-info"
-        *ngIf="cita.mascota?.usuario"
-      >
-
-        <h3>
-          👤 Propietario
-        </h3>
-
-
-        <p *ngIf="cita.mascota.usuario.nombre">
-
-          <strong>Nombre:</strong>
-
-          {{ cita.mascota.usuario.nombre }}
-        </p>
-
-
-        <p *ngIf="cita.mascota.usuario.correo">
-
-          <strong>Correo:</strong>
-
-          {{ cita.mascota.usuario.correo }}
-        </p>
-
-      </div>
-
-
-      <!-- VETERINARIO -->
-      <div
-        class="bloque-info"
-        *ngIf="cita.veterinario"
-      >
-
-        <h3>
-          👨‍⚕️ Veterinario
-        </h3>
-
-
-        <p>
-          <strong>Nombre:</strong>
-
-          {{ cita.veterinario.nombre }}
-          {{ cita.veterinario.apellido }}
-        </p>
-
-
-        <p *ngIf="cita.veterinario.especialidad">
-
-          <strong>Especialidad:</strong>
-
-          {{ cita.veterinario.especialidad }}
-        </p>
-
-      </div>
-
-
-      <!-- SERVICIO -->
-      <div
-        class="bloque-info"
-        *ngIf="cita.servicio"
-      >
-
-        <h3>
-          🩺 Servicio
-        </h3>
-
-
-        <p>
-          <strong>Nombre:</strong>
-
-          {{ cita.servicio.nombre }}
-        </p>
-
-
-        <p *ngIf="cita.servicio.precio !== undefined">
-
-          <strong>Precio:</strong>
-
-          ${{ cita.servicio.precio }}
-        </p>
-
-      </div>
-
-
-      <!-- =================================================
-           ACCIONES
-           ================================================= -->
-
-      <div class="acciones-card">
-
-        <!-- EDITAR -->
-        <button
-          type="button"
-          class="btn-editar"
-          (click)="editarCita(cita)"
+        <div
+          class="bloque-info"
+          *ngIf="cita.mascota"
         >
-          ✏️ Editar
-        </button>
+
+          <h4>
+            🐾 Mascota
+          </h4>
+
+          <div class="detalle-fila">
+
+            <strong>Nombre</strong>
+
+            <span>
+              {{ cita.mascota.nombre }}
+            </span>
+
+          </div>
+
+          <div
+            class="detalle-fila"
+            *ngIf="cita.mascota.especie"
+          >
+
+            <strong>Especie</strong>
+
+            <span>
+              {{ cita.mascota.especie }}
+            </span>
+
+          </div>
+
+          <div
+            class="detalle-fila"
+            *ngIf="cita.mascota.raza"
+          >
+
+            <strong>Raza</strong>
+
+            <span>
+              {{ cita.mascota.raza }}
+            </span>
+
+          </div>
+
+        </div>
 
 
-        <!-- CANCELAR -->
-        <button
-          type="button"
-          class="btn-cancelar"
-          *ngIf="cita.estado !== 'CANCELADA'"
-          (click)="cancelarCita(cita)"
+        <!-- ================================================
+             PROPIETARIO
+             ================================================ -->
+
+        <div
+          class="bloque-info"
+          *ngIf="cita.mascota?.usuario"
         >
-          🚫 Cancelar
-        </button>
+
+          <h4>
+            👤 Propietario
+          </h4>
+
+          <div class="detalle-fila">
+
+            <strong>Nombre</strong>
+
+            <span>
+              {{ cita.mascota?.usuario?.nombre }}
+              {{ cita.mascota?.usuario?.apellido || '' }}
+            </span>
+
+          </div>
+
+          <div
+            class="detalle-fila"
+            *ngIf="cita.mascota?.usuario?.correo"
+          >
+
+            <strong>Correo</strong>
+
+            <span>
+              {{ cita.mascota?.usuario?.correo }}
+            </span>
+
+          </div>
+
+        </div>
 
 
-        <!-- ELIMINAR -->
-        <button
-          type="button"
-          class="btn-eliminar"
-          (click)="eliminarCita(cita)"
+        <!-- ================================================
+             VETERINARIO
+             ================================================ -->
+
+        <div
+          class="bloque-info"
+          *ngIf="cita.veterinario"
         >
-          🗑 Eliminar
-        </button>
 
-      </div>
+          <h4>
+            👨‍⚕️ Veterinario
+          </h4>
 
-    </article>
+          <div class="detalle-fila">
+
+            <strong>Nombre</strong>
+
+            <span>
+              {{ cita.veterinario.nombre }}
+              {{ cita.veterinario.apellido }}
+            </span>
+
+          </div>
+
+          <div
+            class="detalle-fila"
+            *ngIf="cita.veterinario.especialidad"
+          >
+
+            <strong>Especialidad</strong>
+
+            <span>
+              {{ cita.veterinario.especialidad }}
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <!-- ================================================
+             SERVICIO
+             ================================================ -->
+
+        <div
+          class="bloque-info"
+          *ngIf="cita.servicio"
+        >
+
+          <h4>
+            🩺 Servicio
+          </h4>
+
+          <div class="detalle-fila">
+
+            <strong>Nombre</strong>
+
+            <span>
+              {{ cita.servicio.nombre }}
+            </span>
+
+          </div>
+
+          <div
+            class="detalle-fila"
+            *ngIf="cita.servicio.precio != null"
+          >
+
+            <strong>Precio</strong>
+
+            <span class="precio-servicio">
+              {{
+                cita.servicio.precio
+                  | currency:'USD':'symbol':'1.2-2'
+              }}
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <!-- ================================================
+             ACCIONES ADMINISTRATIVAS
+             ================================================ -->
+
+        <div class="acciones-card">
+
+          <!-- EDITAR -->
+          <button
+            type="button"
+            class="btn-editar"
+            [disabled]="cargando || hayOperacionEnCurso"
+            (click)="editarCita(cita)"
+            [attr.aria-label]="
+              'Editar cita número ' + cita.id
+            "
+          >
+            ✏️ Editar
+          </button>
+
+
+          <!-- CANCELAR SIN ELIMINAR -->
+          <button
+            type="button"
+            class="btn-cancelar"
+            *ngIf="cita.estado !== 'CANCELADA'"
+            [disabled]="cargando || hayOperacionEnCurso"
+            (click)="cancelarCita(cita)"
+            [attr.aria-label]="
+              'Cancelar cita número ' + cita.id
+            "
+          >
+            🚫 Cancelar
+          </button>
+
+
+          <!-- ELIMINAR DEFINITIVAMENTE -->
+          <button
+            type="button"
+            class="btn-eliminar"
+            [disabled]="cargando || hayOperacionEnCurso"
+            (click)="eliminarCita(cita)"
+            [attr.aria-label]="
+              'Eliminar cita número ' + cita.id
+            "
+          >
+            🗑 Eliminar
+          </button>
+
+        </div>
+
+
+        <!-- MENSAJE DURANTE UNA OPERACIÓN -->
+        <p
+          class="accion-cargando"
+          *ngIf="procesandoId === cita.id"
+          role="status"
+        >
+          Procesando solicitud...
+        </p>
+
+      </article>
+
+    </div>
 
   </section>
 

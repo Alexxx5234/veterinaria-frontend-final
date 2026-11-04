@@ -1,1 +1,1282 @@
-/* You can add global styles to this file, and also import other style files */
+
+/* ==========================================================
+   VETERINARIA AREVALO
+   ACCESIBILIDAD GLOBAL - VERSIÓN 4
+
+   APLICACIÓN:
+   - Login.
+   - Registro.
+   - Verificación de código.
+   - Dashboard ADMIN y USER.
+   - Mascotas.
+   - Citas.
+   - Servicios.
+   - Veterinarios.
+
+   FUNCIONALIDADES:
+   1. Apariencia normal.
+   2. Contraste suave.
+   3. Modo oscuro.
+   4. Alto contraste.
+   5. Corrección de colores y etiquetas.
+   6. Formularios accesibles.
+   7. Navegación por teclado.
+   8. Espaciado de texto.
+   9. Subrayado de enlaces.
+   10. Reducción de animaciones.
+
+   NOTA:
+   PanelAccesibilidad administra las preferencias,
+   la lectura en voz alta, el volumen y la velocidad.
+
+   Este CSS solo administra la presentación.
+   ========================================================== */
+
+
+/* ==========================================================
+   1. CONFIGURACIÓN GENERAL
+   ========================================================== */
+
+html {
+  min-height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+
+/* ==========================================================
+   2. APARIENCIA NORMAL
+   ========================================================== */
+
+/*
+   No necesita reglas adicionales.
+
+   Se conservan el morado, blanco y demás
+   colores definidos en los SCSS originales.
+
+   data-vet-contraste="normal"
+*/
+
+
+/* ==========================================================
+   3. CONTRASTE SUAVE
+   ========================================================== */
+
+html[data-vet-contraste='suave'] {
+  color-scheme: light;
+}
+
+html[data-vet-contraste='suave'] body {
+  background: #f7f5f0 !important;
+}
+
+/* Fondo suave para ADMIN y USER. */
+
+html[data-vet-contraste='suave']
+app-root :is(
+  .area-trabajo,
+  .contenido-ruta,
+  .mascotas-container,
+  .citas-container,
+  .servicios-container,
+  .veterinarios-container,
+  .usuarios-container
+) {
+  background: #f7f5f0 !important;
+}
+
+/* Tarjetas suaves dentro de la aplicación privada. */
+
+html[data-vet-contraste='suave']
+app-root .contenido-ruta :is(
+  .resumen-card,
+  .mascota-card,
+  .servicio-card,
+  .cita-card,
+  .veterinario-card,
+  .usuario-card,
+  .formulario-card,
+  .filtros-card,
+  .mascotas-header,
+  .citas-header,
+  .servicios-header,
+  .veterinarios-header,
+  .usuarios-header
+) {
+  background: #fcfaf6 !important;
+  border-color: #e2dcd3 !important;
+  box-shadow:
+    0 5px 17px rgba(50, 40, 65, 0.05) !important;
+}
+
+/* Fondo suave para Login, Registro y Verificación. */
+
+html[data-vet-contraste='suave']
+.layout-publico {
+  background: #f7f5f0 !important;
+}
+
+html[data-vet-contraste='suave']
+.layout-publico > router-outlet ~ * {
+  background-color: #f7f5f0 !important;
+}
+
+html[data-vet-contraste='suave']
+.layout-publico > router-outlet ~ *
+:is(
+  [class*="card"],
+  [class*="tarjeta"],
+  [class*="panel"],
+  [class*="formulario"]
+) {
+  background-color: #fcfaf6 !important;
+}
+
+
+/* ==========================================================
+   4. VARIABLES DEL MODO OSCURO
+   ========================================================== */
+
+html[data-vet-contraste='oscuro'] {
+  color-scheme: dark;
+
+  /* Fondos principales. */
+  --vet-fondo: #211d30;
+  --vet-panel: #302a43;
+  --vet-panel-alterno: #3b3351;
+
+  /* Textos. */
+  --vet-texto: #f8f5ff;
+  --vet-texto-suave: #e3dbf2;
+
+  /* Bordes y enlaces. */
+  --vet-borde: #675b83;
+  --vet-enlace: #dac7ff;
+
+  /* Navegación seleccionada. */
+  --vet-seleccion: #e9dfff;
+  --vet-texto-seleccion: #30204d;
+
+  /* Botones principales. */
+  --vet-primario: #d7c3ff;
+  --vet-texto-primario: #261938;
+
+  /* Contadores y etiquetas. */
+  --vet-etiqueta: #e9ddff;
+  --vet-texto-etiqueta: #332154;
+}
+
+
+/* ==========================================================
+   5. VARIABLES DEL ALTO CONTRASTE
+   ========================================================== */
+
+html[data-vet-contraste='alto'] {
+  color-scheme: dark;
+
+  --vet-fondo: #000000;
+  --vet-panel: #101010;
+  --vet-panel-alterno: #1c1c1c;
+
+  --vet-texto: #ffffff;
+  --vet-texto-suave: #ffffff;
+
+  --vet-borde: #ffe45c;
+  --vet-enlace: #ffe45c;
+
+  --vet-seleccion: #ffe45c;
+  --vet-texto-seleccion: #000000;
+
+  --vet-primario: #ffe45c;
+  --vet-texto-primario: #000000;
+
+  --vet-etiqueta: #ffe45c;
+  --vet-texto-etiqueta: #000000;
+}
+
+
+/* ==========================================================
+   6. FONDO GENERAL EN OSCURO Y ALTO CONTRASTE
+   ========================================================== */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) body {
+  background: var(--vet-fondo) !important;
+  color: var(--vet-texto) !important;
+}
+
+/* ADMIN y USER. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-root :is(
+  .layout-privado,
+  .area-trabajo,
+  .contenido-ruta,
+  .mascotas-container,
+  .citas-container,
+  .servicios-container,
+  .veterinarios-container,
+  .usuarios-container,
+  .dashboard-container,
+  .dashboard-admin,
+  .dashboard-usuario
+) {
+  background: var(--vet-fondo) !important;
+  color: var(--vet-texto) !important;
+}
+
+
+/* ==========================================================
+   7. TARJETAS Y CONTENEDORES PRIVADOS
+   ========================================================== */
+
+/*
+   Los contenedores sin función visual
+   mantienen fondo transparente.
+
+   Las tarjetas reciben su color en la
+   siguiente regla.
+*/
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-root .contenido-ruta :is(
+  div,
+  section,
+  article,
+  header,
+  aside,
+  form,
+  fieldset
+) {
+  background-color: transparent !important;
+  background-image: none !important;
+  color: var(--vet-texto) !important;
+}
+
+/* Tarjetas principales y bloques de información. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-root .contenido-ruta :is(
+  article,
+  .resumen-card,
+  .mascota-card,
+  .servicio-card,
+  .cita-card,
+  .veterinario-card,
+  .usuario-card,
+  .formulario-card,
+  .filtros-card,
+  .mascotas-header,
+  .citas-header,
+  .servicios-header,
+  .veterinarios-header,
+  .usuarios-header,
+  [class*="-card"],
+  [class*="tarjeta"],
+  [class*="bienvenida"],
+  [class*="resumen"]
+) {
+  background: var(--vet-panel) !important;
+
+  color: var(--vet-texto) !important;
+  border-color: var(--vet-borde) !important;
+
+  box-shadow: none !important;
+}
+
+/* Recuadros interiores y mensajes. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-root .contenido-ruta :is(
+  .bloque-info,
+  .propietario,
+  .dueno-actual,
+  .especialidad-box,
+  .precio-box,
+  .sin-citas,
+  .sin-mascotas,
+  .sin-servicios,
+  .sin-veterinarios,
+  .sin-usuarios,
+  .sin-resultados,
+  .mensaje-info,
+  .mensaje-error,
+  .mensaje-exito,
+  .estado-vacio,
+  .mensaje-vacio,
+  [class*="vacio"],
+  [class*="vacia"],
+  [class*="sin-datos"],
+  [class*="empty"],
+  [class*="mensaje"]
+) {
+  background: var(--vet-panel-alterno) !important;
+
+  color: var(--vet-texto) !important;
+  border-color: var(--vet-borde) !important;
+}
+
+
+/* ==========================================================
+   8. TEXTOS PRIVADOS
+   ========================================================== */
+
+/*
+   Los textos normales permanecen claros
+   sobre fondos oscuros.
+*/
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-root .contenido-ruta :is(
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  span,
+  strong,
+  small,
+  label,
+  legend,
+  li,
+  td,
+  th
+) {
+  color: var(--vet-texto) !important;
+}
+
+/* Enlaces privados. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-root .contenido-ruta a {
+  color: var(--vet-enlace) !important;
+}
+
+
+/* ==========================================================
+   9. ETIQUETAS Y CONTADORES
+   ========================================================== */
+
+/*
+   Evita textos blancos sobre fondos claros.
+
+   Afecta:
+   - Mi mascota.
+   - Usuario.
+   - Pendiente.
+   - Aprobada.
+   - Servicio veterinario.
+   - Profesional veterinario.
+   - Contadores del listado.
+*/
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-root .contenido-ruta :is(
+  .estado,
+  .rol,
+  .etiqueta-servicio,
+  .etiqueta-veterinario,
+  .etiqueta-mascota,
+  .etiqueta-usuario,
+  .total-registros,
+  .badge,
+  .chip,
+  .pill,
+  .usuario-badge,
+  [class*="badge"],
+  [class*="etiqueta"],
+  [class*="chip"],
+  [class*="pill"]
+) {
+  background: var(--vet-etiqueta) !important;
+
+  color: var(--vet-texto-etiqueta) !important;
+
+  border-color: var(--vet-borde) !important;
+}
+
+/* Texto dentro de las etiquetas. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-root .contenido-ruta :is(
+  .estado,
+  .rol,
+  .etiqueta-servicio,
+  .etiqueta-veterinario,
+  .etiqueta-mascota,
+  .etiqueta-usuario,
+  .total-registros,
+  .badge,
+  .chip,
+  .pill,
+  .usuario-badge,
+  [class*="badge"],
+  [class*="etiqueta"],
+  [class*="chip"],
+  [class*="pill"]
+) :is(
+  span,
+  small,
+  strong
+) {
+  color: var(--vet-texto-etiqueta) !important;
+}
+
+
+/* ==========================================================
+   10. MENÚ LATERAL ADMIN Y USER
+   ========================================================== */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-root .layout-privado .menu-principal {
+  background: var(--vet-panel) !important;
+
+  color: var(--vet-texto) !important;
+  border-color: var(--vet-borde) !important;
+}
+
+/* Perfil, logo y contenedores laterales. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-root .layout-privado :is(
+  .menu-perfil,
+  .menu-logo,
+  .perfil-logo
+) {
+  background: var(--vet-panel-alterno) !important;
+
+  border-color: var(--vet-borde) !important;
+}
+
+/* Textos del menú. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-root .menu-principal :is(
+  strong,
+  small,
+  p,
+  span
+) {
+  color: var(--vet-texto) !important;
+}
+
+/* Enlace no seleccionado. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-root .menu-navegacion
+.enlace-menu:not(.activo) {
+  background: transparent !important;
+  color: var(--vet-texto) !important;
+}
+
+/* Enlace seleccionado. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-root .menu-navegacion
+.enlace-menu.activo {
+  background: var(--vet-seleccion) !important;
+  color: var(--vet-texto-seleccion) !important;
+}
+
+/* Texto e icono de la opción seleccionada. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-root .menu-navegacion
+.enlace-menu.activo :is(
+  span,
+  strong,
+  small
+) {
+  color: var(--vet-texto-seleccion) !important;
+}
+
+/* Cerrar sesión. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-root .menu-pie .boton-salir {
+  background: var(--vet-panel-alterno) !important;
+
+  color: var(--vet-texto) !important;
+  border-color: var(--vet-borde) !important;
+}
+
+
+/* ==========================================================
+   11. BARRA SUPERIOR ADMIN Y USER
+   ========================================================== */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-root .layout-privado .barra-global {
+  background: var(--vet-panel) !important;
+
+  color: var(--vet-texto) !important;
+  border-color: var(--vet-borde) !important;
+}
+
+/* Nombre y descripción de la veterinaria. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-root .barra-global .titulo-barra :is(
+  strong,
+  small
+) {
+  color: var(--vet-texto) !important;
+}
+
+/* Campana y menú móvil. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-root .barra-global :is(
+  .abrir-menu-movil,
+  .boton-herramienta
+) {
+  background: var(--vet-panel-alterno) !important;
+
+  color: var(--vet-texto) !important;
+  border-color: var(--vet-borde) !important;
+}
+
+/* Indicador ADMIN / USER. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-root .barra-global .rol-superior {
+  background: var(--vet-etiqueta) !important;
+  color: var(--vet-texto-etiqueta) !important;
+}
+
+
+/* ==========================================================
+   12. FORMULARIOS PRIVADOS
+   ========================================================== */
+
+/* Campos de entrada. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-root .contenido-ruta :is(
+  input,
+  select,
+  textarea
+) {
+  background: var(--vet-panel-alterno) !important;
+
+  color: var(--vet-texto) !important;
+  border: 1px solid var(--vet-borde) !important;
+
+  caret-color: var(--vet-texto) !important;
+}
+
+/* Ejemplos dentro de los campos. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-root .contenido-ruta
+:is(input, textarea)::placeholder {
+  color: var(--vet-texto-suave) !important;
+  opacity: 1;
+}
+
+/* Opciones de los desplegables. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-root .contenido-ruta select option {
+  background: var(--vet-panel) !important;
+  color: var(--vet-texto) !important;
+}
+
+/* Botones secundarios. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-root .contenido-ruta button {
+  background: var(--vet-panel-alterno) !important;
+
+  color: var(--vet-texto) !important;
+  border: 1px solid var(--vet-borde) !important;
+}
+
+/* Botones principales. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-root .contenido-ruta :is(
+  .btn-nuevo,
+  .btn-guardar,
+  .btn-aprobar,
+  .btn-agendar
+) {
+  background: var(--vet-primario) !important;
+
+  color: var(--vet-texto-primario) !important;
+
+  border-color: var(--vet-primario) !important;
+}
+
+/* Texto de los botones principales. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-root .contenido-ruta :is(
+  .btn-nuevo,
+  .btn-guardar,
+  .btn-aprobar,
+  .btn-agendar
+) :is(
+  span,
+  small,
+  strong
+) {
+  color: var(--vet-texto-primario) !important;
+}
+
+
+/* ==========================================================
+   13. NOTIFICACIONES
+   ========================================================== */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-root .layout-privado :is(
+  .panel-flotante,
+  .panel-titulo,
+  .lista-avisos,
+  .aviso-item
+) {
+  background: var(--vet-panel) !important;
+
+  color: var(--vet-texto) !important;
+  border-color: var(--vet-borde) !important;
+}
+
+/* Texto de los avisos. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-root .panel-flotante :is(
+  h2,
+  p,
+  span,
+  small,
+  strong
+) {
+  color: var(--vet-texto) !important;
+}
+
+
+/* ==========================================================
+   14. LAYOUT PÚBLICO
+   ========================================================== */
+
+/*
+   NUEVA SECCIÓN.
+
+   Estas reglas aplican a:
+   - Login.
+   - Registro.
+   - Verificación de código.
+
+   Se utiliza el componente LayoutPublico.
+
+   router-outlet ~ * selecciona el componente
+   Angular que aparece después del router-outlet.
+
+   El panel ♿ no está dentro de ese selector,
+   por lo que sus estilos se gestionan aparte.
+*/
+
+
+/* Fondo general público. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) .layout-publico {
+  background: var(--vet-fondo) !important;
+  color: var(--vet-texto) !important;
+}
+
+/* Componente público mostrado por Angular Router. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) .layout-publico > router-outlet ~ * {
+  background: var(--vet-fondo) !important;
+  color: var(--vet-texto) !important;
+}
+
+
+/* ==========================================================
+   15. FONDOS DE LOGIN, REGISTRO Y VERIFICACIÓN
+   ========================================================== */
+
+/*
+   En los modos oscuros evitamos que los
+   contenedores originales conserven fondos blancos.
+
+   El modo Normal mantiene el diseño original.
+*/
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) .layout-publico > router-outlet ~ *
+:is(
+  div,
+  main,
+  header,
+  section,
+  article,
+  aside,
+  form,
+  fieldset,
+  footer
+) {
+  background-color: var(--vet-panel) !important;
+  background-image: none !important;
+
+  color: var(--vet-texto) !important;
+
+  border-color: var(--vet-borde) !important;
+}
+
+/* Paneles informativos y contenedores destacados. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) .layout-publico > router-outlet ~ *
+:is(
+  [class*="izquierd"],
+  [class*="informacion"],
+  [class*="info-panel"],
+  [class*="panel-info"]
+) {
+  background: var(--vet-panel-alterno) !important;
+  color: var(--vet-texto) !important;
+}
+
+
+/* ==========================================================
+   16. TEXTOS DE LAS PÁGINAS PÚBLICAS
+   ========================================================== */
+
+/*
+   Los títulos, indicaciones y etiquetas son
+   legibles en ambos modos oscuros.
+*/
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) .layout-publico > router-outlet ~ *
+:is(
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  label,
+  span,
+  small,
+  strong,
+  legend,
+  li
+) {
+  color: var(--vet-texto) !important;
+}
+
+/* Enlaces a Login y Registro. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) .layout-publico > router-outlet ~ * a {
+  color: var(--vet-enlace) !important;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+
+/* ==========================================================
+   17. FORMULARIOS PÚBLICOS
+   ========================================================== */
+
+/*
+   Incluye:
+   - Correo.
+   - Contraseña.
+   - Nombre.
+   - Código de verificación.
+   - Otros campos del formulario.
+*/
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) .layout-publico > router-outlet ~ *
+:is(
+  input,
+  select,
+  textarea
+) {
+  background: var(--vet-panel-alterno) !important;
+
+  color: var(--vet-texto) !important;
+
+  border: 1px solid var(--vet-borde) !important;
+
+  caret-color: var(--vet-texto) !important;
+}
+
+/* Texto de ejemplo en los campos. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) .layout-publico > router-outlet ~ *
+:is(input, textarea)::placeholder {
+  color: var(--vet-texto-suave) !important;
+  opacity: 1;
+}
+
+/* Opciones de los desplegables. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) .layout-publico > router-outlet ~ * select option {
+  background: var(--vet-panel) !important;
+  color: var(--vet-texto) !important;
+}
+
+
+/* ==========================================================
+   18. BOTONES PÚBLICOS
+   ========================================================== */
+
+/* Botones secundarios, como Mostrar contraseña. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) .layout-publico > router-outlet ~ * button {
+  background: var(--vet-panel-alterno) !important;
+
+  color: var(--vet-texto) !important;
+
+  border: 1px solid var(--vet-borde) !important;
+}
+
+/* Botones principales de Login, Registro y Verificación. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) .layout-publico > router-outlet ~ *
+:is(
+  button[type="submit"],
+  .btn-login,
+  .btn-registro,
+  .btn-registrar,
+  .btn-verificar,
+  .btn-verificacion,
+  .btn-principal
+) {
+  background: var(--vet-primario) !important;
+
+  color: var(--vet-texto-primario) !important;
+
+  border-color: var(--vet-primario) !important;
+}
+
+/* Texto dentro de los botones principales. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) .layout-publico > router-outlet ~ *
+:is(
+  button[type="submit"],
+  .btn-login,
+  .btn-registro,
+  .btn-registrar,
+  .btn-verificar,
+  .btn-verificacion,
+  .btn-principal
+) :is(
+  span,
+  small,
+  strong
+) {
+  color: var(--vet-texto-primario) !important;
+}
+
+
+/* ==========================================================
+   19. MENSAJES DE LAS PÁGINAS PÚBLICAS
+   ========================================================== */
+
+/*
+   Los errores de validación deben verse
+   también con alto contraste.
+*/
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) .layout-publico > router-outlet ~ *
+:is(
+  .mensaje-error,
+  .mensaje-exito,
+  .mensaje-info,
+  .error-validacion,
+  [role="alert"]
+) {
+  background: var(--vet-panel-alterno) !important;
+
+  color: var(--vet-texto) !important;
+
+  border-color: var(--vet-borde) !important;
+}
+
+
+/* ==========================================================
+   20. PANEL GLOBAL DE ACCESIBILIDAD
+   ========================================================== */
+
+/*
+   El mismo panel funciona en:
+   - LayoutPrivado.
+   - LayoutPublico.
+
+   Se conservan las cuatro muestras de contraste.
+*/
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-panel-accesibilidad .accesibilidad-panel {
+  background: var(--vet-panel) !important;
+
+  color: var(--vet-texto) !important;
+
+  border-color: var(--vet-borde) !important;
+}
+
+/* Contenedores internos. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-panel-accesibilidad :is(
+  .panel-header,
+  .panel-contenido,
+  .grupo-accesibilidad,
+  .opcion-switch,
+  .escala-control,
+  .modo-btn
+) {
+  background: var(--vet-panel) !important;
+
+  color: var(--vet-texto) !important;
+
+  border-color: var(--vet-borde) !important;
+}
+
+/* Textos del panel. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-panel-accesibilidad .accesibilidad-panel :is(
+  h2,
+  h3,
+  p,
+  strong,
+  small,
+  label
+) {
+  color: var(--vet-texto) !important;
+}
+
+/* Botones del panel. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-panel-accesibilidad :is(
+  .btn-cerrar,
+  .btn-restablecer,
+  .btn-detener,
+  .escala-control button,
+  .acceso-boton
+) {
+  background: var(--vet-panel-alterno) !important;
+
+  color: var(--vet-texto) !important;
+
+  border-color: var(--vet-borde) !important;
+}
+
+/* Botón principal de lectura. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-panel-accesibilidad .btn-leer {
+  background: var(--vet-primario) !important;
+
+  color: var(--vet-texto-primario) !important;
+}
+
+/* Ejemplo del modo Normal. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-panel-accesibilidad .muestra-normal {
+  background: #f3f0ff !important;
+  color: #302d4f !important;
+}
+
+/* Ejemplo del modo Suave. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-panel-accesibilidad .muestra-suave {
+  background: #f5f0e7 !important;
+  color: #51483f !important;
+}
+
+/* Ejemplo de Alto contraste. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-panel-accesibilidad .muestra-alto {
+  background: #080808 !important;
+  color: #ffe45c !important;
+}
+
+/* Ejemplo del modo Oscuro. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-panel-accesibilidad .muestra-oscuro {
+  background: #242036 !important;
+  color: #f7f3ff !important;
+}
+
+/* Interruptores seleccionados. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-panel-accesibilidad
+.opcion-switch input:checked + .switch-visual {
+  background: var(--vet-primario) !important;
+}
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-panel-accesibilidad
+.opcion-switch input:checked + .switch-visual::after {
+  background: var(--vet-texto-primario) !important;
+}
+
+
+/* ==========================================================
+   21. ESPACIADO DE TEXTO
+   ========================================================== */
+
+/*
+   Activado desde el panel ♿.
+
+   Se aplica en páginas públicas y privadas.
+*/
+
+html[data-vet-espaciado='amplio'] app-root :is(
+  p,
+  small,
+  label,
+  li,
+  td,
+  th,
+  textarea
+) {
+  line-height: 1.8 !important;
+
+  letter-spacing: 0.045em !important;
+
+  word-spacing: 0.12em !important;
+}
+
+
+/* ==========================================================
+   22. RESALTAR ENLACES
+   ========================================================== */
+
+html[data-vet-enlaces='subrayados'] app-root a {
+  text-decoration: underline !important;
+
+  text-decoration-thickness: 2px !important;
+
+  text-underline-offset: 4px !important;
+}
+
+
+/* ==========================================================
+   23. ENFOQUE POR TECLADO
+   ========================================================== */
+
+/*
+   Permite identificar visualmente qué elemento
+   está seleccionado al navegar con TAB.
+*/
+
+/* Diseño normal y suave. */
+
+app-root :is(
+  button,
+  a,
+  input,
+  select,
+  textarea
+):focus-visible {
+  outline: 3px solid #6952e6;
+  outline-offset: 3px;
+}
+
+/* Modos oscuro y alto contraste. */
+
+html:is(
+  [data-vet-contraste='oscuro'],
+  [data-vet-contraste='alto']
+) app-root :is(
+  button,
+  a,
+  input,
+  select,
+  textarea
+):focus-visible {
+  outline: 3px solid var(--vet-enlace) !important;
+
+  outline-offset: 3px;
+}
+
+
+/* ==========================================================
+   24. REDUCIR ANIMACIONES
+   ========================================================== */
+
+/*
+   Se activa desde el panel de accesibilidad.
+
+   Ayuda a usuarios sensibles al movimiento.
+*/
+
+html[data-vet-movimiento='reducido'] *,
+html[data-vet-movimiento='reducido'] *::before,
+html[data-vet-movimiento='reducido'] *::after {
+  animation-duration: 0.01ms !important;
+
+  animation-iteration-count: 1 !important;
+
+  transition-duration: 0.01ms !important;
+
+  scroll-behavior: auto !important;
+}
+
+
+/* ==========================================================
+   25. RESPETAR PREFERENCIAS DEL DISPOSITIVO
+   ========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+
+    animation-iteration-count: 1 !important;
+
+    transition-duration: 0.01ms !important;
+
+    scroll-behavior: auto !important;
+  }
+
+}
+
+
+/* ==========================================================
+   FIN DEL STYLES.CSS
+   VETERINARIA AREVALO
+   ========================================================== */

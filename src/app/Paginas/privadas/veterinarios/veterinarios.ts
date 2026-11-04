@@ -1,158 +1,413 @@
+
+/* ==========================================================
+   VETERINARIA AREVALO
+   PÁGINA: VETERINARIOS (USER)
+
+   MEJORAS DE USABILIDAD:
+   - Listado de profesionales desde Spring Boot.
+   - Búsqueda por nombre, apellido o especialidad.
+   - Filtro por especialidad.
+   - Ordenamiento alfabético.
+   - Mensajes de carga, error y lista vacía.
+   - Notificaciones en el menú global.
+   - Navegación al módulo Mis Citas.
+
+   IMPORTANTE:
+   El USER solamente consulta veterinarios.
+   No puede crearlos, editarlos ni eliminarlos.
+   ========================================================== */
+
+
 // ==========================================================
-// IMPORTACIONES
+// IMPORTACIONES ANGULAR
 // ==========================================================
 
-// Component permite crear el componente.
-// OnInit ejecuta código automáticamente al abrir la página.
-// ChangeDetectorRef permite actualizar la vista
-// después de recibir la respuesta del backend.
 import {
   Component,
   OnInit,
   ChangeDetectorRef
 } from '@angular/core';
 
-// CommonModule permite utilizar *ngIf y *ngFor.
 import { CommonModule } from '@angular/common';
 
-// Router permite navegar entre páginas.
+// Permite utilizar ngModel en filtros y buscador.
+import { FormsModule } from '@angular/forms';
+
+// Navegación entre módulos.
 import { Router } from '@angular/router';
 
-// Servicio encargado de consultar
-// los veterinarios desde Spring Boot.
+
+// ==========================================================
+// SERVICIOS
+// ==========================================================
+
+// Servicio existente de la API REST.
 import { VeterinarioServicio }
   from '../../../Servicios/veterinario-servicio';
 
+// Servicio compartido de notificaciones.
+import { NotificacionesServicio }
+  from '../../../Servicios/notificaciones-servicio';
+
+
+// ==========================================================
+// INTERFAZ DEL VETERINARIO
+// ==========================================================
+
+// Representa los campos que utiliza la página.
+// Los campos opcionales permiten mostrar registros
+// aunque no toda la información esté disponible.
+interface Veterinario {
+
+  id?: number;
+
+  nombre?: string | null;
+
+  apellido?: string | null;
+
+  cedula?: string | null;
+
+  especialidad?: string | null;
+
+  telefono?: string | null;
+
+  email?: string | null;
+
+}
+
+
+// ==========================================================
+// COMPONENTE VETERINARIOS
+// ==========================================================
 
 @Component({
 
-  // Nombre interno del componente.
   selector: 'app-veterinarios',
 
-  // Componente standalone.
   standalone: true,
 
-  // CommonModule permite usar
-  // *ngIf y *ngFor en el HTML.
   imports: [
-    CommonModule
+    CommonModule,
+    FormsModule
   ],
 
-  // Archivo HTML.
   templateUrl: './veterinarios.html',
 
-  // Archivo SCSS.
   styleUrl: './veterinarios.scss'
 
 })
 export class Veterinarios implements OnInit {
 
 
-  // ==========================================================
+  // ========================================================
   // LISTA DE VETERINARIOS
-  // ==========================================================
+  // ========================================================
 
-  // Aquí guardaremos los veterinarios
-  // que devuelve Spring Boot.
-  veterinarios: any[] = [];
+  veterinarios: Veterinario[] = [];
 
 
-  // ==========================================================
-  // VARIABLES DE ESTADO
-  // ==========================================================
+  // ========================================================
+  // ESTADOS DE LA INTERFAZ
+  // ========================================================
 
-  // Indica si estamos cargando información.
+  // Indica que estamos esperando una respuesta.
   cargando: boolean = false;
 
-  // Mensaje mostrado cuando ocurre un error.
+  // Diferencia un fallo de una lista vacía.
+  errorCarga: boolean = false;
+
+  // Mensaje cuando ocurre un error.
   mensajeError: string = '';
 
+  // Mensaje de actualización manual.
+  mensajeExito: string = '';
 
-  // ==========================================================
+
+  // ========================================================
+  // BÚSQUEDA Y FILTROS
+  // ========================================================
+
+  // Buscar por nombre, apellido y especialidad.
+  busqueda: string = '';
+
+  // Especialidad seleccionada.
+  filtroEspecialidad: string = 'TODAS';
+
+  // Orden del listado:
+  // nombreAsc o nombreDesc.
+  ordenarPor: string = 'nombreAsc';
+
+
+  // ========================================================
   // CONSTRUCTOR
-  // ==========================================================
+  // ========================================================
 
   constructor(
 
-    // Servicio que se comunica con:
-    // GET /api/veterinarios
     private veterinarioServicio: VeterinarioServicio,
 
-    // Router para regresar al dashboard.
+    private notificacionesServicio: NotificacionesServicio,
+
     private router: Router,
 
-    // Permite actualizar manualmente
-    // la vista cuando llegan los datos.
     private cd: ChangeDetectorRef
 
   ) {}
 
 
-  // ==========================================================
+  // ========================================================
   // AL ABRIR LA PÁGINA
-  // ==========================================================
+  // ========================================================
 
   ngOnInit(): void {
 
-    // Cargamos automáticamente
-    // los veterinarios disponibles.
     this.cargarVeterinarios();
 
   }
 
 
-  // ==========================================================
-  // CARGAR VETERINARIOS
-  // ==========================================================
+  // ========================================================
+  // NORMALIZAR TEXTO
+  // ========================================================
 
-  cargarVeterinarios(): void {
+  /*
+    Permite buscar sin importar las mayúsculas
+    ni las tildes.
 
-    // Activamos el estado de carga.
+    Ejemplo:
+    "cirugia" también encuentra "Cirugía".
+  */
+
+  private normalizarTexto(
+    valor: unknown
+  ): string {
+
+    return String(valor ?? '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim()
+      .toLowerCase();
+
+  }
+
+
+  // ========================================================
+  // OBTENER NOMBRE COMPLETO
+  // ========================================================
+
+  obtenerNombreCompleto(
+    veterinario: Veterinario
+  ): string {
+
+    const nombre = String(
+      veterinario.nombre ?? ''
+    ).trim();
+
+    const apellido = String(
+      veterinario.apellido ?? ''
+    ).trim();
+
+    const completo =
+      `${nombre} ${apellido}`.trim();
+
+    return completo || 'Profesional veterinario';
+
+  }
+
+
+  // ========================================================
+  // ESPECIALIDADES DISPONIBLES
+  // ========================================================
+
+  /*
+    El filtro se llena automáticamente con
+    las especialidades reales de la API.
+
+    No utilizamos especialidades inventadas.
+  */
+
+  get especialidadesDisponibles(): string[] {
+
+    const especialidades = this.veterinarios
+      .map(veterinario =>
+        String(veterinario.especialidad ?? '').trim()
+      )
+      .filter(especialidad =>
+        especialidad.length > 0
+      );
+
+    return Array.from(
+      new Set(especialidades)
+    ).sort((a, b) =>
+      a.localeCompare(b, 'es', {
+        sensitivity: 'base'
+      })
+    );
+
+  }
+
+
+  // ========================================================
+  // VETERINARIOS FILTRADOS
+  // ========================================================
+
+  get veterinariosFiltrados(): Veterinario[] {
+
+    const textoBuscado =
+      this.normalizarTexto(this.busqueda);
+
+    const especialidadSeleccionada =
+      this.normalizarTexto(this.filtroEspecialidad);
+
+
+    // ======================================================
+    // BÚSQUEDA POR TEXTO Y ESPECIALIDAD
+    // ======================================================
+
+    const resultado = this.veterinarios.filter(
+      veterinario => {
+
+        const contenido = this.normalizarTexto(
+          [
+            veterinario.nombre,
+            veterinario.apellido,
+            veterinario.especialidad
+          ].join(' ')
+        );
+
+        const coincideBusqueda =
+          contenido.includes(textoBuscado);
+
+        const coincideEspecialidad =
+          this.filtroEspecialidad === 'TODAS' ||
+          this.normalizarTexto(
+            veterinario.especialidad
+          ) === especialidadSeleccionada;
+
+        return coincideBusqueda &&
+          coincideEspecialidad;
+
+      }
+    );
+
+
+    // ======================================================
+    // ORDENAR ALFABÉTICAMENTE
+    // ======================================================
+
+    return [...resultado].sort((a, b) => {
+
+      const comparacion =
+        this.obtenerNombreCompleto(a)
+          .localeCompare(
+            this.obtenerNombreCompleto(b),
+            'es',
+            {
+              sensitivity: 'base'
+            }
+          );
+
+      return this.ordenarPor === 'nombreDesc'
+        ? -comparacion
+        : comparacion;
+
+    });
+
+  }
+
+
+  // ========================================================
+  // LIMPIAR FILTROS
+  // ========================================================
+
+  limpiarFiltros(): void {
+
+    this.busqueda = '';
+
+    this.filtroEspecialidad = 'TODAS';
+
+    this.ordenarPor = 'nombreAsc';
+
+  }
+
+
+  // ========================================================
+  // CONSULTAR VETERINARIOS DESDE SPRING BOOT
+  // ========================================================
+
+  cargarVeterinarios(
+    actualizacionManual: boolean = false
+  ): void {
+
+
+    // Evitar varias consultas simultáneas.
+    if (this.cargando) {
+      return;
+    }
+
+
+    // Estados mientras consultamos.
     this.cargando = true;
 
-    // Limpiamos errores anteriores.
+    this.errorCarga = false;
+
     this.mensajeError = '';
 
+    this.mensajeExito = '';
 
-    // Ejecutamos:
-    //
-    // GET /api/veterinarios
-    //
-    // El interceptor agrega automáticamente
-    // el token JWT.
+
+    // ======================================================
+    // PETICIÓN GET /api/veterinarios
+    // ======================================================
+
+    // El interceptor JWT agrega el token de esta
+    // pestaña, sin cambiar la sesión de ADMIN.
     this.veterinarioServicio
       .listarVeterinarios()
       .subscribe({
 
 
-        // ====================================================
+        // ==================================================
         // RESPUESTA CORRECTA
-        // ====================================================
+        // ==================================================
 
         next: (respuesta) => {
 
-          // Guardamos los veterinarios.
-          this.veterinarios = respuesta;
+          // Comprobar que recibimos un arreglo.
+          this.veterinarios =
+            Array.isArray(respuesta)
+              ? respuesta
+              : [];
 
-          // Desactivamos el estado de carga.
           this.cargando = false;
 
-
-          console.log(
-            'Veterinarios disponibles:',
-            respuesta
-          );
+          this.errorCarga = false;
 
 
-          // Actualizamos la pantalla.
+          // Mostrar confirmación únicamente cuando
+          // el usuario solicita actualizar.
+          if (actualizacionManual) {
+
+            this.mensajeExito =
+              'El listado de veterinarios se actualizó correctamente.';
+
+            // Aviso en la campana compartida.
+            this.notificacionesServicio.agregar(
+              'Veterinarios actualizados',
+              'Se consultó nuevamente el listado de profesionales.',
+              'exito'
+            );
+
+          }
+
           this.cd.detectChanges();
 
         },
 
 
-        // ====================================================
-        // ERROR
-        // ====================================================
+        // ==================================================
+        // ERROR DE CONSULTA
+        // ==================================================
 
         error: (error) => {
 
@@ -161,13 +416,30 @@ export class Veterinarios implements OnInit {
             error
           );
 
-
-          this.mensajeError =
-            'No se pudieron cargar los veterinarios.';
-
-
           this.cargando = false;
 
+          this.errorCarga = true;
+
+
+          if (error?.status === 0) {
+
+            this.mensajeError =
+              'No se pudo conectar con el servidor. Verifica que la API esté encendida.';
+
+          } else {
+
+            this.mensajeError =
+              'No se pudieron cargar los veterinarios. Intenta nuevamente.';
+
+          }
+
+
+          // Informar el error en la campana.
+          this.notificacionesServicio.agregar(
+            'Error al consultar veterinarios',
+            'No fue posible obtener el listado de profesionales.',
+            'error'
+          );
 
           this.cd.detectChanges();
 
@@ -178,13 +450,48 @@ export class Veterinarios implements OnInit {
   }
 
 
-  // ==========================================================
-  // VOLVER AL DASHBOARD
-  // ==========================================================
+  // ========================================================
+  // IDENTIFICAR VETERINARIOS EN EL HTML
+  // ========================================================
+
+  trackByVeterinario(
+    index: number,
+    veterinario: Veterinario
+  ): number {
+
+    return veterinario.id ?? index;
+
+  }
+
+
+  // ========================================================
+  // IR A MIS CITAS
+  // ========================================================
+
+  /*
+    USER puede consultar a los veterinarios
+    y luego agendar una cita.
+
+    El formulario de Mis Citas permite elegir
+    la mascota, el servicio y el profesional.
+  */
+
+  irCitas(): void {
+
+    void this.router.navigate([
+      '/usuario/citas'
+    ]);
+
+  }
+
+
+  // ========================================================
+  // VOLVER AL DASHBOARD USER
+  // ========================================================
 
   volverDashboard(): void {
 
-    this.router.navigate([
+    void this.router.navigate([
       '/usuario/dashboard'
     ]);
 

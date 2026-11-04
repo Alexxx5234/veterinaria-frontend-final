@@ -1,596 +1,1180 @@
-/* =========================================================
-   CONTENEDOR PRINCIPAL
-   ========================================================= */
 
-.usuarios-container {
-  min-height: 100vh;
-  padding: 40px;
+/* ==========================================================
+   VETERINARIA AREVALO
+   ADMINISTRACIÓN DE USUARIOS - ESTILOS
 
-  background:
-    linear-gradient(
-      135deg,
-      #f5f7ff,
-      #eef1ff
-    );
+   MEJORAS VISUALES:
+   - Diseño morado y blanco.
+   - Estadísticas en tarjetas.
+   - Filtros de usuarios.
+   - Estados diferenciados.
+   - Acciones administrativas claras.
+   - Navegación accesible por teclado.
+   - Adaptación a teléfonos.
+
+   El menú lateral lo controla LayoutPrivado.
+   ========================================================== */
+
+
+/* ==========================================================
+   1. CONFIGURACIÓN GENERAL
+   ========================================================== */
+
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+:host *,
+:host *::before,
+:host *::after {
+  box-sizing: border-box;
 }
 
 
-/* =========================================================
-   CABECERA
-   ========================================================= */
+/* ==========================================================
+   2. CONTENEDOR PRINCIPAL
+   ========================================================== */
+
+.usuarios-container {
+  width: 100%;
+  min-width: 0;
+
+  padding: 0;
+
+  background: transparent;
+
+  color: #302d4f;
+
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+
+/* ==========================================================
+   3. CABECERA
+   ========================================================== */
 
 .usuarios-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
 
+  flex-wrap: wrap;
   gap: 20px;
 
-  padding: 25px 30px;
   margin-bottom: 25px;
+  padding: 28px 30px;
 
-  background-color: white;
-
+  border: 1px solid #ece8fa;
   border-radius: 18px;
 
+  background: #ffffff;
+
   box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.08);
+    0 8px 25px rgba(53, 42, 105, 0.06);
 }
 
+.header-texto {
+  flex: 1;
+  min-width: 220px;
+}
+
+.etiqueta-pagina {
+  display: inline-block;
+
+  margin-bottom: 10px;
+
+  color: #6251d5;
+
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
 
 .usuarios-header h1 {
   margin: 0;
 
   color: #292742;
 
-  font-size: 28px;
+  font-size: 29px;
+  font-weight: 700;
+  line-height: 1.3;
 }
-
 
 .usuarios-header p {
-  margin-top: 6px;
-  margin-bottom: 0;
+  margin: 9px 0 0;
 
-  color: #77758a;
+  color: #68647d;
+
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.acciones-header {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
 }
 
 
-/* =========================================================
-   BOTÓN VOLVER
-   ========================================================= */
+/* ==========================================================
+   4. BOTÓN VOLVER
+   ========================================================== */
 
 .btn-volver {
-  padding: 11px 18px;
+  min-height: 44px;
 
-  border: none;
-  border-radius: 9px;
+  padding: 11px 17px;
 
-  color: #555269;
+  border: 1px solid #e0dcf0;
+  border-radius: 10px;
 
-  background-color: #eeeef7;
+  background: #f3f1fc;
+  color: #514c68;
 
-  font-weight: 600;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
 
   cursor: pointer;
-
-  transition: 0.2s ease;
 }
-
 
 .btn-volver:hover {
-  background-color: #e2e2ef;
-
-  transform: translateY(-1px);
+  background: #e9e5f9;
 }
 
 
-/* =========================================================
-   FILTROS
-   ========================================================= */
+/* ==========================================================
+   5. RESUMEN GENERAL
+   ========================================================== */
 
-.filtros {
-  display: flex;
-
-  gap: 12px;
-
-  margin-bottom: 25px;
-}
-
-
-.btn-filtro {
-  padding: 10px 18px;
-
-  border: 1px solid #d8d8e5;
-  border-radius: 9px;
-
-  color: #555269;
-
-  background-color: white;
-
-  font-weight: 600;
-
-  cursor: pointer;
-
-  transition: 0.2s ease;
-}
-
-
-.btn-filtro:hover {
-  border-color: #6254e8;
-
-  color: #6254e8;
-}
-
-
-.btn-filtro.activo {
-  border-color: #6254e8;
-
-  color: white;
-
-  background-color: #6254e8;
-}
-
-
-/* =========================================================
-   MENSAJES
-   ========================================================= */
-
-.mensaje-info,
-.mensaje-error,
-.mensaje-exito,
-.sin-usuarios {
-  padding: 20px;
-
-  margin-bottom: 25px;
-
-  text-align: center;
-
-  border-radius: 14px;
-}
-
-
-.mensaje-info {
-  color: #6254e8;
-
-  background-color: white;
-
-  box-shadow:
-    0 8px 25px rgba(0, 0, 0, 0.07);
-}
-
-
-.mensaje-error {
-  color: #b42318;
-
-  background-color: #fff1f0;
-
-  border: 1px solid #ffd3cf;
-}
-
-
-.mensaje-exito {
-  color: #176b3a;
-
-  background-color: #ecfdf3;
-
-  border: 1px solid #b7ebc9;
-}
-
-
-/* =========================================================
-   SIN USUARIOS
-   ========================================================= */
-
-.sin-usuarios {
-  background-color: white;
-
-  box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.07);
-}
-
-
-.sin-icono {
-  font-size: 55px;
-
-  margin-bottom: 10px;
-}
-
-
-.sin-usuarios h2 {
-  color: #302d4f;
-}
-
-
-.sin-usuarios p {
-  color: #77758a;
-}
-
-
-/* =========================================================
-   GRID DE USUARIOS
-   ========================================================= */
-
-.usuarios-grid {
+.resumen-grid {
   display: grid;
 
   grid-template-columns:
-    repeat(
-      auto-fit,
-      minmax(300px, 1fr)
-    );
+    repeat(4, minmax(0, 1fr));
 
-  gap: 24px;
+  gap: 16px;
+
+  margin-bottom: 28px;
 }
 
-
-/* =========================================================
-   TARJETA DE USUARIO
-   ========================================================= */
-
-.usuario-card {
-  padding: 25px;
-
-  background-color: white;
-
-  border-radius: 18px;
-
-  box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.08);
-
-  transition: 0.2s ease;
-}
-
-
-.usuario-card:hover {
-  transform: translateY(-4px);
-
-  box-shadow:
-    0 14px 35px rgba(0, 0, 0, 0.12);
-}
-
-
-/* =========================================================
-   PARTE SUPERIOR DEL USUARIO
-   ========================================================= */
-
-.usuario-superior {
+.resumen-card {
   display: flex;
   align-items: center;
 
   gap: 15px;
 
+  min-width: 0;
+  padding: 22px;
+
+  border: 1px solid #ece8fa;
+  border-radius: 17px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 7px 22px rgba(53, 42, 105, 0.05);
+}
+
+.resumen-icono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 52px;
+  height: 52px;
+
+  flex-shrink: 0;
+
+  border-radius: 15px;
+
+  font-size: 25px;
+}
+
+.icono-total {
+  background: #eee9ff;
+}
+
+.icono-aprobados {
+  background: #e6f8ed;
+}
+
+.icono-pendientes {
+  background: #fff3d8;
+}
+
+.icono-bloqueados {
+  background: #ffebed;
+}
+
+.resumen-datos {
+  min-width: 0;
+}
+
+.resumen-datos span {
+  display: block;
+
+  color: #68647d;
+
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.resumen-datos strong {
+  display: block;
+
+  margin-top: 5px;
+
+  color: #302d4f;
+
+  font-size: 28px;
+  font-weight: 700;
+}
+
+
+/* ==========================================================
+   6. MENSAJES
+   ========================================================== */
+
+.mensaje-info,
+.mensaje-error,
+.mensaje-exito {
+  margin-bottom: 23px;
+  padding: 15px 18px;
+
+  border-radius: 12px;
+
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.mensaje-info {
+  border: 1px solid #ded6ff;
+
+  background: #ffffff;
+  color: #5946d5;
+
+  text-align: center;
+}
+
+.mensaje-error {
+  border: 1px solid #f3b4b4;
+
+  background: #fff1f0;
+  color: #a32020;
+}
+
+.mensaje-exito {
+  border: 1px solid #b7ebc9;
+
+  background: #ecfdf3;
+  color: #176b3a;
+}
+
+.btn-reintentar {
+  min-height: 35px;
+
+  margin-left: 12px;
+  padding: 7px 13px;
+
+  border: 1px solid #a32020;
+  border-radius: 8px;
+
+  background: #ffffff;
+  color: #a32020;
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+
+/* ==========================================================
+   7. ENCABEZADO DE GESTIÓN
+   ========================================================== */
+
+.gestion-section {
+  min-width: 0;
+}
+
+.gestion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  flex-wrap: wrap;
+  gap: 16px;
+
   margin-bottom: 20px;
 }
 
+.gestion-header h2 {
+  margin: 0;
 
-.usuario-icono {
-  width: 55px;
-  height: 55px;
+  color: #302d4f;
 
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.gestion-header p {
+  margin: 7px 0 0;
+
+  color: #68647d;
+
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.gestion-acciones {
   display: flex;
-  justify-content: center;
   align-items: center;
 
-  border-radius: 14px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
 
-  background:
-    linear-gradient(
-      135deg,
-      #ede9fe,
-      #ddd6fe
-    );
+.total-resultados {
+  display: inline-flex;
+  align-items: center;
 
-  font-size: 28px;
+  min-height: 35px;
+
+  padding: 8px 12px;
+
+  border-radius: 20px;
+
+  background: #eee9ff;
+  color: #5946c9;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.btn-actualizar {
+  min-height: 44px;
+
+  padding: 11px 16px;
+
+  border: 1px solid #ded6ff;
+  border-radius: 10px;
+
+  background: #ffffff;
+  color: #5946d5;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.btn-actualizar:hover:not(:disabled) {
+  background: #f3f0ff;
 }
 
 
-.usuario-superior h2 {
-  margin: 0 0 6px;
+/* ==========================================================
+   8. BOTONES TODOS / PENDIENTES
+   ========================================================== */
+
+.filtros-vista {
+  display: flex;
+  align-items: center;
+
+  flex-wrap: wrap;
+  gap: 12px;
+
+  margin-bottom: 20px;
+}
+
+.btn-filtro {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 9px;
+
+  min-height: 45px;
+
+  padding: 11px 17px;
+
+  border: 1px solid #d8d8e5;
+  border-radius: 10px;
+
+  background: #ffffff;
+  color: #555269;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.btn-filtro:hover:not(:disabled) {
+  border-color: #6254e8;
+
+  color: #6254e8;
+}
+
+.btn-filtro.activo {
+  border-color: #6254e8;
+
+  background: #6254e8;
+  color: #ffffff;
+}
+
+.contador-pendientes {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 22px;
+  height: 22px;
+
+  padding: 3px 6px;
+
+  border-radius: 20px;
+
+  background: #fff3d8;
+  color: #775000;
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+
+/* ==========================================================
+   9. BUSCADOR Y FILTRO POR ESTADO
+   ========================================================== */
+
+.filtros-card {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 2fr) minmax(190px, 1fr);
+
+  gap: 18px;
+
+  margin-bottom: 25px;
+  padding: 20px;
+
+  border: 1px solid #ece8fa;
+  border-radius: 15px;
+
+  background: #ffffff;
+}
+
+.filtro-grupo {
+  min-width: 0;
+}
+
+.filtro-grupo label {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: #39364d;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.filtro-grupo input,
+.filtro-grupo select {
+  display: block;
+
+  width: 100%;
+  min-height: 46px;
+
+  padding: 11px 13px;
+
+  border: 1px solid #d8d8e5;
+  border-radius: 9px;
+
+  outline: none;
+
+  background: #fafafe;
+  color: #302d4f;
+
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.filtro-grupo input::placeholder {
+  color: #77738a;
+}
+
+.filtro-grupo input:focus,
+.filtro-grupo select:focus {
+  border-color: #6254e8;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 0 0 3px rgba(98, 84, 232, 0.15);
+}
+
+.texto-ayuda {
+  display: block;
+
+  margin-top: 7px;
+
+  color: #68647d;
+
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+
+/* ==========================================================
+   10. SIN USUARIOS O SIN RESULTADOS
+   ========================================================== */
+
+.sin-usuarios,
+.sin-resultados {
+  padding: 35px 25px;
+
+  border: 1px solid #ece8fa;
+  border-radius: 17px;
+
+  background: #ffffff;
+
+  text-align: center;
+
+  box-shadow:
+    0 8px 25px rgba(53, 42, 105, 0.05);
+}
+
+.sin-icono {
+  margin-bottom: 12px;
+
+  font-size: 48px;
+}
+
+.sin-usuarios h3,
+.sin-resultados h3 {
+  margin: 0 0 10px;
 
   color: #302d4f;
 
   font-size: 20px;
 }
 
+.sin-usuarios p,
+.sin-resultados p {
+  max-width: 480px;
 
-/* =========================================================
-   ROL
-   ========================================================= */
+  margin: 0 auto;
+
+  color: #68647d;
+
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.btn-limpiar {
+  min-height: 42px;
+
+  margin-top: 19px;
+  padding: 10px 16px;
+
+  border: 1px solid #6254e8;
+  border-radius: 9px;
+
+  background: #ffffff;
+  color: #5946d5;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.btn-limpiar:hover {
+  background: #f3f0ff;
+}
+
+
+/* ==========================================================
+   11. CUADRÍCULA DE USUARIOS
+   ========================================================== */
+
+.usuarios-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(auto-fit, minmax(300px, 1fr));
+
+  gap: 22px;
+}
+
+
+/* ==========================================================
+   12. TARJETA DE USUARIO
+   ========================================================== */
+
+.usuario-card {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+
+  padding: 24px;
+
+  border: 1px solid #ece8fa;
+  border-radius: 18px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 8px 25px rgba(53, 42, 105, 0.06);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.usuario-card:hover {
+  transform: translateY(-3px);
+
+  box-shadow:
+    0 13px 30px rgba(74, 56, 139, 0.12);
+}
+
+
+/* ==========================================================
+   13. ENCABEZADO DEL USUARIO
+   ========================================================== */
+
+.usuario-superior {
+  display: flex;
+  align-items: center;
+
+  gap: 14px;
+
+  margin-bottom: 20px;
+}
+
+.usuario-icono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 55px;
+  height: 55px;
+
+  flex-shrink: 0;
+
+  border-radius: 15px;
+
+  background: linear-gradient(
+    135deg,
+    #ede9fe,
+    #ddd6fe
+  );
+
+  font-size: 26px;
+}
+
+.usuario-identidad {
+  min-width: 0;
+}
+
+.usuario-identidad h3 {
+  margin: 0 0 8px;
+
+  color: #302d4f;
+
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.4;
+
+  overflow-wrap: anywhere;
+}
 
 .rol {
   display: inline-block;
 
-  padding: 4px 10px;
+  padding: 6px 10px;
 
   border-radius: 20px;
 
-  color: #6254e8;
+  background: #f0edff;
+  color: #5946d5;
 
-  background-color: #f0edff;
-
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
 }
 
-
 .rol.admin {
-  color: #8a5200;
-
-  background-color: #fff0cf;
+  background: #fff0cf;
+  color: #805500;
 }
 
 
-/* =========================================================
-   INFORMACIÓN
-   ========================================================= */
+/* ==========================================================
+   14. INFORMACIÓN DE LA CUENTA
+   ========================================================== */
 
-.usuario-info p {
-  margin: 10px 0;
+.usuario-info {
+  margin-bottom: 20px;
+}
 
-  color: #666477;
+.info-fila {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
 
+  flex-wrap: wrap;
+  gap: 8px;
+
+  padding: 12px 0;
+
+  border-bottom: 1px solid #f0edfa;
+
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.info-fila strong {
+  color: #38364c;
+  font-weight: 600;
+}
+
+.info-fila > span {
+  max-width: 100%;
+
+  color: #625e78;
+
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+
+.correo-usuario {
   word-break: break-word;
 }
 
 
-.usuario-info strong {
-  color: #38364c;
-}
-
-
-/* =========================================================
-   ESTADOS
-   ========================================================= */
+/* ==========================================================
+   15. ESTADOS
+   ========================================================== */
 
 .estado {
   display: inline-block;
 
-  padding: 5px 10px;
+  padding: 6px 10px;
 
+  border: 1px solid transparent;
   border-radius: 20px;
 
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+/* Pendiente de aprobación */
+.estado.pendiente {
+  border-color: #f0d79a;
+
+  background: #fff4d9;
+  color: #765100;
+}
+
+/* Cuenta aprobada */
+.estado.aprobada {
+  border-color: #b6e7ca;
+
+  background: #e8faef;
+  color: #176b3a;
+}
+
+/* Solicitud rechazada */
+.estado.rechazada {
+  border-color: #f3c0c7;
+
+  background: #ffedf0;
+  color: #a32034;
+}
+
+/* Cuenta bloqueada */
+.estado.bloqueada {
+  border-color: #d5d2e0;
+
+  background: #f0eff5;
+  color: #4d4a5f;
+}
+
+/* Cuenta inactiva */
+.estado.inactiva {
+  border-color: #d5d2e0;
+
+  background: #f0eff5;
+  color: #4d4a5f;
+}
+
+
+/* ==========================================================
+   16. VERIFICACIÓN Y ACTIVACIÓN
+   ========================================================== */
+
+.estado-simple {
   font-size: 12px;
   font-weight: 700;
 }
 
-
-.estado.pendiente {
-  color: #805d00;
-
-  background-color: #fff3cd;
-}
-
-
-.estado.aprobada {
+.info-fila > .cuenta-activa {
   color: #176b3a;
+}
 
-  background-color: #dff6e8;
+.info-fila > .cuenta-inactiva {
+  color: #a32034;
 }
 
 
-.estado.rechazada {
-  color: #a71d2a;
-
-  background-color: #fde2e4;
-}
-
-
-.estado.bloqueada {
-  color: #5f5f69;
-
-  background-color: #e6e6eb;
-}
-
-
-/* =========================================================
-   ESTADO ACTIVO / INACTIVO
-   ========================================================= */
-
-.activo-cuenta {
-  color: #198754;
-
-  font-weight: 700;
-}
-
-
-.inactivo-cuenta {
-  color: #dc3545;
-
-  font-weight: 700;
-}
-
-
-/* =========================================================
-   AVISO DE CUENTA ADMIN
-   ========================================================= */
+/* ==========================================================
+   17. CUENTA ADMIN PROTEGIDA
+   ========================================================== */
 
 .aviso-admin {
-  margin-top: 18px;
+  margin-top: auto;
+  padding: 13px;
 
-  padding: 10px;
+  border: 1px solid #f0d79a;
+  border-radius: 10px;
+
+  background: #fff7df;
+  color: #795300;
+
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.5;
 
   text-align: center;
-
-  border-radius: 9px;
-
-  color: #805d00;
-
-  background-color: #fff4d6;
-
-  font-size: 13px;
-  font-weight: 600;
 }
 
 
-/* =========================================================
-   ACCIONES
-   ========================================================= */
+/* ==========================================================
+   18. ACCIONES DE USUARIOS
+   ========================================================== */
 
 .acciones {
   display: flex;
+  align-items: center;
 
   flex-wrap: wrap;
-
   gap: 9px;
 
-  margin-top: 22px;
+  margin-top: auto;
+  padding-top: 17px;
 }
 
-
 .acciones button {
-  flex: 1;
+  flex: 1 1 auto;
 
-  min-width: 105px;
+  min-width: 100px;
+  min-height: 43px;
 
   padding: 10px 12px;
 
-  border: none;
-  border-radius: 8px;
+  border: 1px solid transparent;
+  border-radius: 9px;
 
-  font-size: 13px;
-  font-weight: 600;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
 
   cursor: pointer;
 
-  transition: 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.acciones button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 
-/* =========================================================
-   APROBAR
-   ========================================================= */
+/* ==========================================================
+   19. APROBAR
+   ========================================================== */
 
 .btn-aprobar {
+  background: #e5f8ed;
   color: #176b3a;
+}
 
-  background-color: #dff6e8;
+.btn-aprobar:hover:not(:disabled) {
+  background: #198754;
+  color: #ffffff;
 }
 
 
-.btn-aprobar:hover {
-  color: white;
-
-  background-color: #198754;
-}
-
-
-/* =========================================================
-   RECHAZAR
-   ========================================================= */
+/* ==========================================================
+   20. RECHAZAR
+   ========================================================== */
 
 .btn-rechazar {
-  color: #b42318;
+  background: #ffe8eb;
+  color: #a32034;
+}
 
-  background-color: #fde2e4;
+.btn-rechazar:hover:not(:disabled) {
+  background: #c52c37;
+  color: #ffffff;
 }
 
 
-.btn-rechazar:hover {
-  color: white;
-
-  background-color: #dc3545;
-}
-
-
-/* =========================================================
-   BLOQUEAR
-   ========================================================= */
+/* ==========================================================
+   21. BLOQUEAR
+   ========================================================== */
 
 .btn-bloquear {
+  background: #fff2d4;
   color: #805d00;
+}
 
-  background-color: #fff3cd;
+.btn-bloquear:hover:not(:disabled) {
+  background: #a87400;
+  color: #ffffff;
 }
 
 
-.btn-bloquear:hover {
-  color: white;
-
-  background-color: #d39e00;
-}
-
-
-/* =========================================================
-   ACTIVAR
-   ========================================================= */
+/* ==========================================================
+   22. ACTIVAR
+   ========================================================== */
 
 .btn-activar {
-  color: #0f6674;
+  background: #def6f4;
+  color: #086f72;
+}
 
-  background-color: #d9f3f7;
+.btn-activar:hover:not(:disabled) {
+  background: #087e83;
+  color: #ffffff;
 }
 
 
-.btn-activar:hover {
-  color: white;
-
-  background-color: #138496;
-}
-
-
-/* =========================================================
-   ELIMINAR
-   ========================================================= */
+/* ==========================================================
+   23. ELIMINAR
+   ========================================================== */
 
 .btn-eliminar {
+  background: #ffe5e9;
   color: #9b1c31;
+}
 
-  background-color: #ffe5e9;
+.btn-eliminar:hover:not(:disabled) {
+  background: #c82333;
+  color: #ffffff;
 }
 
 
-.btn-eliminar:hover {
-  color: white;
+/* ==========================================================
+   24. ESTADO DE OPERACIÓN EN CURSO
+   ========================================================== */
 
-  background-color: #c82333;
+.accion-cargando {
+  flex: 1 1 100%;
+
+  margin: 0;
+  padding: 9px;
+
+  border: 1px solid #dcd5ff;
+  border-radius: 8px;
+
+  background: #f7f5ff;
+  color: #5946d5;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  text-align: center;
 }
 
 
-/* =========================================================
-   RESPONSIVO
-   ========================================================= */
+/* ==========================================================
+   25. ACCESIBILIDAD POR TECLADO
+   ========================================================== */
 
-@media (max-width: 700px) {
+.usuarios-container button:focus-visible,
+.usuarios-container input:focus-visible,
+.usuarios-container select:focus-visible {
+  outline: 3px solid #6952e6;
+  outline-offset: 3px;
+}
 
-  .usuarios-container {
-    padding: 20px;
+.usuarios-container button:disabled {
+  cursor: not-allowed;
+}
+
+
+/* ==========================================================
+   26. PANTALLAS MEDIANAS
+   ========================================================== */
+
+@media (max-width: 1250px) {
+
+  .resumen-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
   }
 
+}
+
+
+/* ==========================================================
+   27. TABLETS
+   ========================================================== */
+
+@media (max-width: 800px) {
 
   .usuarios-header {
     flex-direction: column;
-
     align-items: flex-start;
   }
 
+  .usuarios-header {
+    padding: 24px;
+  }
 
+  .filtros-card {
+    grid-template-columns: 1fr;
+  }
+
+  .acciones-header {
+    width: 100%;
+  }
+
+}
+
+
+/* ==========================================================
+   28. CELULARES
+   ========================================================== */
+
+@media (max-width: 600px) {
+
+  .usuarios-header {
+    padding: 20px;
+  }
+
+  .usuarios-header h1 {
+    font-size: 24px;
+  }
+
+  .acciones-header,
   .btn-volver {
     width: 100%;
   }
 
+  .resumen-grid {
+    grid-template-columns: 1fr;
 
-  .filtros {
-    flex-direction: column;
+    gap: 12px;
   }
 
+  .resumen-card {
+    padding: 18px;
+  }
+
+  .gestion-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .gestion-acciones {
+    width: 100%;
+  }
+
+  .filtros-vista {
+    flex-direction: column;
+    align-items: stretch;
+  }
 
   .btn-filtro {
     width: 100%;
   }
 
+  .filtros-card {
+    padding: 16px;
+  }
+
+  .filtro-grupo input,
+  .filtro-grupo select {
+    font-size: 16px;
+  }
 
   .usuarios-grid {
     grid-template-columns: 1fr;
   }
 
+  .usuario-card {
+    padding: 20px;
+  }
 
   .acciones {
     flex-direction: column;
+    align-items: stretch;
   }
-
 
   .acciones button {
     width: 100%;
+  }
+
+}
+
+
+/* ==========================================================
+   29. CELULARES PEQUEÑOS
+   ========================================================== */
+
+@media (max-width: 370px) {
+
+  .usuarios-header,
+  .usuario-card {
+    padding: 16px;
+  }
+
+  .usuarios-header h1 {
+    font-size: 22px;
+  }
+
+  .usuario-superior {
+    align-items: flex-start;
+  }
+
+}
+
+
+/* ==========================================================
+   30. REDUCIR ANIMACIONES
+   ========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .usuarios-container *,
+  .usuarios-container *::before,
+  .usuarios-container *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .usuario-card:hover {
+    transform: none;
   }
 
 }

@@ -27,7 +27,7 @@ export class AdminUsuarioServicio {
   // Corresponde al AdminController de Spring Boot.
 
   private apiUrl =
-    'http://localhost:8080/api/admin';
+    'http://100.110.172.31:8080/api/admin';
 
 
 

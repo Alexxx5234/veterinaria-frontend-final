@@ -1,122 +1,499 @@
-<!-- =======================================================
-     PÁGINA: SERVICIOS
-     ======================================================= -->
+
+<!-- ==========================================================
+     VETERINARIA AREVALO
+     PÁGINA: SERVICIOS (USER)
+
+     MEJORAS DE UI / UX:
+     - Encabezado organizado.
+     - Resumen de servicios disponibles.
+     - Búsqueda y ordenamiento.
+     - Precios claros.
+     - Navegación a Mis Citas.
+     - Mensajes accesibles.
+     - Diseño responsivo.
+
+     El menú lateral y la accesibilidad están
+     integrados en LayoutPrivado.
+     ========================================================== -->
 
 <div class="servicios-container">
 
-  <!-- =====================================================
-       CABECERA
-       ===================================================== -->
+
+  <!-- ========================================================
+       1. CABECERA
+       ======================================================== -->
 
   <header class="servicios-header">
 
-    <div>
-      <h1>🩺 Servicios</h1>
+    <div class="header-texto">
+
+      <span class="etiqueta-pagina">
+        NUESTROS SERVICIOS
+      </span>
+
+      <h1>
+        Servicios Veterinarios 🩺
+      </h1>
 
       <p>
-        Consulta los servicios disponibles
-        en la veterinaria.
+        Conoce los servicios disponibles para el
+        cuidado y bienestar de tus mascotas.
       </p>
+
     </div>
 
-    <button
-      type="button"
-      class="btn-volver"
-      (click)="volverDashboard()"
-    >
-      ← Volver
-    </button>
+
+    <!-- BOTONES DE NAVEGACIÓN -->
+    <div class="acciones-header">
+
+      <button
+        type="button"
+        class="btn-agendar"
+        (click)="irCitas()"
+      >
+        📅 Agendar cita
+      </button>
+
+      <button
+        type="button"
+        class="btn-volver"
+        (click)="volverDashboard()"
+      >
+        ← Volver al panel
+      </button>
+
+    </div>
 
   </header>
 
 
-  <!-- =====================================================
-       CARGANDO
-       ===================================================== -->
+  <!-- ========================================================
+       2. MENSAJES DE LA APLICACIÓN
+       ======================================================== -->
 
+  <!-- MENSAJE DE ÉXITO -->
   <div
-    class="mensaje-info"
-    *ngIf="cargando"
+    class="mensaje-exito"
+    *ngIf="mensajeExito"
+    role="status"
   >
-    Cargando servicios...
+    <span aria-hidden="true">✅</span>
+    {{ mensajeExito }}
   </div>
 
 
-  <!-- =====================================================
-       ERROR
-       ===================================================== -->
-
+  <!-- MENSAJE DE ERROR -->
   <div
     class="mensaje-error"
     *ngIf="mensajeError"
+    role="alert"
   >
+
+    <span aria-hidden="true">⚠️</span>
+
     {{ mensajeError }}
+
+    <button
+      type="button"
+      class="btn-reintentar"
+      *ngIf="errorCarga"
+      (click)="cargarServicios(true)"
+    >
+      Reintentar consulta
+    </button>
+
   </div>
 
 
-  <!-- =====================================================
-       SIN SERVICIOS
-       ===================================================== -->
+  <!-- ========================================================
+       3. RESUMEN DEL CATÁLOGO
+       ======================================================== -->
 
-  <div
-    class="sin-servicios"
-    *ngIf="
-      !cargando &&
-      !mensajeError &&
-      servicios.length === 0
-    "
+  <section
+    class="resumen-servicios"
+    *ngIf="!cargando && !errorCarga"
+    aria-label="Resumen del catálogo de servicios"
   >
 
-    <div class="sin-icono">
+    <div class="resumen-icono" aria-hidden="true">
       🩺
     </div>
 
-    <h2>
-      No hay servicios disponibles
-    </h2>
+    <div class="resumen-texto">
 
-    <p>
-      El administrador todavía no ha registrado
-      servicios en la veterinaria.
-    </p>
+      <span>
+        Servicios disponibles
+      </span>
 
-  </div>
+      <strong>
+        {{ servicios.length }}
+      </strong>
+
+      <small>
+        Consulta las opciones registradas en la veterinaria.
+      </small>
+
+    </div>
+
+    <div class="resumen-decoration" aria-hidden="true">
+      🐾
+    </div>
+
+  </section>
 
 
-  <!-- =====================================================
-       LISTADO DE SERVICIOS
-       ===================================================== -->
+  <!-- ========================================================
+       4. ENCABEZADO DEL LISTADO
+       ======================================================== -->
 
   <section
-    class="servicios-grid"
-    *ngIf="
-      !cargando &&
-      servicios.length > 0
-    "
+    class="listado-section"
+    aria-labelledby="titulo-listado"
   >
 
-    <article
-      class="servicio-card"
-      *ngFor="let servicio of servicios"
+    <div class="listado-header">
+
+      <div>
+
+        <h2 id="titulo-listado">
+          Catálogo de servicios
+        </h2>
+
+        <p>
+          Explora nuestras opciones y elige
+          el servicio que necesita tu mascota.
+        </p>
+
+      </div>
+
+
+      <div class="listado-acciones">
+
+        <!-- CONTADOR -->
+        <span
+          class="total-servicios"
+          *ngIf="!cargando && !errorCarga"
+        >
+          {{ servicios.length }}
+          {{ servicios.length === 1 ? 'servicio' : 'servicios' }}
+        </span>
+
+
+        <!-- ACTUALIZAR SIN RECARGAR LA PÁGINA -->
+        <button
+          type="button"
+          class="btn-actualizar"
+          (click)="cargarServicios(true)"
+          [disabled]="cargando"
+        >
+
+          {{
+            cargando
+              ? 'Consultando...'
+              : '↻ Actualizar'
+          }}
+
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- ======================================================
+         5. BUSCADOR Y ORDENAMIENTO
+         ====================================================== -->
+
+    <div
+      class="filtros-card"
+      *ngIf="
+        !cargando &&
+        !errorCarga &&
+        servicios.length > 0
+      "
     >
 
-      <div class="servicio-icono">
-        🐾
+
+      <!-- BUSCADOR -->
+      <div class="filtro-grupo">
+
+        <label for="buscarServicio">
+          Buscar servicio
+        </label>
+
+        <input
+          id="buscarServicio"
+          type="search"
+          [(ngModel)]="busqueda"
+          placeholder="Ejemplo: vacunación o consulta"
+          autocomplete="off"
+          aria-describedby="busqueda-ayuda"
+        >
+
+        <small
+          id="busqueda-ayuda"
+          class="filtro-ayuda"
+        >
+          Puedes buscar por nombre o descripción.
+        </small>
+
       </div>
 
-      <h2>
-        {{ servicio.nombre }}
-      </h2>
 
-      <p class="descripcion">
-        {{ servicio.descripcion }}
+      <!-- ORDENAMIENTO -->
+      <div class="filtro-grupo">
+
+        <label for="ordenarServicios">
+          Ordenar servicios
+        </label>
+
+        <select
+          id="ordenarServicios"
+          [(ngModel)]="ordenarPor"
+        >
+
+          <option value="nombre">
+            Nombre (A-Z)
+          </option>
+
+          <option value="precioAsc">
+            Menor precio primero
+          </option>
+
+          <option value="precioDesc">
+            Mayor precio primero
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+
+    <!-- ======================================================
+         6. ESTADO DE CARGA
+         ====================================================== -->
+
+    <div
+      class="mensaje-info"
+      *ngIf="cargando"
+      role="status"
+      aria-live="polite"
+    >
+      Consultando los servicios veterinarios...
+    </div>
+
+
+    <!-- ======================================================
+         7. SIN SERVICIOS
+         ====================================================== -->
+
+    <div
+      class="sin-servicios"
+      *ngIf="
+        !cargando &&
+        !errorCarga &&
+        servicios.length === 0
+      "
+    >
+
+      <div class="sin-icono" aria-hidden="true">
+        🩺
+      </div>
+
+      <h3>
+        No hay servicios disponibles
+      </h3>
+
+      <p>
+        Por el momento, el administrador no ha
+        registrado servicios en la veterinaria.
       </p>
 
-      <div class="precio">
-        ${{ servicio.precio }}
+    </div>
+
+
+    <!-- ======================================================
+         8. SIN RESULTADOS DE BÚSQUEDA
+         ====================================================== -->
+
+    <div
+      class="sin-resultados"
+      *ngIf="
+        !cargando &&
+        !errorCarga &&
+        servicios.length > 0 &&
+        serviciosFiltrados.length === 0
+      "
+    >
+
+      <div class="sin-icono" aria-hidden="true">
+        🔎
       </div>
 
-    </article>
+      <h3>
+        No encontramos servicios con esa búsqueda
+      </h3>
+
+      <p>
+        Prueba escribiendo otro nombre o
+        elimina los filtros para ver el catálogo.
+      </p>
+
+      <button
+        type="button"
+        class="btn-limpiar"
+        (click)="limpiarFiltros()"
+      >
+        Limpiar filtros
+      </button>
+
+    </div>
+
+
+    <!-- ======================================================
+         9. LISTA DE SERVICIOS
+         ====================================================== -->
+
+    <div
+      class="servicios-grid"
+      *ngIf="
+        !cargando &&
+        !errorCarga &&
+        serviciosFiltrados.length > 0
+      "
+    >
+
+
+      <!-- ====================================================
+           TARJETA INDIVIDUAL
+           ==================================================== -->
+
+      <article
+        class="servicio-card"
+        *ngFor="
+          let servicio of serviciosFiltrados;
+          trackBy: trackByServicio
+        "
+      >
+
+
+        <!-- PARTE SUPERIOR -->
+        <div class="tarjeta-superior">
+
+          <div
+            class="servicio-icono"
+            aria-hidden="true"
+          >
+            🐾
+          </div>
+
+          <span class="etiqueta-servicio">
+            Servicio veterinario
+          </span>
+
+        </div>
+
+
+        <!-- NOMBRE DEL SERVICIO -->
+        <h3>
+          {{ servicio.nombre }}
+        </h3>
+
+
+        <!-- DESCRIPCIÓN -->
+        <p class="descripcion">
+
+          {{
+            servicio.descripcion ||
+            'Servicio disponible para la atención y cuidado de tu mascota.'
+          }}
+
+        </p>
+
+
+        <!-- PRECIO -->
+        <div class="tarjeta-precio">
+
+          <span>
+            Precio del servicio
+          </span>
+
+          <strong
+            class="precio"
+            *ngIf="precioValido(servicio.precio)"
+          >
+            {{
+              obtenerPrecio(servicio.precio)
+                | currency:'USD':'symbol':'1.2-2'
+            }}
+          </strong>
+
+          <strong
+            class="precio precio-no-disponible"
+            *ngIf="!precioValido(servicio.precio)"
+          >
+            Consultar precio
+          </strong>
+
+        </div>
+
+
+        <!-- ==================================================
+             AGENDAR CITA
+             ================================================== -->
+
+        <!--
+          El usuario se dirige a Mis Citas.
+          En el formulario selecciona el servicio
+          que desea reservar.
+
+          No registramos citas desde esta pantalla.
+        -->
+
+        <button
+          type="button"
+          class="btn-cita"
+          (click)="irCitas()"
+          [attr.aria-label]="
+            'Ir a agendar una cita para el servicio ' +
+            servicio.nombre
+          "
+        >
+          📅 Ir a agendar
+        </button>
+
+      </article>
+
+    </div>
+
+
+    <!-- ======================================================
+         10. AYUDA FINAL
+         ====================================================== -->
+
+    <div
+      class="ayuda-catalogo"
+      *ngIf="
+        !cargando &&
+        !errorCarga &&
+        servicios.length > 0
+      "
+    >
+
+      <span aria-hidden="true">
+        💡
+      </span>
+
+      <p>
+        Para solicitar atención, entra a
+        <strong>Mis Citas</strong> y selecciona
+        la mascota, el servicio, el veterinario
+        y la fecha deseada.
+      </p>
+
+    </div>
 
   </section>
 

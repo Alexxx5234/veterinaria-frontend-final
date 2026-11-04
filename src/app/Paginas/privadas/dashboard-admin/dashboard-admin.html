@@ -1,173 +1,660 @@
-<!-- =======================================================
-     DASHBOARD DEL ADMINISTRADOR
-     ======================================================= -->
 
-<div class="dashboard-container">
+<!-- ==========================================================
+     VETERINARIA AREVALO
+     DASHBOARD ADMIN - RESUMEN GENERAL
+     ========================================================== -->
 
-  <!-- =====================================================
-       CABECERA
-       ===================================================== -->
+<div class="dashboard-admin-page">
 
-  <header class="dashboard-header">
+  <!-- ========================================================
+       FONDO DEL MENÚ EN CELULARES
+       ======================================================== -->
 
-    <div>
-      <h1>Panel de Administración</h1>
-
-      <p>
-        Gestiona usuarios, mascotas, citas,
-        servicios y veterinarios.
-      </p>
-    </div>
-
-
-    <button
-      type="button"
-      class="btn-cerrar"
-      (click)="cerrarSesion()"
-    >
-      Cerrar sesión
-    </button>
-
-  </header>
+  <button
+    type="button"
+    class="menu-overlay"
+    [class.visible]="menuAbierto"
+    (click)="cerrarMenu()"
+    aria-label="Cerrar menú lateral"
+    [attr.tabindex]="menuAbierto ? 0 : -1"
+  ></button>
 
 
+  <!-- ========================================================
+       MENÚ LATERAL
+       ======================================================== -->
 
-  <!-- =====================================================
-       OPCIONES DEL ADMINISTRADOR
-       ===================================================== -->
+  <aside
+    id="menu-admin"
+    class="sidebar"
+    [class.abierto]="menuAbierto"
+    aria-label="Menú de administración"
+  >
 
-  <section class="dashboard-grid">
+    <!-- LOGO -->
+    <div class="sidebar-header">
 
+      <div class="sidebar-brand">
 
-    <!-- ===================================================
-         USUARIOS
-         =================================================== -->
+        <div class="sidebar-logo" aria-hidden="true">
+          🐾
+        </div>
 
-    <div
-      class="card"
-      (click)="irUsuarios()"
-    >
+        <div class="sidebar-brand-text">
+          <h2>Veterinaria</h2>
+          <span>Arevalo</span>
+        </div>
 
-      <div class="icono">
-        👥
       </div>
 
-      <h2>
-        Usuarios
-      </h2>
-
-      <p>
-        Revisa usuarios pendientes, aprueba,
-        rechaza, bloquea y administra cuentas.
-      </p>
+      <button
+        type="button"
+        class="sidebar-cerrar"
+        (click)="cerrarMenu()"
+        aria-label="Cerrar menú"
+      >
+        ✕
+      </button>
 
     </div>
 
 
+    <!-- PERFIL -->
+    <div class="sidebar-perfil">
 
-    <!-- ===================================================
-         MASCOTAS
-         =================================================== -->
-
-    <div
-      class="card"
-      (click)="irMascotas()"
-    >
-
-      <div class="icono">
-        🐾
+      <div class="perfil-icono" aria-hidden="true">
+        👨‍💼
       </div>
 
-      <h2>
-        Mascotas
-      </h2>
-
-      <p>
-        Consulta todas las mascotas registradas
-        en el sistema.
-      </p>
-
-    </div>
-
-
-
-    <!-- ===================================================
-         CITAS
-         =================================================== -->
-
-    <div
-      class="card"
-      (click)="irCitas()"
-    >
-
-      <div class="icono">
-        📅
+      <div>
+        <strong>Administrador</strong>
+        <span>Panel de control</span>
       </div>
 
-      <h2>
-        Citas
-      </h2>
-
-      <p>
-        Consulta y administra las citas
-        registradas por los usuarios.
-      </p>
-
     </div>
 
 
-
-    <!-- ===================================================
-         SERVICIOS
-         =================================================== -->
-
-    <div
-      class="card"
-      (click)="irServicios()"
+    <!-- NAVEGACIÓN -->
+    <nav
+      class="sidebar-nav"
+      aria-label="Navegación principal"
     >
 
-      <div class="icono">
-        🩺
-      </div>
+      <p class="menu-titulo">
+        MENÚ PRINCIPAL
+      </p>
 
-      <h2>
-        Servicios
-      </h2>
 
-      <p>
-        Crea, modifica y elimina los servicios
-        ofrecidos por la veterinaria.
+      <button
+        type="button"
+        class="nav-item activo"
+        (click)="irInicio()"
+        aria-current="page"
+      >
+        <span class="nav-icon" aria-hidden="true">🏠</span>
+        <span>Inicio</span>
+      </button>
+
+
+      <button
+        type="button"
+        class="nav-item"
+        (click)="irUsuarios()"
+      >
+        <span class="nav-icon" aria-hidden="true">👥</span>
+        <span>Usuarios</span>
+      </button>
+
+
+      <button
+        type="button"
+        class="nav-item"
+        (click)="irMascotas()"
+      >
+        <span class="nav-icon" aria-hidden="true">🐾</span>
+        <span>Mascotas</span>
+      </button>
+
+
+      <button
+        type="button"
+        class="nav-item"
+        (click)="irCitas()"
+      >
+        <span class="nav-icon" aria-hidden="true">📅</span>
+        <span>Citas</span>
+      </button>
+
+
+      <button
+        type="button"
+        class="nav-item"
+        (click)="irServicios()"
+      >
+        <span class="nav-icon" aria-hidden="true">🩺</span>
+        <span>Servicios</span>
+      </button>
+
+
+      <button
+        type="button"
+        class="nav-item"
+        (click)="irVeterinarios()"
+      >
+        <span class="nav-icon" aria-hidden="true">👨‍⚕️</span>
+        <span>Veterinarios</span>
+      </button>
+
+    </nav>
+
+
+    <!-- CERRAR SESIÓN -->
+    <div class="sidebar-footer">
+
+      <button
+        type="button"
+        class="btn-cerrar-sesion"
+        (click)="cerrarSesion()"
+      >
+        <span aria-hidden="true">🚪</span>
+        <span>Cerrar sesión</span>
+      </button>
+
+      <p class="sidebar-copy">
+        Veterinaria Arevalo
       </p>
 
     </div>
 
+  </aside>
 
 
-    <!-- ===================================================
-         VETERINARIOS
-         =================================================== -->
+  <!-- ========================================================
+       CONTENIDO DEL DASHBOARD
+       ======================================================== -->
 
-    <div
-      class="card"
-      (click)="irVeterinarios()"
+  <main class="dashboard-main">
+
+    <!-- CABECERA -->
+    <header class="dashboard-header">
+
+      <div class="header-superior">
+
+        <button
+          type="button"
+          class="btn-menu"
+          (click)="cambiarMenu()"
+          aria-controls="menu-admin"
+          [attr.aria-expanded]="menuAbierto"
+        >
+          <span aria-hidden="true">☰</span>
+          Menú
+        </button>
+
+        <span class="rol-badge">
+          ● Administrador
+        </span>
+
+      </div>
+
+      <div class="header-texto">
+
+        <h1>Panel de Administración</h1>
+
+        <p>
+          Consulta la información general de tu veterinaria.
+        </p>
+
+      </div>
+
+    </header>
+
+
+    <!-- ======================================================
+         BIENVENIDA
+         ====================================================== -->
+
+    <section class="bienvenida">
+
+      <div class="bienvenida-contenido">
+
+        <span class="bienvenida-etiqueta">
+          PANEL ADMINISTRATIVO
+        </span>
+
+        <h2>
+          ¡Bienvenido a Veterinaria Arevalo! 🐾
+        </h2>
+
+        <p>
+          Revisa las estadísticas y mantente informado
+          sobre la actividad de tu veterinaria.
+        </p>
+
+      </div>
+
+      <div
+        class="bienvenida-icono"
+        aria-hidden="true"
+      >
+        🐶
+      </div>
+
+    </section>
+
+
+    <!-- ======================================================
+         RESUMEN GENERAL
+         ====================================================== -->
+
+    <section
+      class="resumen-section"
+      aria-labelledby="titulo-resumen"
     >
 
-      <div class="icono">
-        👨‍⚕️
+      <div class="resumen-encabezado">
+
+        <div>
+
+          <h2 id="titulo-resumen">
+            Resumen general
+          </h2>
+
+          <p>
+            Información actualizada desde el sistema.
+          </p>
+
+        </div>
+
+
+        <!-- ACTUALIZAR LOS DATOS -->
+        <button
+          type="button"
+          class="btn-actualizar"
+          (click)="cargarResumen()"
+          [disabled]="cargandoResumen"
+        >
+          {{ cargandoResumen ? 'Actualizando...' : '↻ Actualizar' }}
+        </button>
+
       </div>
 
-      <h2>
-        Veterinarios
-      </h2>
 
-      <p>
-        Registra, modifica y administra
-        los veterinarios del sistema.
-      </p>
+      <!-- ERROR DE CONEXIÓN -->
+      <div
+        class="resumen-alerta"
+        *ngIf="errorResumen"
+        role="alert"
+      >
+        Algunas estadísticas no pudieron cargarse.
+        Comprueba la conexión con Spring Boot.
+      </div>
 
-    </div>
+
+      <!-- ====================================================
+           TARJETAS DE ESTADÍSTICAS
+           ==================================================== -->
+
+      <div
+        class="resumen-grid"
+        aria-live="polite"
+      >
+
+        <!-- TOTAL USUARIOS -->
+        <article class="resumen-card">
+
+          <div class="resumen-icono">
+            👥
+          </div>
+
+          <span class="resumen-label">
+            Usuarios registrados
+          </span>
+
+          <strong class="resumen-numero">
+            {{ totalUsuarios === null ? '—' : totalUsuarios }}
+          </strong>
+
+          <small>
+            Total de cuentas del sistema
+          </small>
+
+        </article>
 
 
-  </section>
+        <!-- TOTAL MASCOTAS -->
+        <article class="resumen-card">
+
+          <div class="resumen-icono">
+            🐾
+          </div>
+
+          <span class="resumen-label">
+            Mascotas registradas
+          </span>
+
+          <strong class="resumen-numero">
+            {{ totalMascotas === null ? '—' : totalMascotas }}
+          </strong>
+
+          <small>
+            Mascotas ingresadas al sistema
+          </small>
+
+        </article>
+
+
+        <!-- TOTAL CITAS -->
+        <article class="resumen-card">
+
+          <div class="resumen-icono">
+            📅
+          </div>
+
+          <span class="resumen-label">
+            Citas registradas
+          </span>
+
+          <strong class="resumen-numero">
+            {{ totalCitas === null ? '—' : totalCitas }}
+          </strong>
+
+          <small>
+            Total de citas de la veterinaria
+          </small>
+
+        </article>
+
+
+        <!-- TOTAL SERVICIOS -->
+        <article class="resumen-card">
+
+          <div class="resumen-icono">
+            🩺
+          </div>
+
+          <span class="resumen-label">
+            Servicios disponibles
+          </span>
+
+          <strong class="resumen-numero">
+            {{ totalServicios === null ? '—' : totalServicios }}
+          </strong>
+
+          <small>
+            Servicios registrados
+          </small>
+
+        </article>
+
+
+        <!-- TOTAL VETERINARIOS -->
+        <article class="resumen-card">
+
+          <div class="resumen-icono">
+            👨‍⚕️
+          </div>
+
+          <span class="resumen-label">
+            Veterinarios
+          </span>
+
+          <strong class="resumen-numero">
+            {{ totalVeterinarios === null ? '—' : totalVeterinarios }}
+          </strong>
+
+          <small>
+            Profesionales registrados
+          </small>
+
+        </article>
+
+
+        <!-- USUARIOS PENDIENTES -->
+        <article class="resumen-card resumen-destacado">
+
+          <div class="resumen-icono">
+            ⏳
+          </div>
+
+          <span class="resumen-label">
+            Usuarios pendientes
+          </span>
+
+          <strong class="resumen-numero">
+            {{ usuariosPendientes === null ? '—' : usuariosPendientes }}
+          </strong>
+
+          <small>
+            Cuentas por revisar y aprobar
+          </small>
+
+        </article>
+
+      </div>
+
+    </section>
+
+
+    <!-- ======================================================
+         INFORMACIÓN ADICIONAL
+         ====================================================== -->
+
+    <section class="detalle-grid">
+
+      <!-- ====================================================
+           PRÓXIMAS CITAS
+           ==================================================== -->
+
+      <article class="detalle-panel">
+
+        <div class="detalle-encabezado">
+
+          <div>
+
+            <h2>
+              📅 Próximas citas
+            </h2>
+
+            <p>
+              Las próximas atenciones registradas.
+            </p>
+
+          </div>
+
+          <button
+            type="button"
+            class="detalle-enlace"
+            (click)="irCitas()"
+          >
+            Ver todas →
+          </button>
+
+        </div>
+
+
+        <!-- MENSAJE DE CARGA -->
+        <p
+          class="detalle-vacio"
+          *ngIf="cargandoResumen"
+        >
+          Cargando próximas citas...
+        </p>
+
+
+        <!-- SI NO SE PUDIERON CONSULTAR -->
+        <p
+          class="detalle-vacio"
+          *ngIf="
+            !cargandoResumen &&
+            totalCitas === null
+          "
+        >
+          No se pudo consultar la información de las citas.
+        </p>
+
+
+        <!-- SIN CITAS PRÓXIMAS -->
+        <p
+          class="detalle-vacio"
+          *ngIf="
+            !cargandoResumen &&
+            totalCitas !== null &&
+            proximasCitas.length === 0
+          "
+        >
+          No hay próximas citas registradas.
+        </p>
+
+
+        <!-- LISTADO DE CITAS -->
+        <div
+          class="lista-citas"
+          *ngIf="
+            !cargandoResumen &&
+            proximasCitas.length > 0
+          "
+        >
+
+          <div
+            class="cita-item"
+            *ngFor="let cita of proximasCitas"
+          >
+
+            <div class="cita-icono" aria-hidden="true">
+              🐾
+            </div>
+
+            <div class="cita-contenido">
+
+              <strong>
+                {{ cita.mascota?.nombre || 'Mascota' }}
+              </strong>
+
+              <span>
+                {{ cita.servicio?.nombre || 'Cita veterinaria' }}
+              </span>
+
+              <small>
+                {{ cita.fechaHora | date:'dd/MM/yyyy HH:mm' }}
+              </small>
+
+            </div>
+
+            <span class="cita-estado">
+              {{ cita.estado || 'Registrada' }}
+            </span>
+
+          </div>
+
+        </div>
+
+      </article>
+
+
+      <!-- ====================================================
+           ESTADO DE USUARIOS
+           ==================================================== -->
+
+      <article class="detalle-panel">
+
+        <div class="detalle-encabezado">
+
+          <div>
+
+            <h2>
+              👥 Estado de usuarios
+            </h2>
+
+            <p>
+              Distribución de las cuentas registradas.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="estados-lista">
+
+          <!-- APROBADOS -->
+          <div class="estado-fila">
+
+            <span>
+              <span class="estado-punto aprobado"></span>
+              Aprobados
+            </span>
+
+            <strong>
+              {{ usuariosAprobados === null ? '—' : usuariosAprobados }}
+            </strong>
+
+          </div>
+
+
+          <!-- PENDIENTES -->
+          <div class="estado-fila">
+
+            <span>
+              <span class="estado-punto pendiente"></span>
+              Pendientes
+            </span>
+
+            <strong>
+              {{ usuariosPendientes === null ? '—' : usuariosPendientes }}
+            </strong>
+
+          </div>
+
+
+          <!-- RECHAZADOS -->
+          <div class="estado-fila">
+
+            <span>
+              <span class="estado-punto rechazado"></span>
+              Rechazados
+            </span>
+
+            <strong>
+              {{ usuariosRechazados === null ? '—' : usuariosRechazados }}
+            </strong>
+
+          </div>
+
+
+          <!-- BLOQUEADOS -->
+          <div class="estado-fila">
+
+            <span>
+              <span class="estado-punto bloqueado"></span>
+              Bloqueados
+            </span>
+
+            <strong>
+              {{ usuariosBloqueados === null ? '—' : usuariosBloqueados }}
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        <div class="citas-hoy">
+
+          <span>
+            📅 Citas de hoy
+          </span>
+
+          <strong>
+            {{ citasHoy === null ? '—' : citasHoy }}
+          </strong>
+
+        </div>
+
+      </article>
+
+    </section>
+
+  </main>
 
 </div>
