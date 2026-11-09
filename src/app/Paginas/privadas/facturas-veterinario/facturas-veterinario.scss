@@ -1,0 +1,1941 @@
+/* ==========================================================
+   VETERINARIA ARÉVALO
+   ESTILOS DEL MÓDULO DE FACTURACIÓN
+
+   Características:
+   - Diseño profesional y sencillo.
+   - Adaptable a computadoras, tablets y móviles.
+   - Contraste y navegación por teclado.
+   - Compatible con preferencias de accesibilidad.
+   - Tabla adaptable.
+   - Ventana de detalle de factura.
+========================================================== */
+
+:host {
+  display: block;
+  min-width: 0;
+}
+
+:host *,
+:host *::before,
+:host *::after {
+  box-sizing: border-box;
+}
+
+
+// ==========================================================
+// 1. CONTENEDOR PRINCIPAL
+// ==========================================================
+
+.facturas-vet {
+
+  --fv-fondo: #f5faf7;
+  --fv-panel: #ffffff;
+  --fv-texto: #18372d;
+  --fv-suave: #64786f;
+  --fv-borde: #deebe4;
+  --fv-verde: #08785b;
+
+  min-width: 0;
+
+  padding: 8px 6px 28px;
+
+  color: var(--fv-texto);
+
+  background: var(--fv-fondo);
+
+  border-radius: 18px;
+
+  font-family: 'Segoe UI', Arial, sans-serif;
+
+}
+
+
+// ==========================================================
+// 2. ACCESIBILIDAD
+// ==========================================================
+
+.facturas-vet button,
+.facturas-vet input,
+.facturas-vet select {
+  font: inherit;
+}
+
+.facturas-vet button:focus-visible,
+.facturas-vet input:focus-visible,
+.facturas-vet select:focus-visible {
+
+  outline: 3px solid rgba(8, 120, 91, .28);
+
+  outline-offset: 2px;
+
+}
+
+.facturas-vet button:disabled {
+
+  opacity: .55;
+
+  cursor: not-allowed;
+
+}
+
+
+// ==========================================================
+// 3. ENCABEZADO
+// ==========================================================
+
+.facturas-vet__header {
+
+  display: flex;
+
+  align-items: flex-start;
+
+  justify-content: space-between;
+
+  gap: 18px;
+
+  flex-wrap: wrap;
+
+  margin-bottom: 22px;
+
+}
+
+.facturas-vet__eyebrow,
+.panel-filtros__eyebrow {
+
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: var(--fv-verde);
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  letter-spacing: .11em;
+
+}
+
+.facturas-vet__header h1 {
+
+  margin: 0 0 7px;
+
+  color: var(--fv-texto);
+
+  font-size: clamp(24px, 3vw, 33px);
+
+  line-height: 1.2;
+
+  letter-spacing: -.6px;
+
+}
+
+.facturas-vet__header p {
+
+  max-width: 680px;
+
+  margin: 0;
+
+  color: var(--fv-suave);
+
+  font-size: 14px;
+
+  line-height: 1.55;
+
+}
+
+.facturas-vet__header-actions {
+
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 9px;
+
+}
+
+
+// ==========================================================
+// 4. BOTONES GENERALES
+// ==========================================================
+
+.btn {
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 8px;
+
+  min-height: 42px;
+
+  padding: 10px 15px;
+
+  border: 1px solid transparent;
+
+  border-radius: 10px;
+
+  cursor: pointer;
+
+  font-size: 12px !important;
+
+  font-weight: 750;
+
+  transition:
+    background .18s ease,
+    border-color .18s ease,
+    transform .18s ease;
+
+}
+
+.btn:hover:not(:disabled) {
+
+  transform: translateY(-1px);
+
+}
+
+.btn--principal {
+
+  color: #fff;
+
+  background: #08785b;
+
+  border-color: #08785b;
+
+}
+
+.btn--principal:hover:not(:disabled) {
+
+  background: #06664d;
+
+}
+
+.btn--secundario {
+
+  color: #17664f;
+
+  background: #fff;
+
+  border-color: #cfe3d8;
+
+}
+
+.btn--secundario:hover:not(:disabled) {
+
+  background: #eff8f3;
+
+}
+
+
+// ==========================================================
+// 5. ALERTAS Y MENSAJES
+// ==========================================================
+
+.alerta {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 12px;
+
+  margin-bottom: 15px;
+
+  padding: 12px 15px;
+
+  border: 1px solid transparent;
+
+  border-radius: 11px;
+
+  font-size: 13px;
+
+  line-height: 1.45;
+
+}
+
+.alerta--error {
+
+  color: #992f3c;
+
+  background: #fff1f2;
+
+  border-color: #f3cbd0;
+
+}
+
+.alerta--exito {
+
+  color: #17664f;
+
+  background: #eaf8ef;
+
+  border-color: #ccebd8;
+
+}
+
+.alerta button {
+
+  flex: 0 0 auto;
+
+  padding: 5px 8px;
+
+  color: inherit;
+
+  background: transparent;
+
+  border: 0;
+
+  cursor: pointer;
+
+  font-weight: 750;
+
+}
+
+.alerta .alerta__cerrar {
+
+  font-size: 20px;
+
+  line-height: 1;
+
+}
+
+
+// ==========================================================
+// 6. INDICADORES
+// ==========================================================
+
+.facturas-vet__indicadores {
+
+  display: grid;
+
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+
+  gap: 13px;
+
+  margin-bottom: 19px;
+
+}
+
+.indicador {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  min-width: 0;
+
+  padding: 17px 15px;
+
+  background: var(--fv-panel);
+
+  border: 1px solid var(--fv-borde);
+
+  border-radius: 15px;
+
+  box-shadow: 0 7px 22px rgba(16, 80, 57, .04);
+
+}
+
+.indicador__icono {
+
+  display: grid;
+
+  place-items: center;
+
+  flex: 0 0 43px;
+
+  width: 43px;
+
+  height: 43px;
+
+  border-radius: 13px;
+
+  font-size: 21px;
+
+}
+
+.indicador__icono--verde {
+  background: #e0f5e9;
+}
+
+.indicador__icono--azul {
+  background: #e5f1fc;
+}
+
+.indicador__icono--naranja {
+  background: #fff1df;
+}
+
+.indicador__icono--violeta {
+  background: #f0eafe;
+}
+
+.indicador > div {
+
+  min-width: 0;
+
+}
+
+.indicador__label {
+
+  display: block;
+
+  color: var(--fv-suave);
+
+  font-size: 11px;
+
+  line-height: 1.35;
+
+}
+
+.indicador strong {
+
+  display: block;
+
+  margin: 5px 0 3px;
+
+  color: var(--fv-texto);
+
+  font-size: clamp(20px, 2vw, 27px);
+
+  line-height: 1.2;
+
+  overflow-wrap: anywhere;
+
+}
+
+.indicador small {
+
+  color: var(--fv-suave);
+
+  font-size: 10px;
+
+  line-height: 1.4;
+
+}
+
+
+// ==========================================================
+// 7. PANELES
+// ==========================================================
+
+.panel-filtros,
+.panel-listado {
+
+  min-width: 0;
+
+  margin-bottom: 18px;
+
+  padding: 20px;
+
+  background: var(--fv-panel);
+
+  border: 1px solid var(--fv-borde);
+
+  border-radius: 16px;
+
+  box-shadow: 0 7px 22px rgba(16, 80, 57, .035);
+
+}
+
+.panel-filtros__heading,
+.panel-listado__heading {
+
+  display: flex;
+
+  align-items: flex-start;
+
+  justify-content: space-between;
+
+  gap: 14px;
+
+  margin-bottom: 17px;
+
+}
+
+.panel-filtros__heading h2,
+.panel-listado__heading h2 {
+
+  margin: 0;
+
+  color: var(--fv-texto);
+
+  font-size: 18px;
+
+  line-height: 1.3;
+
+}
+
+.panel-filtros__heading p,
+.panel-listado__heading p {
+
+  margin: 5px 0 0;
+
+  color: var(--fv-suave);
+
+  font-size: 12px;
+
+  line-height: 1.45;
+
+}
+
+
+// ==========================================================
+// 8. BOTÓN LIMPIAR FILTROS
+// ==========================================================
+
+.btn-limpiar {
+
+  padding: 8px 11px;
+
+  color: #08785b;
+
+  background: #eff8f3;
+
+  border: 1px solid #d6ecdf;
+
+  border-radius: 9px;
+
+  cursor: pointer;
+
+  font-size: 11px !important;
+
+  font-weight: 750;
+
+}
+
+.btn-limpiar:hover {
+
+  background: #e4f4eb;
+
+}
+
+
+// ==========================================================
+// 9. FORMULARIO DE FILTROS
+// ==========================================================
+
+.filtros-grid {
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(220px, 1.5fr)
+    repeat(3, minmax(135px, 1fr));
+
+  gap: 13px;
+
+}
+
+.campo {
+
+  display: grid;
+
+  align-content: start;
+
+  gap: 7px;
+
+  min-width: 0;
+
+}
+
+.campo > span {
+
+  color: #3e5d50;
+
+  font-size: 11px;
+
+  font-weight: 750;
+
+}
+
+.campo input,
+.campo select {
+
+  width: 100%;
+
+  min-width: 0;
+
+  height: 42px;
+
+  padding: 0 11px;
+
+  color: var(--fv-texto);
+
+  background: #fbfdfc;
+
+  border: 1px solid #dce9e2;
+
+  border-radius: 9px;
+
+  font-size: 12px;
+
+}
+
+.campo input::placeholder {
+
+  color: #9aa9a1;
+
+}
+
+.campo--busqueda {
+
+  grid-column: span 2;
+
+}
+
+
+// ==========================================================
+// 10. BUSCADOR
+// ==========================================================
+
+.campo__entrada--icono {
+
+  position: relative;
+
+}
+
+.campo__entrada--icono > span {
+
+  position: absolute;
+
+  top: 50%;
+
+  left: 12px;
+
+  color: #6b8a7b;
+
+  font-size: 22px;
+
+  line-height: 1;
+
+  transform: translateY(-55%);
+
+  pointer-events: none;
+
+}
+
+.campo__entrada--icono input {
+
+  padding-left: 37px;
+
+}
+
+
+// ==========================================================
+// 11. FILTROS RÁPIDOS
+// ==========================================================
+
+.filtros-rapidos {
+
+  display: flex;
+
+  align-items: center;
+
+  flex-wrap: wrap;
+
+  gap: 8px;
+
+  margin-top: 15px;
+
+}
+
+.filtros-rapidos > span {
+
+  margin-right: 3px;
+
+  color: var(--fv-suave);
+
+  font-size: 11px;
+
+}
+
+.filtros-rapidos button {
+
+  padding: 6px 11px;
+
+  color: #17664f;
+
+  background: #f1f8f4;
+
+  border: 1px solid #dceee4;
+
+  border-radius: 20px;
+
+  cursor: pointer;
+
+  font-size: 10px !important;
+
+  font-weight: 750;
+
+}
+
+.filtros-rapidos button:hover {
+
+  background: #e4f4eb;
+
+}
+
+
+// ==========================================================
+// 12. TABLA DE FACTURAS
+// ==========================================================
+
+.panel-listado {
+
+  padding-bottom: 13px;
+
+}
+
+.panel-listado__heading {
+
+  align-items: center;
+
+}
+
+.panel-listado__orden {
+
+  padding: 7px 10px;
+
+  color: #537164;
+
+  background: #f1f8f4;
+
+  border-radius: 20px;
+
+  font-size: 10px;
+
+  white-space: nowrap;
+
+}
+
+.tabla-contenedor {
+
+  width: 100%;
+
+  overflow-x: auto;
+
+  border: 1px solid #e6eee9;
+
+  border-radius: 12px;
+
+}
+
+.tabla-facturas {
+
+  width: 100%;
+
+  min-width: 1030px;
+
+  border-collapse: collapse;
+
+  text-align: left;
+
+}
+
+.tabla-facturas th {
+
+  padding: 12px 11px;
+
+  color: #526c60;
+
+  background: #f4f9f6;
+
+  border-bottom: 1px solid #e2ece6;
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  white-space: nowrap;
+
+}
+
+.tabla-facturas td {
+
+  padding: 12px 11px;
+
+  color: #355247;
+
+  border-bottom: 1px solid #edf2ef;
+
+  font-size: 11px;
+
+  vertical-align: middle;
+
+}
+
+.tabla-facturas tbody tr:last-child td {
+
+  border-bottom: 0;
+
+}
+
+.tabla-facturas tbody tr:hover {
+
+  background: #fbfefc;
+
+}
+
+.tabla-facturas td strong {
+
+  display: block;
+
+  color: #244438;
+
+  font-size: 11px;
+
+  font-weight: 750;
+
+}
+
+.tabla-facturas td small {
+
+  display: block;
+
+  margin-top: 4px;
+
+  color: #84948b;
+
+  font-size: 9px;
+
+  overflow-wrap: anywhere;
+
+}
+
+.tabla-facturas .numero-factura {
+
+  color: #08785b;
+
+  white-space: nowrap;
+
+}
+
+.alinear-derecha {
+
+  text-align: right !important;
+
+}
+
+.tabla-facturas .total-celda {
+
+  color: #183f31;
+
+  font-size: 12px;
+
+  font-weight: 800;
+
+  white-space: nowrap;
+
+}
+
+
+// ==========================================================
+// 13. ESTADOS DE FACTURA
+// ==========================================================
+
+.estado {
+
+  display: inline-flex;
+
+  align-items: center;
+
+  padding: 5px 8px;
+
+  border-radius: 20px;
+
+  font-size: 9px;
+
+  font-weight: 800;
+
+  white-space: nowrap;
+
+}
+
+.estado--emitida {
+
+  color: #08724f;
+
+  background: #e1f6e9;
+
+}
+
+.estado--pendiente {
+
+  color: #865d0b;
+
+  background: #fff2d6;
+
+}
+
+.estado--otro {
+
+  color: #5c6870;
+
+  background: #edf0f2;
+
+}
+
+
+// ==========================================================
+// 14. ESTADO DEL CORREO
+// ==========================================================
+
+.correo-estado {
+
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 5px;
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  white-space: nowrap;
+
+}
+
+.correo-estado--enviado {
+
+  color: #08724f;
+
+}
+
+.correo-estado--pendiente {
+
+  color: #9a6a12;
+
+}
+
+
+// ==========================================================
+// 15. BOTONES DE ACCIONES
+// ==========================================================
+
+.acciones {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 5px;
+
+  white-space: nowrap;
+
+}
+
+.accion {
+
+  min-width: 31px;
+
+  min-height: 29px;
+
+  padding: 5px 7px;
+
+  border: 1px solid transparent;
+
+  border-radius: 7px;
+
+  cursor: pointer;
+
+  font-size: 9px !important;
+
+  font-weight: 800;
+
+}
+
+.accion--ver {
+
+  color: #17664f;
+
+  background: #eaf7ef;
+
+  border-color: #d8eee0;
+
+}
+
+.accion--pdf {
+
+  color: #285b8d;
+
+  background: #edf5fc;
+
+  border-color: #dcebf8;
+
+}
+
+.accion--correo {
+
+  color: #7756a4;
+
+  background: #f3effb;
+
+  border-color: #e6ddf5;
+
+}
+
+
+// ==========================================================
+// 16. ESTADOS VACÍOS
+// ==========================================================
+
+.estado-vacio {
+
+  display: grid;
+
+  justify-items: center;
+
+  gap: 8px;
+
+  min-height: 205px;
+
+  padding: 35px 18px;
+
+  color: var(--fv-suave);
+
+  text-align: center;
+
+  background: #fbfdfc;
+
+  border: 1px dashed #dbe9e1;
+
+  border-radius: 12px;
+
+}
+
+.estado-vacio__icono {
+
+  display: grid;
+
+  place-items: center;
+
+  width: 48px;
+
+  height: 48px;
+
+  margin-bottom: 3px;
+
+  background: #eaf7ef;
+
+  border-radius: 15px;
+
+  font-size: 23px;
+
+}
+
+.estado-vacio strong {
+
+  color: #25483a;
+
+  font-size: 14px;
+
+}
+
+.estado-vacio small {
+
+  max-width: 430px;
+
+  font-size: 11px;
+
+  line-height: 1.5;
+
+}
+
+.estado-vacio .btn {
+
+  margin-top: 8px;
+
+}
+
+.estado-vacio--cargando {
+
+  border-style: solid;
+
+}
+
+.estado-vacio--cargando strong {
+
+  margin-top: 5px;
+
+}
+
+
+// ==========================================================
+// 17. INDICADOR DE CARGA
+// ==========================================================
+
+.spinner {
+
+  width: 30px;
+
+  height: 30px;
+
+  border: 3px solid #dceee4;
+
+  border-top-color: #08785b;
+
+  border-radius: 50%;
+
+  animation: girar .8s linear infinite;
+
+}
+
+@keyframes girar {
+
+  to {
+
+    transform: rotate(360deg);
+
+  }
+
+}
+
+
+// ==========================================================
+// 18. PAGINACIÓN
+// ==========================================================
+
+.paginacion {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 12px;
+
+  padding: 14px 2px 0;
+
+  color: var(--fv-suave);
+
+  font-size: 10px;
+
+}
+
+.paginacion > div {
+
+  display: flex;
+
+  gap: 7px;
+
+}
+
+.paginacion button {
+
+  min-height: 33px;
+
+  padding: 6px 11px;
+
+  color: #17664f;
+
+  background: #fff;
+
+  border: 1px solid #d6e8dd;
+
+  border-radius: 8px;
+
+  cursor: pointer;
+
+  font-size: 10px !important;
+
+  font-weight: 750;
+
+}
+
+
+// ==========================================================
+// 19. NOTA INFORMATIVA
+// ==========================================================
+
+.nota-interna {
+
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 8px;
+
+  margin: 0;
+
+  padding: 11px 13px;
+
+  color: #63796e;
+
+  background: #edf6f0;
+
+  border-radius: 10px;
+
+  font-size: 10px;
+
+  line-height: 1.5;
+
+}
+
+.nota-interna span {
+
+  flex: 0 0 auto;
+
+  color: #08785b;
+
+  font-size: 13px;
+
+}
+
+
+// ==========================================================
+// 20. MODAL DE DETALLE
+// ==========================================================
+
+.modal-fondo {
+
+  position: fixed;
+
+  z-index: 1200;
+
+  inset: 0;
+
+  display: grid;
+
+  place-items: center;
+
+  padding: 18px;
+
+  overflow-y: auto;
+
+  background: rgba(13, 31, 24, .58);
+
+  backdrop-filter: blur(3px);
+
+}
+
+.modal-factura {
+
+  width: min(760px, 100%);
+
+  max-height: min(90vh, 900px);
+
+  overflow: auto;
+
+  color: var(--fv-texto);
+
+  background: #fff;
+
+  border: 1px solid #e0ebe4;
+
+  border-radius: 18px;
+
+  box-shadow: 0 24px 70px rgba(0, 0, 0, .22);
+
+}
+
+.modal-factura__header {
+
+  display: flex;
+
+  align-items: flex-start;
+
+  justify-content: space-between;
+
+  gap: 12px;
+
+  padding: 22px 24px 17px;
+
+  border-bottom: 1px solid #e9f0eb;
+
+}
+
+.modal-factura__header h2 {
+
+  margin: 0;
+
+  color: #183e30;
+
+  font-size: 21px;
+
+}
+
+.modal-factura__header p {
+
+  margin: 5px 0 0;
+
+  color: #73857b;
+
+  font-size: 11px;
+
+}
+
+.modal-factura__cerrar {
+
+  display: grid;
+
+  place-items: center;
+
+  flex: 0 0 34px;
+
+  width: 34px;
+
+  height: 34px;
+
+  color: #60776a;
+
+  background: #f1f6f3;
+
+  border: 0;
+
+  border-radius: 9px;
+
+  cursor: pointer;
+
+  font-size: 23px !important;
+
+  line-height: 1;
+
+}
+
+.modal-factura__contenido {
+
+  padding: 20px 24px;
+
+}
+
+
+// ==========================================================
+// 21. DATOS DEL DETALLE
+// ==========================================================
+
+.detalle-grid {
+
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 13px;
+
+  padding-bottom: 20px;
+
+  border-bottom: 1px solid #e9f0eb;
+
+}
+
+.detalle-grid > div {
+
+  display: grid;
+
+  gap: 4px;
+
+  min-width: 0;
+
+}
+
+.detalle-grid small {
+
+  color: #829188;
+
+  font-size: 10px;
+
+}
+
+.detalle-grid strong {
+
+  color: #294b3d;
+
+  font-size: 12px;
+
+  overflow-wrap: anywhere;
+
+}
+
+
+// ==========================================================
+// 22. RESUMEN ECONÓMICO
+// ==========================================================
+
+.detalle-seccion {
+
+  padding-top: 17px;
+
+}
+
+.detalle-seccion h3 {
+
+  margin: 0 0 13px;
+
+  color: #244638;
+
+  font-size: 15px;
+
+}
+
+.detalle-linea {
+
+  display: flex;
+
+  justify-content: space-between;
+
+  gap: 14px;
+
+  padding: 9px 0;
+
+  color: #63786d;
+
+  border-bottom: 1px solid #eff3f0;
+
+  font-size: 12px;
+
+}
+
+.detalle-linea strong {
+
+  color: #294b3d;
+
+  white-space: nowrap;
+
+}
+
+
+// ==========================================================
+// 23. MEDICAMENTOS DEL DETALLE
+// ==========================================================
+
+.detalle-medicamentos {
+
+  margin: 12px 0;
+
+  padding: 12px;
+
+  background: #f7fbf8;
+
+  border: 1px solid #e5efe8;
+
+  border-radius: 10px;
+
+}
+
+.detalle-medicamentos h4 {
+
+  margin: 0 0 9px;
+
+  color: #315747;
+
+  font-size: 11px;
+
+}
+
+.detalle-medicamento {
+
+  display: flex;
+
+  justify-content: space-between;
+
+  gap: 15px;
+
+  padding: 9px 0;
+
+  border-top: 1px solid #e7efe9;
+
+}
+
+.detalle-medicamento > div {
+
+  display: grid;
+
+  gap: 3px;
+
+  min-width: 0;
+
+}
+
+.detalle-medicamento strong {
+
+  color: #294b3d;
+
+  font-size: 11px;
+
+}
+
+.detalle-medicamento small {
+
+  color: #75877d;
+
+  font-size: 10px;
+
+  overflow-wrap: anywhere;
+
+}
+
+
+// ==========================================================
+// 24. TOTAL DE FACTURA
+// ==========================================================
+
+.detalle-linea--total {
+
+  margin-top: 6px;
+
+  padding: 14px 12px;
+
+  color: #075c43;
+
+  background: #eaf7ef;
+
+  border: 0;
+
+  border-radius: 9px;
+
+  font-size: 14px;
+
+  font-weight: 800;
+
+}
+
+.detalle-linea--total strong {
+
+  color: #075c43;
+
+  font-size: 17px;
+
+}
+
+
+// ==========================================================
+// 25. BOTONES DEL MODAL
+// ==========================================================
+
+.modal-factura__footer {
+
+  display: flex;
+
+  justify-content: flex-end;
+
+  flex-wrap: wrap;
+
+  gap: 8px;
+
+  padding: 15px 24px 20px;
+
+  border-top: 1px solid #e9f0eb;
+
+}
+
+
+// ==========================================================
+// 26. MODO DE ALTO CONTRASTE
+// ==========================================================
+
+:host-context(html[data-vet-contraste='alto'])
+.facturas-vet {
+
+  --fv-fondo: #000;
+
+  --fv-panel: #000;
+
+  --fv-texto: #fff;
+
+  --fv-suave: #fff;
+
+  --fv-borde: #ffe45c;
+
+  --fv-verde: #ffe45c;
+
+}
+
+:host-context(html[data-vet-contraste='alto'])
+.facturas-vet :is(
+
+  .indicador,
+  .panel-filtros,
+  .panel-listado,
+  .tabla-contenedor,
+  .tabla-facturas th,
+  .tabla-facturas td,
+  .campo input,
+  .campo select,
+  .estado-vacio,
+  .nota-interna
+
+) {
+
+  color: #fff !important;
+
+  background: #000 !important;
+
+  border-color: #ffe45c !important;
+
+}
+
+:host-context(html[data-vet-contraste='alto'])
+.facturas-vet :is(
+
+  h1,
+  h2,
+  h3,
+  strong,
+  small,
+  p,
+  span,
+  label,
+  th,
+  td,
+  button
+
+) {
+
+  color: #ffe45c !important;
+
+}
+
+:host-context(html[data-vet-contraste='alto'])
+.modal-factura {
+
+  color: #fff;
+
+  background: #000;
+
+  border-color: #ffe45c;
+
+}
+
+
+// ==========================================================
+// 27. MODO OSCURO
+// ==========================================================
+
+:host-context(html[data-vet-contraste='oscuro'])
+.facturas-vet {
+
+  --fv-fondo: #151720;
+
+  --fv-panel: #20232e;
+
+  --fv-texto: #f5f6fb;
+
+  --fv-suave: #d1d5df;
+
+  --fv-borde: #505768;
+
+  --fv-verde: #8eddb9;
+
+}
+
+:host-context(html[data-vet-contraste='oscuro'])
+.facturas-vet :is(
+
+  .campo input,
+  .campo select,
+  .tabla-facturas th,
+  .estado-vacio,
+  .nota-interna,
+  .filtros-rapidos button,
+  .btn-limpiar
+
+) {
+
+  color: #f5f6fb;
+
+  background: #292e3b;
+
+  border-color: #505768;
+
+}
+
+
+// ==========================================================
+// 28. TABLETS
+// ==========================================================
+
+@media (max-width: 1150px) {
+
+  .facturas-vet__indicadores {
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  }
+
+  .filtros-grid {
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  }
+
+  .campo--busqueda {
+
+    grid-column: span 2;
+
+  }
+
+}
+
+
+// ==========================================================
+// 29. TELÉFONOS
+// ==========================================================
+
+@media (max-width: 680px) {
+
+  .facturas-vet {
+
+    padding: 4px 0 18px;
+
+  }
+
+  .facturas-vet__header-actions {
+
+    width: 100%;
+
+  }
+
+  .facturas-vet__header-actions .btn {
+
+    flex: 1;
+
+  }
+
+  .facturas-vet__indicadores {
+
+    gap: 9px;
+
+  }
+
+  .indicador {
+
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+    padding: 13px;
+
+  }
+
+  .indicador strong {
+
+    font-size: 21px;
+
+  }
+
+  .panel-filtros,
+  .panel-listado {
+
+    padding: 15px;
+
+  }
+
+  .panel-filtros__heading,
+  .panel-listado__heading {
+
+    align-items: flex-start;
+
+    flex-wrap: wrap;
+
+  }
+
+  .filtros-grid {
+
+    grid-template-columns: 1fr;
+
+  }
+
+  .campo--busqueda {
+
+    grid-column: auto;
+
+  }
+
+  // La tabla se convierte en tarjetas en teléfonos.
+  .panel-listado .tabla-contenedor {
+
+    overflow: visible;
+
+    border: 0;
+
+  }
+
+  .tabla-facturas {
+
+    display: block;
+
+    min-width: 0;
+
+  }
+
+  .tabla-facturas thead {
+
+    display: none;
+
+  }
+
+  .tabla-facturas tbody,
+  .tabla-facturas tr,
+  .tabla-facturas td {
+
+    display: block;
+
+    width: 100%;
+
+  }
+
+  .tabla-facturas tr {
+
+    margin-bottom: 11px;
+
+    padding: 7px 11px;
+
+    background: #fbfefc;
+
+    border: 1px solid #e3eee7;
+
+    border-radius: 11px;
+
+  }
+
+  .tabla-facturas td {
+
+    display: grid;
+
+    grid-template-columns:
+      minmax(95px, .7fr)
+      minmax(0, 1.3fr);
+
+    gap: 10px;
+
+    align-items: center;
+
+    padding: 8px 2px;
+
+    border-bottom: 1px solid #edf2ef;
+
+    text-align: left !important;
+
+  }
+
+  .tabla-facturas td::before {
+
+    content: attr(data-label);
+
+    color: #83938a;
+
+    font-size: 10px;
+
+    font-weight: 750;
+
+  }
+
+  .tabla-facturas td:last-child {
+
+    border-bottom: 0;
+
+  }
+
+  .acciones {
+
+    justify-content: flex-start;
+
+  }
+
+  .paginacion {
+
+    align-items: flex-start;
+
+    flex-direction: column;
+
+  }
+
+  .modal-fondo {
+
+    align-items: start;
+
+    padding: 8px;
+
+  }
+
+  .modal-factura {
+
+    max-height: 96vh;
+
+    border-radius: 13px;
+
+  }
+
+  .modal-factura__header,
+  .modal-factura__contenido {
+
+    padding-right: 16px;
+
+    padding-left: 16px;
+
+  }
+
+  .detalle-grid {
+
+    grid-template-columns: 1fr;
+
+  }
+
+  .modal-factura__footer {
+
+    padding: 13px 16px 16px;
+
+  }
+
+}
+
+
+// ==========================================================
+// 30. TELÉFONOS PEQUEÑOS
+// ==========================================================
+
+@media (max-width: 390px) {
+
+  .facturas-vet__indicadores {
+
+    grid-template-columns: 1fr;
+
+  }
+
+  .indicador {
+
+    flex-direction: row;
+
+    align-items: center;
+
+  }
+
+  .alerta {
+
+    align-items: flex-start;
+
+    flex-direction: column;
+
+  }
+
+}
+
+
+// ==========================================================
+// 31. REDUCIR MOVIMIENTOS
+// ==========================================================
+
+@media (prefers-reduced-motion: reduce) {
+
+  .facturas-vet *,
+  .facturas-vet *::before,
+  .facturas-vet *::after {
+
+    animation: none !important;
+
+    transition: none !important;
+
+  }
+
+}

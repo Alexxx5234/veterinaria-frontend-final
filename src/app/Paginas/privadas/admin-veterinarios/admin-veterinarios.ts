@@ -1,26 +1,28 @@
 
 /* ==========================================================
-   VETERINARIA AREVALO
-   ADMINISTRACIÓN DE VETERINARIOS (ADMIN)
+   VETERINARIA ARÉVALO
+   ADMINISTRACIÓN DE VETERINARIOS
 
-   FUNCIONALIDADES:
-   - Consultar veterinarios registrados.
-   - Mostrar total de profesionales.
-   - Buscar por nombre, cédula o especialidad.
-   - Filtrar por especialidad.
-   - Ordenar los resultados.
-   - Registrar, editar y eliminar veterinarios.
-   - Validar los campos del formulario.
-   - Confirmar antes de eliminar.
-   - Notificaciones globales.
-   - Estados de carga y errores.
+   FUNCIONES:
+   1. Listar veterinarios.
+   2. Buscar por nombre, cédula y especialidad.
+   3. Filtrar y ordenar.
+   4. Seleccionar usuarios existentes.
+   5. Registrar veterinarios vinculando cuentas.
+   6. Asignar automáticamente el rol VETERINARIO.
+   7. Editar datos profesionales.
+   8. Eliminar de forma protegida.
+   9. Validar formularios.
+   10. Mostrar notificaciones y errores.
 
-   Los veterinarios son profesionales registrados,
-   no constituyen un tercer rol de inicio de sesión.
-   ========================================================== */
+   IMPORTANTE:
+   No se crean usuarios duplicados.
+   No se modifica la contraseña de la cuenta.
+========================================================== */
+
 
 // ==========================================================
-// IMPORTACIONES ANGULAR
+// 1. IMPORTACIONES
 // ==========================================================
 
 import {
@@ -31,10 +33,8 @@ import {
   ViewChild
 } from '@angular/core';
 
-// Permite utilizar *ngIf y *ngFor.
 import { CommonModule } from '@angular/common';
 
-// Formularios y filtros.
 import {
   FormBuilder,
   FormGroup,
@@ -43,45 +43,39 @@ import {
   Validators
 } from '@angular/forms';
 
-// Navegación.
 import { Router } from '@angular/router';
 
-// Crear o actualizar mediante Observable.
 import { Observable } from 'rxjs';
 
-// ==========================================================
-// SERVICIOS
-// ==========================================================
-
-// Métodos REST de veterinarios.
-import { VeterinarioServicio }
-  from '../../../Servicios/veterinario-servicio';
-
-// Campana de notificaciones del LayoutPrivado.
-import { NotificacionesServicio }
-  from '../../../Servicios/notificaciones-servicio';
 
 // ==========================================================
-// INTERFAZ DE VETERINARIO
+// 2. SERVICIOS
 // ==========================================================
 
-// Campos utilizados por Veterinario.java.
-interface VeterinarioAdmin {
-  id: number;
-  cedula: string;
-  nombre: string;
-  apellido: string;
-  especialidad: string;
-  telefono: string;
-  email: string;
-}
+import {
+  VeterinarioServicio,
+  Veterinario,
+  RegistroVeterinarioDesdeUsuario
+} from '../../../Servicios/veterinario-servicio';
+
+import {
+  AdminUsuarioServicio,
+  UsuarioAdmin
+} from '../../../Servicios/admin-usuario-servicio';
+
+import {
+  NotificacionesServicio
+} from '../../../Servicios/notificaciones-servicio';
+
 
 // ==========================================================
-// COMPONENTE
+// 3. COMPONENTE
 // ==========================================================
 
 @Component({
+
   selector: 'app-admin-veterinarios',
+
   standalone: true,
 
   imports: [
@@ -91,90 +85,127 @@ interface VeterinarioAdmin {
   ],
 
   templateUrl: './admin-veterinarios.html',
+
   styleUrl: './admin-veterinarios.scss'
+
 })
 export class AdminVeterinarios implements OnInit {
 
-  // ========================================================
-  // LISTA DE VETERINARIOS
-  // ========================================================
-
-  veterinarios: VeterinarioAdmin[] = [];
 
   // ========================================================
-  // ESTADOS DE LA INTERFAZ
+  // 4. LISTAS PRINCIPALES
   // ========================================================
 
-  cargando: boolean = false;
-  errorCarga: boolean = false;
+  veterinarios: Veterinario[] = [];
 
-  // Evita repetir solicitudes POST o PUT.
-  guardando: boolean = false;
+  usuariosDisponibles: UsuarioAdmin[] = [];
 
-  // Identifica al veterinario que se elimina.
+
+  // ========================================================
+  // 5. ESTADOS DE CARGA
+  // ========================================================
+
+  cargando = false;
+
+  cargandoUsuarios = false;
+
+  guardando = false;
+
+  errorCarga = false;
+
+  errorUsuarios = false;
+
   eliminandoId: number | null = null;
 
-  mensajeError: string = '';
-  mensajeExito: string = '';
 
   // ========================================================
-  // BUSCADOR Y FILTROS
+  // 6. MENSAJES
   // ========================================================
 
-  busqueda: string = '';
+  mensajeError = '';
 
-  filtroEspecialidad: string = 'TODAS';
+  mensajeExito = '';
 
-  ordenarPor: string = 'nombreAsc';
 
   // ========================================================
-  // FORMULARIO
+  // 7. BÚSQUEDA Y FILTROS
+  // ========================================================
+
+  busqueda = '';
+
+  filtroEspecialidad = 'TODAS';
+
+  ordenarPor = 'nombreAsc';
+
+
+  // ========================================================
+  // 8. FORMULARIO
   // ========================================================
 
   veterinarioForm: FormGroup;
 
-  mostrarFormulario: boolean = false;
+  mostrarFormulario = false;
 
-  // null = nuevo veterinario.
-  // número = modificar veterinario.
   veterinarioEditandoId: number | null = null;
 
-  // Para colocar el cursor en el primer campo.
+  // Conserva la ficha original durante la edición.
+  veterinarioEditando: Veterinario | null = null;
+
+
+  // ========================================================
+  // 9. REFERENCIAS PARA ACCESIBILIDAD
+  // ========================================================
+
   @ViewChild('campoCedula')
   campoCedula?: ElementRef<HTMLInputElement>;
 
+  @ViewChild('campoUsuario')
+  campoUsuario?: ElementRef<HTMLSelectElement>;
+
+
   // ========================================================
-  // CONSTRUCTOR
+  // 10. CONSTRUCTOR
   // ========================================================
 
   constructor(
+
     private veterinarioServicio: VeterinarioServicio,
+
+    private adminUsuarioServicio: AdminUsuarioServicio,
+
     private notificacionesServicio: NotificacionesServicio,
+
     private fb: FormBuilder,
+
     private router: Router,
+
     private cd: ChangeDetectorRef
+
   ) {
 
-    // Los nombres coinciden con la entidad Veterinario.
+    /*
+      El formulario tiene únicamente los datos
+      que realmente necesita el backend.
+
+      Para registrar:
+      usuarioId, cedula, especialidad y telefono.
+
+      Para editar:
+      cedula, especialidad y telefono.
+    */
+
     this.veterinarioForm = this.fb.group({
 
-      // Exactamente diez números.
+      usuarioId: [
+        null
+      ],
+
       cedula: [
         '',
         [
           Validators.required,
           Validators.pattern(/^[0-9]{10}$/)
         ]
-      ],
-
-      nombre: [
-        '',
-        Validators.required
-      ],
-
-      apellido: [
-        '',
-        Validators.required
       ],
 
       especialidad: [
@@ -185,89 +216,187 @@ export class AdminVeterinarios implements OnInit {
       telefono: [
         '',
         Validators.required
-      ],
-
-      email: [
-        '',
-        [
-          Validators.required,
-          Validators.email
-        ]
       ]
 
     });
 
   }
 
+
   // ========================================================
-  // AL ABRIR LA PÁGINA
+  // 11. INICIALIZACIÓN
   // ========================================================
 
   ngOnInit(): void {
+
     this.cargarVeterinarios();
+
   }
 
+
   // ========================================================
-  // NORMALIZAR BÚSQUEDAS
+  // 12. NORMALIZAR TEXTO
   // ========================================================
 
-  // Permite buscar sin distinguir tildes y mayúsculas.
   private normalizarTexto(valor: unknown): string {
 
     return String(valor ?? '')
+
       .normalize('NFD')
+
       .replace(/[\u0300-\u036f]/g, '')
+
       .trim()
+
       .toLowerCase();
 
   }
 
+
   // ========================================================
-  // CONSULTAR VETERINARIOS
+  // 13. TOTAL DE VETERINARIOS
+  // ========================================================
+
+  get totalVeterinarios(): number {
+
+    return this.veterinarios.length;
+
+  }
+
+
+  // ========================================================
+  // 14. COMPROBAR OPERACIONES
+  // ========================================================
+
+  get hayOperacionEnCurso(): boolean {
+
+    return (
+
+      this.guardando ||
+
+      this.eliminandoId !== null
+
+    );
+
+  }
+
+
+  // ========================================================
+  // 15. USUARIOS QUE SE PUEDEN ASIGNAR
+  // ========================================================
+
+  /*
+    Además de los filtros del servicio, se excluyen
+    cuentas cuyo correo ya aparece en una ficha
+    veterinaria existente.
+
+    Esto evita presentar cuentas duplicadas
+    en el selector.
+  */
+
+  get usuariosElegibles(): UsuarioAdmin[] {
+
+    const correosRegistrados = new Set(
+
+      this.veterinarios
+
+        .map(v => this.normalizarTexto(v.email))
+
+        .filter(correo => correo.length > 0)
+
+    );
+
+    return this.usuariosDisponibles.filter(usuario => {
+
+      const correo = this.normalizarTexto(
+        usuario.correo
+      );
+
+      return (
+        correo.length > 0 &&
+        !correosRegistrados.has(correo)
+      );
+
+    });
+
+  }
+
+
+  // ========================================================
+  // 16. USUARIO SELECCIONADO
+  // ========================================================
+
+  get usuarioSeleccionado(): UsuarioAdmin | null {
+
+    const id = Number(
+      this.veterinarioForm.get('usuarioId')?.value
+    );
+
+    if (!id) {
+      return null;
+    }
+
+    return this.usuariosElegibles.find(
+      usuario => usuario.id === id
+    ) ?? null;
+
+  }
+
+
+  // ========================================================
+  // 17. CARGAR VETERINARIOS
   // ========================================================
 
   cargarVeterinarios(
-    actualizacionManual: boolean = false
+    actualizacionManual = false
   ): void {
 
     if (
       this.cargando ||
-      this.guardando ||
-      this.eliminandoId !== null
+      this.hayOperacionEnCurso
     ) {
       return;
     }
 
     this.cargando = true;
+
     this.errorCarga = false;
+
     this.mensajeError = '';
 
     // GET /api/veterinarios
+
     this.veterinarioServicio
+
       .listarVeterinarios()
+
       .subscribe({
 
-        // --------------------------------------------------
-        // RESPUESTA CORRECTA
-        // --------------------------------------------------
-        next: (respuesta) => {
+        next: respuesta => {
 
           this.veterinarios = Array.isArray(respuesta)
+
             ? respuesta
+
             : [];
 
           this.cargando = false;
+
           this.errorCarga = false;
 
           if (actualizacionManual) {
 
             this.mensajeExito =
-              'El listado de veterinarios se actualizó correctamente.';
+              'Listado de veterinarios actualizado correctamente.';
 
             this.notificacionesServicio.agregar(
+
               'Veterinarios actualizados',
-              'Se consultó nuevamente el listado de profesionales.',
+
+              'El listado de profesionales se actualizó correctamente.',
+
               'info'
+
             );
 
           }
@@ -276,28 +405,31 @@ export class AdminVeterinarios implements OnInit {
 
         },
 
-        // --------------------------------------------------
-        // ERROR
-        // --------------------------------------------------
-        error: (error) => {
+        error: error => {
 
           console.error(
-            'Error al cargar veterinarios:',
+            'Error al consultar veterinarios:',
             error
           );
 
           this.cargando = false;
+
           this.errorCarga = true;
 
-          this.mensajeError =
-            error?.status === 0
-              ? 'No se pudo conectar con Spring Boot. Comprueba que el servidor esté encendido.'
-              : 'No se pudieron cargar los veterinarios. Intenta nuevamente.';
+          this.mensajeError = error?.status === 0
+
+            ? 'No se pudo conectar con Spring Boot.'
+
+            : 'No se pudieron cargar los veterinarios.';
 
           this.notificacionesServicio.agregar(
-            'Error al consultar veterinarios',
-            'No fue posible obtener el listado de profesionales.',
+
+            'Error de consulta',
+
+            'No fue posible cargar los veterinarios.',
+
             'error'
+
           );
 
           this.cd.detectChanges();
@@ -308,22 +440,79 @@ export class AdminVeterinarios implements OnInit {
 
   }
 
+
   // ========================================================
-  // TOTAL DE VETERINARIOS
+  // 18. CARGAR USUARIOS DISPONIBLES
   // ========================================================
 
-  // Solo una tarjeta de resumen, sin dividirla
-  // por especialidades.
-  get totalVeterinarios(): number {
-    return this.veterinarios.length;
+  /*
+    GET /api/admin/usuarios
+
+    El servicio filtra las cuentas:
+    - USER.
+    - Correo verificado.
+    - Estado PENDIENTE o APROBADA.
+  */
+
+  cargarUsuariosDisponibles(): void {
+
+    if (this.cargandoUsuarios) {
+      return;
+    }
+
+    this.cargandoUsuarios = true;
+
+    this.errorUsuarios = false;
+
+    this.adminUsuarioServicio
+
+      .listarUsuariosDisponiblesParaVeterinario()
+
+      .subscribe({
+
+        next: respuesta => {
+
+          this.usuariosDisponibles = Array.isArray(respuesta)
+
+            ? respuesta
+
+            : [];
+
+          this.cargandoUsuarios = false;
+
+          this.errorUsuarios = false;
+
+          this.cd.detectChanges();
+
+        },
+
+        error: error => {
+
+          console.error(
+            'Error al consultar usuarios disponibles:',
+            error
+          );
+
+          this.cargandoUsuarios = false;
+
+          this.errorUsuarios = true;
+
+          this.mensajeError =
+            'No se pudieron consultar las cuentas disponibles.';
+
+          this.cd.detectChanges();
+
+        }
+
+      });
+
   }
 
+
   // ========================================================
-  // ESPECIALIDADES DISPONIBLES
+  // 19. ESPECIALIDADES DISPONIBLES
   // ========================================================
 
-  // Genera las opciones del filtro a partir
-  // de los datos reales recibidos desde la API.
   get especialidadesDisponibles(): string[] {
 
     const especialidades = new Map<string, string>();
@@ -336,115 +525,133 @@ export class AdminVeterinarios implements OnInit {
 
       const clave = this.normalizarTexto(nombre);
 
-      if (nombre && !especialidades.has(clave)) {
+      if (
+        nombre &&
+        !especialidades.has(clave)
+      ) {
+
         especialidades.set(clave, nombre);
+
       }
 
     }
 
     return Array.from(especialidades.values())
+
       .sort((a, b) =>
+
         a.localeCompare(
           b,
           'es',
           { sensitivity: 'base' }
         )
+
       );
 
   }
 
+
   // ========================================================
-  // BUSCAR, FILTRAR Y ORDENAR
+  // 20. BUSCAR, FILTRAR Y ORDENAR
   // ========================================================
 
-  get veterinariosFiltrados(): VeterinarioAdmin[] {
+  get veterinariosFiltrados(): Veterinario[] {
 
-    const texto =
-      this.normalizarTexto(this.busqueda);
-
-    const especialidadBuscada =
-      this.normalizarTexto(this.filtroEspecialidad);
-
-    const resultado = this.veterinarios.filter(
-      veterinario => {
-
-        // Datos donde se puede buscar.
-        const contenido = this.normalizarTexto([
-
-          veterinario.id,
-          veterinario.cedula,
-          veterinario.nombre,
-          veterinario.apellido,
-          veterinario.especialidad,
-          veterinario.telefono,
-          veterinario.email
-
-        ].join(' '));
-
-        const coincideBusqueda =
-          contenido.includes(texto);
-
-        const coincideEspecialidad =
-          this.filtroEspecialidad === 'TODAS' ||
-          this.normalizarTexto(
-            veterinario.especialidad
-          ) === especialidadBuscada;
-
-        return coincideBusqueda &&
-          coincideEspecialidad;
-
-      }
+    const texto = this.normalizarTexto(
+      this.busqueda
     );
 
-    // Ordenar sin modificar la lista original.
+    const especialidad = this.normalizarTexto(
+      this.filtroEspecialidad
+    );
+
+    const resultado = this.veterinarios.filter(v => {
+
+      const contenido = this.normalizarTexto([
+
+        v.id,
+        v.cedula,
+        v.nombre,
+        v.apellido,
+        v.especialidad,
+        v.telefono,
+        v.email
+
+      ].join(' '));
+
+      const coincideTexto =
+        contenido.includes(texto);
+
+      const coincideEspecialidad =
+
+        this.filtroEspecialidad === 'TODAS' ||
+
+        this.normalizarTexto(v.especialidad) === especialidad;
+
+      return coincideTexto && coincideEspecialidad;
+
+    });
+
     return [...resultado].sort((a, b) => {
 
       if (this.ordenarPor === 'especialidadAsc') {
 
-        return String(a.especialidad ?? '')
-          .localeCompare(
-            String(b.especialidad ?? ''),
-            'es',
-            { sensitivity: 'base' }
-          );
+        return String(a.especialidad ?? '').localeCompare(
+
+          String(b.especialidad ?? ''),
+
+          'es',
+
+          { sensitivity: 'base' }
+
+        );
 
       }
 
       const nombreA =
-        `${a.nombre ?? ''} ${a.apellido ?? ''}`.trim();
+        `${a.nombre ?? ''} ${a.apellido ?? ''}`;
 
       const nombreB =
-        `${b.nombre ?? ''} ${b.apellido ?? ''}`.trim();
+        `${b.nombre ?? ''} ${b.apellido ?? ''}`;
 
-      const comparacion =
-        nombreA.localeCompare(
-          nombreB,
-          'es',
-          { sensitivity: 'base' }
-        );
+      const comparacion = nombreA.localeCompare(
+
+        nombreB,
+
+        'es',
+
+        { sensitivity: 'base' }
+
+      );
 
       return this.ordenarPor === 'nombreDesc'
+
         ? -comparacion
+
         : comparacion;
 
     });
 
   }
 
+
   // ========================================================
-  // LIMPIAR FILTROS
+  // 21. LIMPIAR FILTROS
   // ========================================================
 
   limpiarFiltros(): void {
 
     this.busqueda = '';
+
     this.filtroEspecialidad = 'TODAS';
+
     this.ordenarPor = 'nombreAsc';
 
   }
 
+
   // ========================================================
-  // COMPROBAR CAMPOS CON ERRORES
+  // 22. VALIDAR CAMPOS
   // ========================================================
 
   campoInvalido(nombre: string): boolean {
@@ -452,84 +659,118 @@ export class AdminVeterinarios implements OnInit {
     const control = this.veterinarioForm.get(nombre);
 
     return !!control &&
+
       control.invalid &&
+
       (control.touched || control.dirty);
 
   }
 
-  // ========================================================
-  // OPERACIÓN EN CURSO
-  // ========================================================
-
-  get hayOperacionEnCurso(): boolean {
-
-    return this.guardando ||
-      this.eliminandoId !== null;
-
-  }
 
   // ========================================================
-  // ABRIR FORMULARIO PARA REGISTRAR
+  // 23. ABRIR REGISTRO DE NUEVO VETERINARIO
   // ========================================================
 
   nuevoVeterinario(): void {
 
-    if (this.cargando || this.hayOperacionEnCurso) {
+    if (
+      this.cargando ||
+      this.hayOperacionEnCurso
+    ) {
       return;
     }
 
     this.veterinarioEditandoId = null;
 
+    this.veterinarioEditando = null;
+
+    // El ID del usuario es obligatorio al registrar.
+
+    const controlUsuario =
+      this.veterinarioForm.get('usuarioId');
+
+    controlUsuario?.setValidators([
+      Validators.required
+    ]);
+
+    controlUsuario?.updateValueAndValidity();
+
     this.veterinarioForm.reset({
 
+      usuarioId: null,
+
       cedula: '',
-      nombre: '',
-      apellido: '',
+
       especialidad: '',
-      telefono: '',
-      email: ''
+
+      telefono: ''
 
     });
 
     this.mensajeError = '';
+
     this.mensajeExito = '';
 
     this.mostrarFormulario = true;
 
+    // Cargar las cuentas existentes.
+
+    this.cargarUsuariosDisponibles();
+
     this.cd.detectChanges();
 
-    // Enfocar el primer campo.
-    this.campoCedula?.nativeElement.focus();
+    this.campoUsuario?.nativeElement.focus();
 
   }
 
+
   // ========================================================
-  // ABRIR FORMULARIO PARA EDITAR
+  // 24. EDITAR VETERINARIO
   // ========================================================
 
-  editarVeterinario(
-    veterinario: VeterinarioAdmin
-  ): void {
+  /*
+    La cuenta de usuario no se cambia durante
+    la edición de los datos profesionales.
 
-    if (this.cargando || this.hayOperacionEnCurso) {
+    Se conservan nombre y correo originales.
+  */
+
+  editarVeterinario(veterinario: Veterinario): void {
+
+    if (
+      this.cargando ||
+      this.hayOperacionEnCurso
+    ) {
       return;
     }
 
     this.veterinarioEditandoId = veterinario.id;
 
-    // Cargar los seis campos de Veterinario.java.
+    this.veterinarioEditando = veterinario;
+
+    // El selector de usuario no es necesario al editar.
+
+    const controlUsuario =
+      this.veterinarioForm.get('usuarioId');
+
+    controlUsuario?.clearValidators();
+
+    controlUsuario?.updateValueAndValidity();
+
     this.veterinarioForm.reset({
 
-      cedula: veterinario.cedula,
-      nombre: veterinario.nombre,
-      apellido: veterinario.apellido,
-      especialidad: veterinario.especialidad,
-      telefono: veterinario.telefono,
-      email: veterinario.email
+      usuarioId: null,
+
+      cedula: veterinario.cedula ?? '',
+
+      especialidad: veterinario.especialidad ?? '',
+
+      telefono: veterinario.telefono ?? ''
 
     });
 
     this.mensajeError = '';
+
     this.mensajeExito = '';
 
     this.mostrarFormulario = true;
@@ -540,13 +781,25 @@ export class AdminVeterinarios implements OnInit {
 
   }
 
+
   // ========================================================
-  // GUARDAR VETERINARIO
+  // 25. GUARDAR VETERINARIO
   // ========================================================
+
+  /*
+    NUEVO REGISTRO:
+    POST /api/veterinarios/desde-usuario
+
+    EDICIÓN:
+    PUT /api/veterinarios/{id}
+  */
 
   guardarVeterinario(): void {
 
-    if (this.cargando || this.hayOperacionEnCurso) {
+    if (
+      this.guardando ||
+      this.cargando
+    ) {
       return;
     }
 
@@ -555,6 +808,7 @@ export class AdminVeterinarios implements OnInit {
     // ------------------------------------------------------
     // VALIDAR FORMULARIO
     // ------------------------------------------------------
+
     if (this.veterinarioForm.invalid) {
 
       this.veterinarioForm.markAllAsTouched();
@@ -566,78 +820,178 @@ export class AdminVeterinarios implements OnInit {
     const valores =
       this.veterinarioForm.getRawValue();
 
-    // Limpiar espacios antes de enviar.
-    const datosVeterinario = {
+    const cedula = String(
+      valores.cedula ?? ''
+    ).trim();
 
-      cedula: String(valores.cedula ?? '').trim(),
+    const especialidad = String(
+      valores.especialidad ?? ''
+    ).trim();
 
-      nombre: String(valores.nombre ?? '').trim(),
+    const telefono = String(
+      valores.telefono ?? ''
+    ).trim();
 
-      apellido: String(valores.apellido ?? '').trim(),
 
-      especialidad:
-        String(valores.especialidad ?? '').trim(),
+    // ------------------------------------------------------
+    // VALIDAR DATOS PROFESIONALES
+    // ------------------------------------------------------
 
-      telefono: String(valores.telefono ?? '').trim(),
+    if (!cedula || !especialidad || !telefono) {
 
-      email: String(valores.email ?? '').trim()
-
-    };
-
-    // Los campos de texto no pueden ser solo espacios.
-    const camposTexto = [
-      'nombre',
-      'apellido',
-      'especialidad',
-      'telefono'
-    ];
-
-    let hayCamposVacios = false;
-
-    for (const campo of camposTexto) {
-
-      const valor =
-        String(valores[campo] ?? '').trim();
-
-      if (!valor) {
-
-        this.veterinarioForm
-          .get(campo)
-          ?.setErrors({ required: true });
-
-        hayCamposVacios = true;
-
-      }
-
-    }
-
-    if (hayCamposVacios) {
-
-      this.veterinarioForm.markAllAsTouched();
+      this.mensajeError =
+        'Completa todos los datos profesionales.';
 
       return;
 
     }
 
+    if (!/^[0-9]{10}$/.test(cedula)) {
+
+      this.mensajeError =
+        'La cédula debe contener exactamente 10 números.';
+
+      return;
+
+    }
+
+
     // ------------------------------------------------------
-    // CREAR O EDITAR
+    // DETERMINAR OPERACIÓN
     // ------------------------------------------------------
 
     const editando =
       this.veterinarioEditandoId !== null;
 
-    const peticion: Observable<any> = editando
+    let peticion: Observable<Veterinario>;
 
-      ? this.veterinarioServicio
-          .actualizarVeterinario(
-            this.veterinarioEditandoId!,
-            datosVeterinario
-          )
 
-      : this.veterinarioServicio
-          .crearVeterinario(datosVeterinario);
+    // ======================================================
+    // 25.1. NUEVO VETERINARIO DESDE USUARIO
+    // ======================================================
+
+    if (!editando) {
+
+      const usuarioId = Number(valores.usuarioId);
+
+      // Comprobar que se seleccionó una cuenta real.
+
+      const usuarioValido = this.usuariosElegibles.some(
+
+        usuario => usuario.id === usuarioId
+
+      );
+
+      if (
+        !Number.isInteger(usuarioId) ||
+        usuarioId <= 0 ||
+        !usuarioValido
+      ) {
+
+        this.mensajeError =
+          'Selecciona una cuenta de usuario verificada y disponible.';
+
+        this.veterinarioForm
+          .get('usuarioId')
+          ?.markAsTouched();
+
+        return;
+
+      }
+
+      /*
+        Este objeto coincide exactamente
+        con el DTO del backend.
+      */
+
+      const datos: RegistroVeterinarioDesdeUsuario = {
+
+        usuarioId,
+
+        cedula,
+
+        especialidad,
+
+        telefono
+
+      };
+
+      // POST /api/veterinarios/desde-usuario
+
+      peticion = this.veterinarioServicio
+
+        .registrarDesdeUsuario(datos);
+
+    }
+
+
+    // ======================================================
+    // 25.2. ACTUALIZAR DATOS PROFESIONALES
+    // ======================================================
+
+    else {
+
+      const veterinarioActual =
+
+        this.veterinarioEditando ??
+
+        this.veterinarios.find(
+
+          v => v.id === this.veterinarioEditandoId
+
+        );
+
+      if (!veterinarioActual) {
+
+        this.mensajeError =
+          'No se encontró el veterinario que deseas editar.';
+
+        return;
+
+      }
+
+      /*
+        El backend PUT actualiza nombre, apellido y email.
+
+        Por eso enviamos sus valores actuales para
+        conservar la cuenta vinculada y no modificarlos.
+      */
+
+      const datosActualizacion: Partial<Veterinario> = {
+
+        cedula,
+
+        nombre: veterinarioActual.nombre,
+
+        apellido: veterinarioActual.apellido ?? '',
+
+        especialidad,
+
+        telefono,
+
+        email: veterinarioActual.email
+
+      };
+
+      peticion = this.veterinarioServicio
+
+        .actualizarVeterinario(
+
+          this.veterinarioEditandoId!,
+
+          datosActualizacion
+
+        );
+
+    }
+
+
+    // ======================================================
+    // 25.3. EJECUTAR OPERACIÓN
+    // ======================================================
 
     this.guardando = true;
+
     this.mensajeExito = '';
 
     peticion.subscribe({
@@ -645,6 +999,7 @@ export class AdminVeterinarios implements OnInit {
       // ----------------------------------------------------
       // OPERACIÓN CORRECTA
       // ----------------------------------------------------
+
       next: () => {
 
         this.guardando = false;
@@ -652,16 +1007,24 @@ export class AdminVeterinarios implements OnInit {
         this.cerrarFormulario();
 
         this.mensajeExito = editando
-          ? 'Veterinario actualizado correctamente.'
-          : 'Veterinario registrado correctamente.';
+
+          ? 'Datos profesionales actualizados correctamente.'
+
+          : 'Veterinario asignado correctamente. La cuenta ahora tiene el rol VETERINARIO.';
 
         this.notificacionesServicio.agregar(
+
           editando
             ? 'Veterinario actualizado'
-            : 'Veterinario registrado',
-          `${this.mensajeExito} ${datosVeterinario.nombre} ${datosVeterinario.apellido}.`,
+            : 'Veterinario asignado',
+
+          this.mensajeExito,
+
           'exito'
+
         );
+
+        // Actualizar los profesionales.
 
         this.cargarVeterinarios();
 
@@ -669,10 +1032,12 @@ export class AdminVeterinarios implements OnInit {
 
       },
 
+
       // ----------------------------------------------------
       // ERROR DEL BACKEND
       // ----------------------------------------------------
-      error: (error) => {
+
+      error: error => {
 
         console.error(
           'Error al guardar veterinario:',
@@ -681,15 +1046,36 @@ export class AdminVeterinarios implements OnInit {
 
         this.guardando = false;
 
-        this.mensajeError =
+        const detalle =
+
+          error?.error?.detail ||
+
           error?.error?.mensaje ||
-          error?.error?.message ||
-          'No se pudo guardar el veterinario. Revisa los datos.';
+
+          error?.error?.message;
+
+        if (error?.status === 409) {
+
+          this.mensajeError = detalle ||
+
+            'La cuenta ya está asignada o no cumple los requisitos.';
+
+        } else {
+
+          this.mensajeError = detalle ||
+
+            'No se pudo guardar el veterinario. Comprueba los datos y la conexión.';
+
+        }
 
         this.notificacionesServicio.agregar(
-          'Error al guardar veterinario',
-          'No se pudo completar el registro o la edición.',
+
+          'No se pudo completar la operación',
+
+          this.mensajeError,
+
           'error'
+
         );
 
         this.cd.detectChanges();
@@ -700,24 +1086,40 @@ export class AdminVeterinarios implements OnInit {
 
   }
 
+
   // ========================================================
-  // ELIMINAR VETERINARIO
+  // 26. ELIMINAR VETERINARIO
   // ========================================================
 
-  eliminarVeterinario(
-    veterinario: VeterinarioAdmin
-  ): void {
+  /*
+    Requiere aplicar la corrección del controlador
+    backend indicada más adelante.
 
-    if (this.cargando || this.hayOperacionEnCurso) {
+    El backend impedirá eliminar profesionales
+    que tengan citas asociadas y devolverá la cuenta
+    vinculada al rol USER cuando sea posible.
+  */
+
+  eliminarVeterinario(veterinario: Veterinario): void {
+
+    if (
+      this.cargando ||
+      this.hayOperacionEnCurso
+    ) {
       return;
     }
 
-    // Solicitar confirmación antes del DELETE.
+    const nombre =
+
+      `${veterinario.nombre ?? ''} ${veterinario.apellido ?? ''}`.trim();
+
     const confirmado = window.confirm(
 
-      `¿Estás seguro de eliminar permanentemente a ` +
-      `${veterinario.nombre} ${veterinario.apellido}? ` +
-      `Esta acción no se puede deshacer.`
+      `¿Deseas eliminar la ficha profesional de ${nombre}? ` +
+
+      `Si tiene citas asociadas, el sistema impedirá la eliminación. ` +
+
+      `La cuenta vinculada volverá al rol USER si la operación es válida.`
 
     );
 
@@ -728,43 +1130,37 @@ export class AdminVeterinarios implements OnInit {
     this.eliminandoId = veterinario.id;
 
     this.mensajeError = '';
+
     this.mensajeExito = '';
 
-    // DELETE /api/veterinarios/{id}
     this.veterinarioServicio
+
       .eliminarVeterinario(veterinario.id)
+
       .subscribe({
 
-        // --------------------------------------------------
-        // ELIMINACIÓN CORRECTA
-        // --------------------------------------------------
         next: () => {
 
           this.eliminandoId = null;
 
-          if (
-            this.veterinarioEditandoId === veterinario.id
-          ) {
-            this.cerrarFormulario();
-          }
-
           this.mensajeExito =
-            'Veterinario eliminado correctamente.';
+            'Ficha profesional eliminada correctamente.';
 
           this.notificacionesServicio.agregar(
+
             'Veterinario eliminado',
-            `Se eliminó a ${veterinario.nombre} ${veterinario.apellido}.`,
+
+            `${nombre} ya no tiene una ficha profesional activa.`,
+
             'exito'
+
           );
 
           this.cargarVeterinarios();
 
         },
 
-        // --------------------------------------------------
-        // ERROR DE ELIMINACIÓN
-        // --------------------------------------------------
-        error: (error) => {
+        error: error => {
 
           console.error(
             'Error al eliminar veterinario:',
@@ -774,14 +1170,23 @@ export class AdminVeterinarios implements OnInit {
           this.eliminandoId = null;
 
           this.mensajeError =
+
+            error?.error?.detail ||
+
             error?.error?.mensaje ||
+
             error?.error?.message ||
-            'No se pudo eliminar el veterinario. Puede tener citas asociadas.';
+
+            'No se pudo eliminar. Comprueba si el veterinario tiene citas asociadas.';
 
           this.notificacionesServicio.agregar(
-            'Error al eliminar veterinario',
-            `No se pudo eliminar a ${veterinario.nombre}.`,
+
+            'No se pudo eliminar',
+
+            this.mensajeError,
+
             'error'
+
           );
 
           this.cd.detectChanges();
@@ -792,41 +1197,56 @@ export class AdminVeterinarios implements OnInit {
 
   }
 
+
   // ========================================================
-  // CERRAR FORMULARIO
+  // 27. CERRAR FORMULARIO
   // ========================================================
 
   cerrarFormulario(): void {
 
-    // No cerrar mientras se realiza el PUT o POST.
     if (this.guardando) {
       return;
     }
 
     this.mostrarFormulario = false;
+
     this.veterinarioEditandoId = null;
 
-    this.veterinarioForm.reset();
+    this.veterinarioEditando = null;
+
+    this.veterinarioForm.reset({
+
+      usuarioId: null,
+
+      cedula: '',
+
+      especialidad: '',
+
+      telefono: ''
+
+    });
 
     this.cd.detectChanges();
 
   }
 
+
   // ========================================================
-  // IDENTIFICAR VETERINARIOS EN EL HTML
+  // 28. IDENTIFICAR FILAS
   // ========================================================
 
   trackByVeterinario(
     index: number,
-    veterinario: VeterinarioAdmin
+    veterinario: Veterinario
   ): number {
 
     return veterinario.id ?? index;
 
   }
 
+
   // ========================================================
-  // REGRESAR AL DASHBOARD ADMIN
+  // 29. VOLVER AL DASHBOARD
   // ========================================================
 
   volverDashboard(): void {

@@ -1,0 +1,482 @@
+
+<!-- ==========================================================
+  VETERINARIA ARÉVALO · PANEL DEL VETERINARIO
+
+  FUNCIONALIDADES:
+  1. Presentación del panel profesional.
+  2. Indicadores de citas y atenciones.
+  3. Próximas citas asignadas.
+  4. Citas programadas para el día.
+  5. Facturas emitidas durante el día.
+  6. Resumen del importe total facturado.
+
+  El menú, la campana y accesibilidad ♿ son proporcionados
+  por LayoutPrivado. No se duplican en este componente.
+========================================================== -->
+
+<div class="dash-final dash-final--vet">
+
+  <!-- ======================================================
+       1. ENCABEZADO DEL DASHBOARD
+  ======================================================= -->
+  <header class="dash-final__encabezado">
+    <div>
+      <span class="dash-final__eyebrow">
+        🩺 ESPACIO PROFESIONAL
+      </span>
+
+      <h1>¡Bienvenido, veterinario!</h1>
+
+      <p>
+        Consulta tus citas asignadas y el resumen de tus
+        atenciones médicas.
+      </p>
+    </div>
+
+    <!-- Actualiza simultáneamente citas, atenciones y facturas. -->
+    <button
+      class="dash-final__actualizar"
+      type="button"
+      (click)="cargarResumen()"
+      [disabled]="cargando">
+
+      {{ cargando ? 'Actualizando…' : '↻ Actualizar datos' }}
+
+    </button>
+  </header>
+
+
+  <!-- ======================================================
+       2. BANNER DE BIENVENIDA
+  ======================================================= -->
+  <section
+    class="dash-final__hero"
+    aria-label="Bienvenida al panel clínico">
+
+    <div class="dash-final__hero-texto">
+
+      <span>
+        💚 CADA MASCOTA MERECE EL MEJOR CUIDADO
+      </span>
+
+      <h2>Tu vocación hace la diferencia.</h2>
+
+      <p>
+        Organiza tus citas y lleva el seguimiento de los
+        pacientes que tienes asignados.
+      </p>
+
+    </div>
+
+    <img
+      src="/imagenes/mascotas-hero.webp"
+      alt=""
+      aria-hidden="true"
+      loading="lazy">
+
+  </section>
+
+
+  <!-- ======================================================
+       3. MENSAJE GENERAL DE ERROR
+  ======================================================= -->
+  <p
+    class="dash-final__alerta"
+    role="alert"
+    *ngIf="errorCarga">
+
+    ⚠️ No se pudo consultar toda la información.
+    Comprueba la conexión o tus permisos de veterinario.
+
+  </p>
+
+
+  <!-- ======================================================
+       4. INDICADORES PRINCIPALES
+
+       Las cifras se obtienen directamente desde la API.
+  ======================================================= -->
+  <section
+    class="dash-final__indicadores"
+    aria-label="Indicadores del veterinario">
+
+    <!-- Total de citas asignadas -->
+    <article class="dash-final__indicador">
+
+      <span class="dash-final__indicador-icono" aria-hidden="true">
+        📅
+      </span>
+
+      <div>
+        <span>Mis citas</span>
+
+        <strong>
+          {{ totalCitas === null ? '—' : totalCitas }}
+        </strong>
+
+        <small>Total asignadas</small>
+      </div>
+
+    </article>
+
+
+    <!-- Citas pendientes -->
+    <article class="dash-final__indicador">
+
+      <span class="dash-final__indicador-icono" aria-hidden="true">
+        ⏳
+      </span>
+
+      <div>
+        <span>Pendientes</span>
+
+        <strong>
+          {{ citasPendientes === null ? '—' : citasPendientes }}
+        </strong>
+
+        <small>Por revisar</small>
+      </div>
+
+    </article>
+
+
+    <!-- Citas confirmadas -->
+    <article class="dash-final__indicador">
+
+      <span class="dash-final__indicador-icono" aria-hidden="true">
+        ✅
+      </span>
+
+      <div>
+        <span>Confirmadas</span>
+
+        <strong>
+          {{ citasConfirmadas === null ? '—' : citasConfirmadas }}
+        </strong>
+
+        <small>Listas para atender</small>
+      </div>
+
+    </article>
+
+
+    <!-- Total de atenciones -->
+    <article class="dash-final__indicador">
+
+      <span class="dash-final__indicador-icono" aria-hidden="true">
+        🩺
+      </span>
+
+      <div>
+        <span>Mis atenciones</span>
+
+        <strong>
+          {{ totalAtenciones === null ? '—' : totalAtenciones }}
+        </strong>
+
+        <small>Registradas</small>
+      </div>
+
+    </article>
+
+  </section>
+
+
+  <!-- ======================================================
+       5. PRÓXIMAS CITAS ASIGNADAS
+
+       Solo se muestran citas del veterinario autenticado.
+  ======================================================= -->
+  <section
+    class="dash-final__panel"
+    aria-labelledby="titulo-citas-vet">
+
+    <div class="dash-final__panel-head">
+
+      <div>
+        <h2 id="titulo-citas-vet">
+          📅 Próximas citas asignadas
+        </h2>
+
+        <p>
+          Solo pacientes vinculados a tu cuenta profesional
+        </p>
+      </div>
+
+    </div>
+
+
+    <!-- Estado de carga -->
+    <p class="dash-final__vacio" *ngIf="cargando">
+      Consultando tus citas…
+    </p>
+
+
+    <!-- Error al obtener citas -->
+    <p
+      class="dash-final__vacio"
+      *ngIf="!cargando && totalCitas === null">
+
+      No se pudo consultar las citas.
+
+    </p>
+
+
+    <!-- Sin próximas citas -->
+    <p
+      class="dash-final__vacio"
+      *ngIf="!cargando &&
+             totalCitas !== null &&
+             proximasCitas.length === 0">
+
+      No tienes citas próximas.
+
+    </p>
+
+
+    <!-- Listado de próximas citas -->
+    <div
+      class="dash-final__lista"
+      *ngIf="!cargando && proximasCitas.length > 0">
+
+      <article
+        class="dash-final__fila"
+        *ngFor="let cita of proximasCitas">
+
+        <span class="dash-final__avatar" aria-hidden="true">
+          🐾
+        </span>
+
+        <div class="dash-final__fila-texto">
+
+          <strong>
+            {{ cita.mascota?.nombre || 'Mascota' }}
+          </strong>
+
+          <span>
+            {{ cita.servicio?.nombre || cita.motivo || 'Cita veterinaria' }}
+          </span>
+
+          <small>
+            {{ cita.fechaHora | date:'dd/MM/yyyy HH:mm' }}
+          </small>
+
+        </div>
+
+        <span
+          class="dash-final__estado"
+          [class.dash-final__estado--pendiente]="
+            cita.estado?.toUpperCase() === 'PENDIENTE'
+          ">
+
+          {{ cita.estado || 'Registrada' }}
+
+        </span>
+
+      </article>
+
+    </div>
+
+  </section>
+
+
+  <!-- ======================================================
+       6. RESUMEN DE CITAS DEL DÍA
+  ======================================================= -->
+  <p class="dash-final__nota">
+
+    <strong>
+      {{ citasHoy === null ? '—' : citasHoy }}
+    </strong>
+
+    <span>Citas asignadas para hoy</span>
+
+  </p>
+
+
+  <!-- ======================================================
+       7. FACTURAS EMITIDAS DURANTE EL DÍA
+
+       Endpoint:
+       GET /api/facturas/mis-facturas
+
+       El backend determina las facturas permitidas según
+       el usuario autenticado mediante su token JWT.
+
+       El frontend filtra por fechaEmision para mostrar
+       exclusivamente las facturas del día actual.
+  ======================================================= -->
+  <section
+    class="dash-final__panel"
+    aria-labelledby="titulo-facturas-vet">
+
+    <!-- Encabezado de facturación -->
+    <div class="dash-final__panel-head">
+
+      <div>
+        <h2 id="titulo-facturas-vet">
+          🧾 Facturas emitidas hoy
+        </h2>
+
+        <p>
+          Comprobantes generados a partir de tus atenciones médicas
+        </p>
+      </div>
+
+    </div>
+
+
+    <!-- Estado de carga de las facturas -->
+    <p
+      class="dash-final__vacio"
+      *ngIf="cargando">
+
+      Consultando las facturas emitidas…
+
+    </p>
+
+
+    <!-- Error independiente de la consulta de facturas -->
+    <p
+      class="dash-final__vacio"
+      role="alert"
+      *ngIf="!cargando && errorFacturas">
+
+      ⚠️ No fue posible consultar las facturas.
+      Comprueba la conexión e intenta actualizar los datos.
+
+    </p>
+
+
+    <!-- Información disponible cuando la API responde correctamente -->
+    <ng-container *ngIf="!cargando && !errorFacturas">
+
+
+      <!-- ==================================================
+           7.1. RESUMEN ECONÓMICO DEL DÍA
+
+           Total de comprobantes y suma de sus importes.
+      =================================================== -->
+      <div
+        class="dash-final__nota dash-final__nota--facturas"
+        *ngIf="facturasHoy.length > 0">
+
+        <div>
+          <strong>
+            {{ facturasHoy.length }}
+          </strong>
+
+          <span>Facturas emitidas hoy</span>
+        </div>
+
+        <div>
+          <strong>
+            {{ formatearMoneda(totalFacturadoHoy) }}
+          </strong>
+
+          <span>Total facturado hoy</span>
+        </div>
+
+      </div>
+
+
+      <!-- ==================================================
+           7.2. LISTADO DE FACTURAS DEL DÍA
+
+           Cada registro presenta:
+           - Número de comprobante.
+           - Propietario.
+           - Mascota.
+           - Servicio.
+           - Fecha y hora.
+           - Total.
+           - Estado del correo electrónico.
+      =================================================== -->
+      <div
+        class="dash-final__lista"
+        *ngIf="facturasHoy.length > 0">
+
+        <article
+          class="dash-final__fila"
+          *ngFor="let factura of facturasHoy">
+
+          <!-- Identificador visual -->
+          <span
+            class="dash-final__avatar"
+            aria-hidden="true">
+
+            🧾
+
+          </span>
+
+
+          <!-- Información del comprobante -->
+          <div class="dash-final__fila-texto">
+
+            <strong>
+              {{ factura.numeroFactura || ('Factura #' + factura.id) }}
+            </strong>
+
+            <span>
+              {{ factura.nombreCliente || 'Propietario' }}
+              ·
+              {{ factura.nombreMascota || 'Mascota' }}
+            </span>
+
+            <small>
+              {{ factura.nombreServicio || 'Servicio no especificado' }}
+              ·
+              {{ mostrarFechaFactura(factura.fechaEmision) }}
+            </small>
+
+          </div>
+
+
+          <!-- Importe y estado del envío -->
+          <div class="dash-final__factura-meta">
+
+            <strong>
+              {{ formatearMoneda(factura.total) }}
+            </strong>
+
+            <span
+              class="dash-final__etiqueta"
+              [class.dash-final__estado--pendiente]="
+                !factura.correoEnviado
+              ">
+
+              {{
+                factura.correoEnviado
+                  ? 'Correo enviado'
+                  : 'Correo no enviado'
+              }}
+
+            </span>
+
+            <small>
+              {{ factura.estado || 'EMITIDA' }}
+            </small>
+
+          </div>
+
+        </article>
+
+      </div>
+
+
+      <!-- ==================================================
+           7.3. MENSAJE CUANDO NO EXISTEN FACTURAS HOY
+      =================================================== -->
+      <p
+        class="dash-final__vacio"
+        *ngIf="facturasHoy.length === 0">
+
+        🧾 No has emitido facturas durante el día de hoy.
+
+      </p>
+
+    </ng-container>
+
+  </section>
+
+</div>

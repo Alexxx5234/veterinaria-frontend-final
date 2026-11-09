@@ -1,558 +1,91 @@
-
-<!-- ==========================================================
-     VETERINARIA AREVALO
-     FORMULARIO DE REGISTRO
-
-     MEJORAS:
-     - Diseño dividido en dos columnas.
-     - Instrucciones claras.
-     - Validación de campos.
-     - Contraseñas visibles u ocultas.
-     - Mensajes de error y confirmación.
-     ========================================================== -->
-
-<div class="registro-container">
-
-  <main class="registro-layout">
-
-    <!-- ======================================================
-         SECCIÓN IZQUIERDA - INFORMACIÓN
-         ====================================================== -->
-
-    <section class="registro-info">
-
-      <!-- MARCA -->
-      <div class="marca">
-
-        <div class="marca-icono" aria-hidden="true">
-          🐾
+<!-- REGISTRO · VETERINARIA ARÉVALO · conserva registrar(), validaciones y API -->
+<div class="vet-auth vet-auth--registro">
+  <main class="vet-auth__shell">
+    <section class="vet-auth__hero" aria-labelledby="mensaje-registro">
+      <div class="vet-auth__brand">
+        <span class="vet-auth__marca-icono" aria-hidden="true">🐾</span>
+        <span><span class="vet-auth__marca-nombre">Veterinaria Arévalo</span><span class="vet-auth__marca-sub">Sistema Veterinario</span></span>
+      </div>
+      <div class="vet-auth__relato">
+        <span class="vet-auth__eyebrow">FORMA PARTE DE NUESTRA FAMILIA</span>
+        <h1 id="mensaje-registro">Cuidemos juntos a <span>tus mejores amigos.</span></h1>
+        <p>Crea tu cuenta para registrar mascotas, organizar citas y consultar nuestros servicios.</p>
+        <div class="vet-auth__pasos">
+          <div class="vet-auth__paso"><span class="vet-auth__paso-numero">1</span><span><strong>Crea tu cuenta</strong><small>Completa tus datos personales.</small></span></div>
+          <div class="vet-auth__paso"><span class="vet-auth__paso-numero">2</span><span><strong>Verifica tu correo</strong><small>Ingresa el código recibido.</small></span></div>
+          <div class="vet-auth__paso"><span class="vet-auth__paso-numero">3</span><span><strong>Espera la aprobación</strong><small>El administrador revisará tu cuenta.</small></span></div>
         </div>
-
-        <span>
-          Veterinaria Arevalo
-        </span>
-
       </div>
-
-
-      <!-- PRESENTACIÓN -->
-      <div class="informacion">
-
-        <span class="etiqueta">
-          FORMA PARTE DE NUESTRA FAMILIA
-        </span>
-
-        <h1>
-          Cuidemos juntos
-          <span>a tus mejores amigos.</span>
-        </h1>
-
-        <p>
-          Crea tu cuenta para registrar a tus mascotas,
-          organizar sus citas y consultar los servicios
-          de nuestra veterinaria.
-        </p>
-
-
-        <!-- PASOS DEL REGISTRO -->
-        <div class="pasos-registro">
-
-          <div class="paso">
-
-            <span class="paso-numero">1</span>
-
-            <div>
-              <strong>Crea tu cuenta</strong>
-              <small>Completa tus datos personales.</small>
-            </div>
-
-          </div>
-
-          <div class="paso">
-
-            <span class="paso-numero">2</span>
-
-            <div>
-              <strong>Verifica tu correo</strong>
-              <small>Ingresa el código de verificación.</small>
-            </div>
-
-          </div>
-
-          <div class="paso">
-
-            <span class="paso-numero">3</span>
-
-            <div>
-              <strong>Espera la aprobación</strong>
-              <small>El administrador revisará tu cuenta.</small>
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <!-- MENSAJE INFERIOR -->
-      <div class="info-footer">
-        🐶 🐱 Su bienestar es nuestra prioridad.
-      </div>
-
+      <img class="vet-auth__foto" src="/imagenes/mascotas-hero.webp" alt="Un perro y un gato juntos" />
+      <span class="vet-auth__lema">💚 Cuidamos lo que más quieres</span>
     </section>
 
-
-    <!-- ======================================================
-         SECCIÓN DERECHA - FORMULARIO
-         ====================================================== -->
-
-    <section class="registro-formulario">
-
-      <div class="registro-card">
-
-        <!-- ENCABEZADO -->
-        <div class="registro-header">
-
-          <div class="logo" aria-hidden="true">
-            🐾
-          </div>
-
-          <h2>
-            Crear una cuenta
-          </h2>
-
-          <p>
-            Completa tus datos para registrarte
-            en Veterinaria Arevalo.
-          </p>
-
-        </div>
-
-
-        <!-- ==================================================
-             FORMULARIO REACTIVO
-             ================================================== -->
-
-        <form
-          [formGroup]="registroForm"
-          (ngSubmit)="registrar()"
-          class="form-registro"
-          novalidate
-          [attr.aria-busy]="cargando"
-        >
-
-          <!-- ================================================
-               NOMBRE COMPLETO
-               ================================================ -->
-
-          <div class="form-group">
-
-            <label for="nombre">
-              Nombre completo
-              <span class="obligatorio" aria-hidden="true">*</span>
-            </label>
-
-            <input
-              id="nombre"
-              type="text"
-              formControlName="nombre"
-              placeholder="Ingresa tu nombre completo"
-              autocomplete="name"
-              minlength="3"
-              required
-              [class.input-error]="
-                registroForm.get('nombre')?.touched &&
-                registroForm.get('nombre')?.invalid
-              "
-              [attr.aria-invalid]="
-                registroForm.get('nombre')?.touched &&
-                registroForm.get('nombre')?.invalid
-              "
-              [attr.aria-describedby]="
-                registroForm.get('nombre')?.touched &&
-                registroForm.get('nombre')?.invalid
-                  ? 'nombre-error'
-                  : null
-              "
-            >
-
-            <small
-              id="nombre-error"
-              class="error-validacion"
-              *ngIf="
-                registroForm.get('nombre')?.touched &&
-                registroForm.get('nombre')?.invalid
-              "
-            >
-
-              <span
-                *ngIf="
-                  registroForm.get('nombre')?.hasError('required')
-                "
-              >
-                El nombre es obligatorio.
-              </span>
-
-              <span
-                *ngIf="
-                  registroForm.get('nombre')?.hasError('minlength')
-                "
-              >
-                Ingresa al menos 3 caracteres.
-              </span>
-
+    <section class="vet-auth__derecha" aria-labelledby="titulo-registro">
+      <div class="vet-auth__form-card">
+        <header class="vet-auth__cabecera">
+          <span class="vet-auth__logo-form" aria-hidden="true">🐾</span>
+          <h2 id="titulo-registro">Crear una cuenta</h2>
+          <p>Completa tus datos para registrarte en Veterinaria Arévalo.</p>
+        </header>
+        <form class="vet-auth__form" [formGroup]="registroForm" (ngSubmit)="registrar()" novalidate [attr.aria-busy]="cargando">
+          <div class="vet-auth__campo">
+            <label for="nombre">Nombre completo <span class="vet-auth__obligatorio">*</span></label>
+            <input id="nombre" type="text" formControlName="nombre" placeholder="Ingresa tu nombre completo" autocomplete="name" required minlength="3"
+              [class.input-error]="registroForm.get('nombre')?.touched && registroForm.get('nombre')?.invalid"
+              [attr.aria-invalid]="registroForm.get('nombre')?.touched && registroForm.get('nombre')?.invalid"
+              [attr.aria-describedby]="registroForm.get('nombre')?.touched && registroForm.get('nombre')?.invalid ? 'nombre-error' : null" />
+            <small id="nombre-error" class="vet-auth__error-campo" *ngIf="registroForm.get('nombre')?.touched && registroForm.get('nombre')?.invalid">
+              <span *ngIf="registroForm.get('nombre')?.hasError('required')">El nombre es obligatorio.</span>
+              <span *ngIf="registroForm.get('nombre')?.hasError('minlength')">Ingresa al menos 3 caracteres.</span>
             </small>
-
           </div>
-
-
-          <!-- ================================================
-               CORREO ELECTRÓNICO
-               ================================================ -->
-
-          <div class="form-group">
-
-            <label for="correo">
-              Correo electrónico
-              <span class="obligatorio" aria-hidden="true">*</span>
-            </label>
-
-            <input
-              id="correo"
-              type="email"
-              formControlName="correo"
-              placeholder="ejemplo@correo.com"
-              autocomplete="email"
-              inputmode="email"
-              autocapitalize="none"
-              spellcheck="false"
-              required
-              [class.input-error]="
-                registroForm.get('correo')?.touched &&
-                registroForm.get('correo')?.invalid
-              "
-              [attr.aria-invalid]="
-                registroForm.get('correo')?.touched &&
-                registroForm.get('correo')?.invalid
-              "
-              [attr.aria-describedby]="
-                registroForm.get('correo')?.touched &&
-                registroForm.get('correo')?.invalid
-                  ? 'correo-error'
-                  : null
-              "
-            >
-
-            <small
-              id="correo-error"
-              class="error-validacion"
-              *ngIf="
-                registroForm.get('correo')?.touched &&
-                registroForm.get('correo')?.invalid
-              "
-            >
-
-              <span
-                *ngIf="
-                  registroForm.get('correo')?.hasError('required')
-                "
-              >
-                El correo es obligatorio.
-              </span>
-
-              <span
-                *ngIf="
-                  registroForm.get('correo')?.hasError('email')
-                "
-              >
-                Ingresa un correo electrónico válido.
-              </span>
-
+          <div class="vet-auth__campo">
+            <label for="correo">Correo electrónico <span class="vet-auth__obligatorio">*</span></label>
+            <input id="correo" type="email" formControlName="correo" placeholder="tucorreo@ejemplo.com" autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false" required
+              [class.input-error]="registroForm.get('correo')?.touched && registroForm.get('correo')?.invalid"
+              [attr.aria-invalid]="registroForm.get('correo')?.touched && registroForm.get('correo')?.invalid"
+              [attr.aria-describedby]="registroForm.get('correo')?.touched && registroForm.get('correo')?.invalid ? 'correo-error' : null" />
+            <small id="correo-error" class="vet-auth__error-campo" *ngIf="registroForm.get('correo')?.touched && registroForm.get('correo')?.invalid">
+              <span *ngIf="registroForm.get('correo')?.hasError('required')">El correo es obligatorio.</span>
+              <span *ngIf="registroForm.get('correo')?.hasError('email')">Ingresa un correo válido.</span>
             </small>
-
           </div>
-
-
-          <!-- ================================================
-               CONTRASEÑA
-               ================================================ -->
-
-          <div class="form-group">
-
-            <label for="password">
-              Contraseña
-              <span class="obligatorio" aria-hidden="true">*</span>
-            </label>
-
-            <div class="password-container">
-
-              <input
-                id="password"
-                formControlName="password"
-                [type]="mostrarPassword ? 'text' : 'password'"
-                placeholder="Mínimo 6 caracteres"
-                autocomplete="new-password"
-                minlength="6"
-                required
-                [class.input-error]="
-                  registroForm.get('password')?.touched &&
-                  registroForm.get('password')?.invalid
-                "
-                [attr.aria-invalid]="
-                  registroForm.get('password')?.touched &&
-                  registroForm.get('password')?.invalid
-                "
-                [attr.aria-describedby]="
-                  registroForm.get('password')?.touched &&
-                  registroForm.get('password')?.invalid
-                    ? 'password-ayuda password-error'
-                    : 'password-ayuda'
-                "
-              >
-
-              <!-- VER / OCULTAR CONTRASEÑA -->
-              <button
-                type="button"
-                class="btn-ver-password"
-                (click)="cambiarVisibilidadPassword()"
-                [attr.aria-label]="
-                  mostrarPassword
-                    ? 'Ocultar contraseña'
-                    : 'Mostrar contraseña'
-                "
-                [attr.aria-pressed]="mostrarPassword"
-              >
-                <span aria-hidden="true">
-                  {{ mostrarPassword ? '🙈' : '👁️' }}
-                </span>
-              </button>
-
+          <div class="vet-auth__campo">
+            <label for="password">Contraseña <span class="vet-auth__obligatorio">*</span></label>
+            <div class="vet-auth__password">
+              <input id="password" [type]="mostrarPassword ? 'text' : 'password'" formControlName="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password" required minlength="6"
+                [class.input-error]="registroForm.get('password')?.touched && registroForm.get('password')?.invalid"
+                [attr.aria-invalid]="registroForm.get('password')?.touched && registroForm.get('password')?.invalid"
+                [attr.aria-describedby]="registroForm.get('password')?.touched && registroForm.get('password')?.invalid ? 'password-ayuda password-error' : 'password-ayuda'" />
+              <button class="vet-auth__ojo" type="button" (click)="cambiarVisibilidadPassword()" [attr.aria-label]="mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'" [attr.aria-pressed]="mostrarPassword"><span aria-hidden="true">{{ mostrarPassword ? '🙈' : '👁️' }}</span></button>
             </div>
-
-            <small
-              id="password-ayuda"
-              class="texto-ayuda"
-            >
-              Utiliza al menos 6 caracteres.
+            <small id="password-ayuda" class="vet-auth__ayuda">Utiliza al menos 6 caracteres.</small>
+            <small id="password-error" class="vet-auth__error-campo" *ngIf="registroForm.get('password')?.touched && registroForm.get('password')?.invalid">
+              <span *ngIf="registroForm.get('password')?.hasError('required')">La contraseña es obligatoria.</span>
+              <span *ngIf="registroForm.get('password')?.hasError('minlength')">La contraseña debe tener mínimo 6 caracteres.</span>
             </small>
-
-            <small
-              id="password-error"
-              class="error-validacion"
-              *ngIf="
-                registroForm.get('password')?.touched &&
-                registroForm.get('password')?.invalid
-              "
-            >
-
-              <span
-                *ngIf="
-                  registroForm.get('password')?.hasError('required')
-                "
-              >
-                La contraseña es obligatoria.
-              </span>
-
-              <span
-                *ngIf="
-                  registroForm.get('password')?.hasError('minlength')
-                "
-              >
-                La contraseña debe tener mínimo 6 caracteres.
-              </span>
-
-            </small>
-
           </div>
-
-
-          <!-- ================================================
-               CONFIRMAR CONTRASEÑA
-               ================================================ -->
-
-          <div class="form-group">
-
-            <label for="confirmarPassword">
-              Confirmar contraseña
-              <span class="obligatorio" aria-hidden="true">*</span>
-            </label>
-
-            <div class="password-container">
-
-              <input
-                id="confirmarPassword"
-                formControlName="confirmarPassword"
-                [type]="
-                  mostrarConfirmarPassword ? 'text' : 'password'
-                "
-                placeholder="Repite tu contraseña"
-                autocomplete="new-password"
-                required
-                [class.input-error]="
-                  registroForm.get('confirmarPassword')?.touched &&
-                  (
-                    registroForm.get('confirmarPassword')?.invalid ||
-                    registroForm.hasError('passwordsDiferentes')
-                  )
-                "
-                [attr.aria-invalid]="
-                  registroForm.get('confirmarPassword')?.touched &&
-                  (
-                    registroForm.get('confirmarPassword')?.invalid ||
-                    registroForm.hasError('passwordsDiferentes')
-                  )
-                "
-                [attr.aria-describedby]="
-                  registroForm.get('confirmarPassword')?.touched &&
-                  (
-                    registroForm.get('confirmarPassword')?.invalid ||
-                    registroForm.hasError('passwordsDiferentes')
-                  )
-                    ? 'confirmar-error'
-                    : null
-                "
-              >
-
-              <button
-                type="button"
-                class="btn-ver-password"
-                (click)="cambiarVisibilidadConfirmacion()"
-                [attr.aria-label]="
-                  mostrarConfirmarPassword
-                    ? 'Ocultar confirmación de contraseña'
-                    : 'Mostrar confirmación de contraseña'
-                "
-                [attr.aria-pressed]="mostrarConfirmarPassword"
-              >
-                <span aria-hidden="true">
-                  {{ mostrarConfirmarPassword ? '🙈' : '👁️' }}
-                </span>
-              </button>
-
+          <div class="vet-auth__campo">
+            <label for="confirmarPassword">Confirmar contraseña <span class="vet-auth__obligatorio">*</span></label>
+            <div class="vet-auth__password">
+              <input id="confirmarPassword" [type]="mostrarConfirmarPassword ? 'text' : 'password'" formControlName="confirmarPassword" placeholder="Repite tu contraseña" autocomplete="new-password" required
+                [class.input-error]="registroForm.get('confirmarPassword')?.touched && (registroForm.get('confirmarPassword')?.invalid || registroForm.hasError('passwordsDiferentes'))"
+                [attr.aria-invalid]="registroForm.get('confirmarPassword')?.touched && (registroForm.get('confirmarPassword')?.invalid || registroForm.hasError('passwordsDiferentes'))"
+                [attr.aria-describedby]="registroForm.get('confirmarPassword')?.touched && (registroForm.get('confirmarPassword')?.invalid || registroForm.hasError('passwordsDiferentes')) ? 'confirmar-error' : null" />
+              <button class="vet-auth__ojo" type="button" (click)="cambiarVisibilidadConfirmacion()" [attr.aria-label]="mostrarConfirmarPassword ? 'Ocultar confirmación de contraseña' : 'Mostrar confirmación de contraseña'" [attr.aria-pressed]="mostrarConfirmarPassword"><span aria-hidden="true">{{ mostrarConfirmarPassword ? '🙈' : '👁️' }}</span></button>
             </div>
-
-
-            <small
-              id="confirmar-error"
-              class="error-validacion"
-              *ngIf="
-                registroForm.get('confirmarPassword')?.touched &&
-                (
-                  registroForm.get('confirmarPassword')?.invalid ||
-                  registroForm.hasError('passwordsDiferentes')
-                )
-              "
-            >
-
-              <span
-                *ngIf="
-                  registroForm.get('confirmarPassword')?.hasError('required')
-                "
-              >
-                Debes confirmar tu contraseña.
-              </span>
-
-              <span
-                *ngIf="
-                  registroForm.hasError('passwordsDiferentes')
-                "
-              >
-                Las contraseñas no coinciden.
-              </span>
-
+            <small id="confirmar-error" class="vet-auth__error-campo" *ngIf="registroForm.get('confirmarPassword')?.touched && (registroForm.get('confirmarPassword')?.invalid || registroForm.hasError('passwordsDiferentes'))">
+              <span *ngIf="registroForm.get('confirmarPassword')?.hasError('required')">Debes confirmar tu contraseña.</span>
+              <span *ngIf="registroForm.hasError('passwordsDiferentes')">Las contraseñas no coinciden.</span>
             </small>
-
           </div>
-
-
-          <!-- ================================================
-               MENSAJES DEL REGISTRO
-               ================================================ -->
-
-          <div
-            class="mensaje-error"
-            *ngIf="mensajeError"
-            role="alert"
-          >
-            {{ mensajeError }}
-          </div>
-
-          <div
-            class="mensaje-exito"
-            *ngIf="mensajeExito"
-            role="status"
-          >
-            {{ mensajeExito }}
-          </div>
-
-
-          <!-- ================================================
-               BOTÓN REGISTRAR
-               ================================================ -->
-
-          <button
-            type="submit"
-            class="btn-registro"
-            [disabled]="cargando"
-          >
-
-            <span *ngIf="!cargando">
-              Crear mi cuenta
-            </span>
-
-            <span *ngIf="cargando">
-              Registrando...
-            </span>
-
-          </button>
-
-
-          <!-- ================================================
-               VOLVER AL LOGIN
-               ================================================ -->
-
-          <div class="login-link">
-
-            <span>
-              ¿Ya tienes una cuenta?
-            </span>
-
-            <button
-              type="button"
-              (click)="irLogin()"
-            >
-              Inicia sesión
-            </button>
-
-          </div>
-
+          <div class="vet-auth__mensaje vet-auth__mensaje--error" *ngIf="mensajeError" role="alert">{{ mensajeError }}</div>
+          <div class="vet-auth__mensaje vet-auth__mensaje--exito" *ngIf="mensajeExito" role="status">{{ mensajeExito }}</div>
+          <button class="vet-auth__enviar" type="submit" [disabled]="cargando">{{ cargando ? 'Registrando...' : 'Crear mi cuenta' }}</button>
         </form>
-
-
-        <!-- ==================================================
-             INFORMACIÓN SOBRE LA VERIFICACIÓN
-             ================================================== -->
-
-        <div class="info-registro">
-
-          <p>
-            <strong>📧 Importante:</strong>
-            después de registrarte deberás verificar
-            tu correo electrónico.
-          </p>
-
-          <p>
-            Tu cuenta podrá utilizarse cuando
-            el administrador la apruebe.
-          </p>
-
-        </div>
-
+        <div class="vet-auth__enlace-fila">¿Ya tienes una cuenta? <button type="button" (click)="irLogin()">Inicia sesión</button></div>
+        <div class="vet-auth__bloque-info" style="margin-top: 22px;"><p>📧 Recibirás un código para verificar tu correo.</p><p>La cuenta se habilita después de la aprobación del administrador.</p></div>
       </div>
-
     </section>
-
   </main>
-
 </div>

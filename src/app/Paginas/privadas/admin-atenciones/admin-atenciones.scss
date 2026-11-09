@@ -1,0 +1,1583 @@
+
+/* ==========================================================
+   VETERINARIA ARÉVALO
+   ADMINISTRACIÓN DE ATENCIONES MÉDICAS
+   ========================================================== */
+
+.atenciones-container {
+
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 28px;
+
+  color: #24352d;
+
+  box-sizing: border-box;
+
+}
+
+
+// ==========================================================
+// 1. CABECERA
+// ==========================================================
+
+.atenciones-header {
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+
+  margin-bottom: 30px;
+
+  .etiqueta-pagina {
+
+    display: inline-block;
+
+    color: #16845b;
+
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+
+    margin-bottom: 10px;
+
+  }
+
+  h1 {
+
+    margin: 0;
+
+    color: #183c2d;
+
+    font-size: 29px;
+    font-weight: 800;
+
+  }
+
+  p {
+
+    margin: 10px 0 0;
+
+    color: #77857d;
+
+    font-size: 14px;
+    line-height: 1.6;
+
+  }
+
+}
+
+
+.acciones-header {
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  flex-wrap: wrap;
+
+}
+
+
+.btn-actualizar,
+.btn-volver {
+
+  border: none;
+  border-radius: 9px;
+
+  padding: 12px 17px;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+
+}
+
+
+.btn-actualizar {
+
+  background: #16845b;
+  color: white;
+
+  &:hover {
+    background: #106b49;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+}
+
+
+.btn-volver {
+
+  background: #edf3ef;
+  color: #365344;
+
+  &:hover {
+    background: #dfeae3;
+  }
+
+}
+
+
+// ==========================================================
+// 2. MENSAJES
+// ==========================================================
+
+.mensaje-exito,
+.mensaje-error {
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 14px 17px;
+
+  border-radius: 10px;
+
+  margin-bottom: 20px;
+
+  font-size: 13px;
+  font-weight: 600;
+
+}
+
+
+.mensaje-exito {
+
+  background: #e8f7ee;
+  color: #167447;
+
+  border: 1px solid #c8ead5;
+
+}
+
+
+.mensaje-error {
+
+  background: #fff0ee;
+  color: #b63d32;
+
+  border: 1px solid #f2d0cc;
+
+  button {
+
+    margin-left: auto;
+
+    border: none;
+    background: transparent;
+
+    color: inherit;
+    font-weight: 800;
+
+    cursor: pointer;
+
+  }
+
+}
+
+
+// ==========================================================
+// 3. TÍTULOS DE SECCIÓN
+// ==========================================================
+
+.seccion-titulo,
+.filtros-header {
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 15px;
+
+  margin-bottom: 17px;
+
+  h2 {
+
+    margin: 0;
+
+    color: #254b38;
+
+    font-size: 18px;
+    font-weight: 800;
+
+  }
+
+  p {
+
+    margin: 6px 0 0;
+
+    color: #849188;
+
+    font-size: 12px;
+
+  }
+
+}
+
+
+.estadisticas-etiqueta {
+
+  padding: 7px 11px;
+
+  border-radius: 7px;
+
+  background: #edf6ef;
+
+  color: #27744e;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: 0.8px;
+
+}
+
+
+// ==========================================================
+// 4. ESTADÍSTICAS
+// ==========================================================
+
+.estadisticas-section {
+
+  margin-bottom: 28px;
+
+}
+
+
+.estadisticas-grid {
+
+  display: grid;
+
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  gap: 17px;
+
+}
+
+
+.estadistica-card {
+
+  display: flex;
+  align-items: center;
+  gap: 17px;
+
+  min-width: 0;
+
+  padding: 23px;
+
+  background: #ffffff;
+
+  border: 1px solid #e8eee9;
+  border-radius: 13px;
+
+  box-shadow: 0 3px 12px rgba(25, 65, 43, 0.035);
+
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+
+    transform: translateY(-3px);
+
+    box-shadow: 0 7px 20px rgba(25, 65, 43, 0.08);
+
+  }
+
+}
+
+
+.estadistica-icono {
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 53px;
+  height: 53px;
+
+  flex-shrink: 0;
+
+  border-radius: 12px;
+
+  font-size: 25px;
+
+}
+
+
+.icono-verde {
+
+  background: #e5f5eb;
+
+}
+
+
+.icono-azul {
+
+  background: #e8f2fa;
+
+}
+
+
+.icono-violeta {
+
+  background: #f0ebfa;
+
+}
+
+
+.estadistica-datos {
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  span {
+
+    color: #718078;
+
+    font-size: 12px;
+    font-weight: 600;
+
+  }
+
+  strong {
+
+    color: #234d36;
+
+    font-size: 28px;
+    font-weight: 800;
+
+  }
+
+  small {
+
+    color: #a0aaa3;
+
+    font-size: 11px;
+
+  }
+
+}
+
+
+.estado-cargando {
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+
+  padding: 35px 15px;
+
+  color: #718078;
+
+  font-size: 13px;
+
+}
+
+
+.estadisticas-error {
+
+  padding: 17px;
+
+  border-radius: 9px;
+
+  background: #fff1ef;
+
+  color: #a84238;
+
+  font-size: 13px;
+
+  button {
+
+    margin-left: 12px;
+
+    padding: 7px 12px;
+
+    border: none;
+    border-radius: 6px;
+
+    background: #b94b40;
+    color: white;
+
+    cursor: pointer;
+
+  }
+
+}
+
+
+// ==========================================================
+// 5. RESUMEN POR VETERINARIO
+// ==========================================================
+
+.ranking-section {
+
+  padding: 23px;
+
+  margin-bottom: 27px;
+
+  background: #ffffff;
+
+  border: 1px solid #e8eee9;
+  border-radius: 13px;
+
+}
+
+
+.ranking-lista {
+
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 20px 28px;
+
+}
+
+
+.ranking-item {
+
+  min-width: 0;
+
+}
+
+
+.ranking-datos {
+
+  display: flex;
+  align-items: center;
+  gap: 11px;
+
+  margin-bottom: 10px;
+
+}
+
+
+.ranking-avatar {
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 39px;
+  height: 39px;
+
+  flex-shrink: 0;
+
+  border-radius: 10px;
+
+  background: #eaf5ed;
+
+  font-size: 19px;
+
+}
+
+
+.ranking-nombre {
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  min-width: 0;
+  flex: 1;
+
+  strong {
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    color: #31523f;
+
+    font-size: 12px;
+
+  }
+
+  span {
+
+    color: #929e96;
+
+    font-size: 11px;
+
+  }
+
+}
+
+
+.ranking-total {
+
+  color: #16845b;
+
+  font-size: 16px;
+
+}
+
+
+.barra-progreso {
+
+  display: block;
+
+  width: 100%;
+  height: 8px;
+
+  border: none;
+  border-radius: 20px;
+
+  overflow: hidden;
+
+  appearance: none;
+  -webkit-appearance: none;
+
+  background: #e9f0eb;
+
+  &::-webkit-progress-bar {
+
+    background: #e9f0eb;
+
+    border-radius: 20px;
+
+  }
+
+  &::-webkit-progress-value {
+
+    background: #269568;
+
+    border-radius: 20px;
+
+  }
+
+  &::-moz-progress-bar {
+
+    background: #269568;
+
+    border-radius: 20px;
+
+  }
+
+}
+
+
+// ==========================================================
+// 6. FILTROS
+// ==========================================================
+
+.filtros-section {
+
+  padding: 24px;
+
+  margin-bottom: 23px;
+
+  background: white;
+
+  border: 1px solid #e7eee8;
+  border-radius: 13px;
+
+}
+
+
+.contador-registros {
+
+  padding: 8px 13px;
+
+  border-radius: 8px;
+
+  background: #eaf5ed;
+
+  color: #19764e;
+
+  font-size: 12px;
+  font-weight: 800;
+
+  white-space: nowrap;
+
+}
+
+
+.filtros-grid {
+
+  display: grid;
+
+  grid-template-columns: 2fr 1.4fr 1fr 1fr;
+
+  gap: 14px;
+
+}
+
+
+.campo-filtro {
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  min-width: 0;
+
+  label {
+
+    color: #52665a;
+
+    font-size: 12px;
+    font-weight: 700;
+
+  }
+
+  input,
+  select {
+
+    width: 100%;
+    min-width: 0;
+
+    height: 43px;
+
+    padding: 0 12px;
+
+    border: 1px solid #dfe8e1;
+    border-radius: 8px;
+
+    outline: none;
+
+    background: #ffffff;
+
+    color: #344b3c;
+
+    font-family: inherit;
+    font-size: 12px;
+
+    box-sizing: border-box;
+
+    transition: border 0.2s, box-shadow 0.2s;
+
+    &:focus {
+
+      border-color: #29936a;
+
+      box-shadow: 0 0 0 3px rgba(41, 147, 106, 0.10);
+
+    }
+
+  }
+
+  input::placeholder {
+
+    color: #aab4ad;
+
+  }
+
+}
+
+
+.acciones-filtros {
+
+  display: flex;
+  gap: 10px;
+
+  margin-top: 18px;
+
+}
+
+
+.btn-aplicar,
+.btn-limpiar {
+
+  padding: 11px 17px;
+
+  border: none;
+  border-radius: 8px;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+
+}
+
+
+.btn-aplicar {
+
+  background: #16845b;
+  color: white;
+
+  &:hover {
+    background: #106c49;
+  }
+
+}
+
+
+.btn-limpiar {
+
+  background: #edf3ef;
+  color: #50665a;
+
+  &:hover {
+    background: #dce8df;
+  }
+
+}
+
+
+.btn-aplicar:disabled,
+.btn-limpiar:disabled {
+
+  opacity: 0.5;
+  cursor: not-allowed;
+
+}
+
+
+.ayuda-filtros {
+
+  margin: 13px 0 0;
+
+  color: #9aa69d;
+
+  font-size: 11px;
+  line-height: 1.5;
+
+}
+
+
+// ==========================================================
+// 7. TABLA
+// ==========================================================
+
+.tabla-section {
+
+  overflow: hidden;
+
+  background: #ffffff;
+
+  border: 1px solid #e7eee8;
+  border-radius: 13px;
+
+  box-shadow: 0 3px 12px rgba(25, 65, 43, 0.035);
+
+}
+
+
+.tabla-responsive {
+
+  width: 100%;
+
+  overflow-x: auto;
+
+}
+
+
+.tabla-responsive table {
+
+  width: 100%;
+
+  min-width: 1050px;
+
+  border-collapse: collapse;
+
+}
+
+
+.tabla-responsive thead {
+
+  background: #f1f7f2;
+
+}
+
+
+.tabla-responsive th {
+
+  padding: 17px 15px;
+
+  color: #496354;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  text-align: left;
+
+  white-space: nowrap;
+
+}
+
+
+.tabla-responsive td {
+
+  padding: 16px 15px;
+
+  border-bottom: 1px solid #edf1ed;
+
+  color: #526259;
+
+  font-size: 12px;
+
+  vertical-align: middle;
+
+}
+
+
+.tabla-responsive tbody tr {
+
+  transition: background 0.2s;
+
+  &:hover {
+
+    background: #f8fbf8;
+
+  }
+
+  &:last-child td {
+
+    border-bottom: none;
+
+  }
+
+}
+
+
+.fecha-principal {
+
+  display: block;
+
+  color: #365844;
+
+  font-weight: 700;
+
+}
+
+
+.tabla-responsive td small {
+
+  display: block;
+
+  margin-top: 5px;
+
+  color: #98a39b;
+
+  font-size: 10px;
+
+}
+
+
+.celda-mascota {
+
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+}
+
+
+.mascota-icono {
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 36px;
+  height: 36px;
+
+  border-radius: 9px;
+
+  background: #edf6ef;
+
+  font-size: 17px;
+
+}
+
+
+.celda-mascota strong,
+.celda-veterinario strong {
+
+  display: block;
+
+  color: #355442;
+
+  font-size: 12px;
+
+}
+
+
+.texto-resumen {
+
+  display: -webkit-box;
+
+  max-width: 180px;
+
+  overflow: hidden;
+
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+
+  line-height: 1.5;
+
+  color: #65756a;
+
+}
+
+
+.btn-detalle {
+
+  padding: 9px 12px;
+
+  border: 1px solid #cde5d5;
+  border-radius: 7px;
+
+  background: #eff8f1;
+
+  color: #17734c;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+
+  &:hover {
+
+    background: #dcefe1;
+
+  }
+
+}
+
+
+.sin-resultados {
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  padding: 45px 15px;
+
+  text-align: center;
+
+  span {
+
+    margin-bottom: 12px;
+
+    font-size: 35px;
+
+  }
+
+  strong {
+
+    color: #45624f;
+
+    font-size: 14px;
+
+  }
+
+  p {
+
+    color: #98a49b;
+
+    font-size: 12px;
+
+  }
+
+}
+
+
+// ==========================================================
+// 8. SPINNER
+// ==========================================================
+
+.spinner {
+
+  width: 19px;
+  height: 19px;
+
+  border: 3px solid #dcebe0;
+  border-top-color: #16845b;
+
+  border-radius: 50%;
+
+  animation: girar 0.8s linear infinite;
+
+}
+
+
+@keyframes girar {
+
+  to {
+    transform: rotate(360deg);
+  }
+
+}
+
+
+// ==========================================================
+// 9. MODAL
+// ==========================================================
+
+.modal-overlay {
+
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 2000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background: rgba(17, 36, 26, 0.60);
+
+  backdrop-filter: blur(4px);
+
+}
+
+
+.modal-detalle {
+
+  width: 100%;
+  max-width: 760px;
+
+  max-height: 92vh;
+
+  overflow-y: auto;
+
+  padding: 27px;
+
+  border-radius: 16px;
+
+  background: #ffffff;
+
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.20);
+
+}
+
+
+.modal-header {
+
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  gap: 15px;
+
+  padding-bottom: 19px;
+
+  border-bottom: 1px solid #eaf0eb;
+
+  h2 {
+
+    margin: 6px 0;
+
+    color: #234b36;
+
+    font-size: 23px;
+
+  }
+
+  p {
+
+    margin: 0;
+
+    color: #8a978e;
+
+    font-size: 12px;
+
+  }
+
+}
+
+
+.modal-etiqueta {
+
+  color: #16845b;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: 1px;
+
+}
+
+
+.btn-cerrar {
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 35px;
+  height: 35px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #f0f4f0;
+
+  color: #54705d;
+
+  font-size: 24px;
+
+  cursor: pointer;
+
+  &:hover {
+    background: #e3ece5;
+  }
+
+}
+
+
+// ==========================================================
+// 10. INFORMACIÓN GENERAL DEL MODAL
+// ==========================================================
+
+.detalle-resumen {
+
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 12px;
+
+  padding: 19px 0;
+
+  article {
+
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+
+    padding: 14px;
+
+    border: 1px solid #e9f0ea;
+    border-radius: 9px;
+
+    background: #f8fbf8;
+
+  }
+
+  span {
+
+    color: #89978d;
+
+    font-size: 10px;
+    font-weight: 700;
+
+  }
+
+  strong {
+
+    color: #345943;
+
+    font-size: 12px;
+
+    line-height: 1.5;
+
+  }
+
+}
+
+
+// ==========================================================
+// 11. BLOQUES MÉDICOS
+// ==========================================================
+
+.detalle-bloque {
+
+  padding: 17px 0;
+
+  border-bottom: 1px solid #edf1ed;
+
+  h3 {
+
+    margin: 0 0 10px;
+
+    color: #27714b;
+
+    font-size: 14px;
+    font-weight: 800;
+
+  }
+
+  p {
+
+    margin: 0;
+
+    color: #5c6c61;
+
+    font-size: 13px;
+
+    line-height: 1.7;
+
+    white-space: pre-line;
+
+    overflow-wrap: anywhere;
+
+  }
+
+}
+
+
+// ==========================================================
+// 12. HISTORIAL CLÍNICO
+// ==========================================================
+
+.historial-acciones {
+
+  margin-top: 20px;
+
+}
+
+
+.btn-historial {
+
+  width: 100%;
+
+  padding: 13px;
+
+  border: 1px solid #cbe5d3;
+  border-radius: 9px;
+
+  background: #edf7ef;
+
+  color: #1b754c;
+
+  font-size: 12px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  &:hover {
+    background: #e1f1e5;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: wait;
+  }
+
+}
+
+
+.historial-panel {
+
+  margin-top: 18px;
+
+  padding: 17px;
+
+  border: 1px solid #e1ece3;
+  border-radius: 11px;
+
+  background: #f8fbf8;
+
+}
+
+
+.historial-header {
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  margin-bottom: 15px;
+
+  h3 {
+
+    margin: 0;
+
+    color: #315c40;
+
+    font-size: 15px;
+
+  }
+
+  button {
+
+    padding: 7px 10px;
+
+    border: none;
+    border-radius: 6px;
+
+    background: #e7eee8;
+
+    color: #4b6351;
+
+    font-size: 11px;
+
+    cursor: pointer;
+
+  }
+
+}
+
+
+.historial-item {
+
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+
+  padding: 14px;
+
+  margin-bottom: 10px;
+
+  border-left: 3px solid #269568;
+  border-radius: 5px;
+
+  background: #ffffff;
+
+  strong {
+
+    color: #315941;
+
+    font-size: 12px;
+
+  }
+
+  span {
+
+    color: #65736a;
+
+    font-size: 11px;
+
+    line-height: 1.5;
+
+  }
+
+}
+
+
+.historial-fecha {
+
+  color: #198054;
+
+  font-size: 11px;
+  font-weight: 800;
+
+}
+
+
+.historial-vacio {
+
+  padding: 15px;
+
+  color: #859188;
+
+  font-size: 12px;
+
+  text-align: center;
+
+}
+
+
+// ==========================================================
+// 13. PIE DEL MODAL
+// ==========================================================
+
+.modal-footer {
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 15px;
+
+  padding-top: 19px;
+  margin-top: 20px;
+
+  border-top: 1px solid #eaf0eb;
+
+  span {
+
+    color: #98a39b;
+
+    font-size: 10px;
+
+  }
+
+}
+
+
+.btn-cerrar-modal {
+
+  padding: 10px 19px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #16845b;
+
+  color: white;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  &:hover {
+    background: #106c49;
+  }
+
+}
+
+
+// ==========================================================
+// 14. RESPONSIVE
+// ==========================================================
+
+@media (max-width: 1100px) {
+
+  .filtros-grid {
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  }
+
+}
+
+
+@media (max-width: 800px) {
+
+  .atenciones-container {
+
+    padding: 20px;
+
+  }
+
+  .atenciones-header {
+
+    align-items: flex-start;
+
+    flex-direction: column;
+
+  }
+
+  .estadisticas-grid {
+
+    grid-template-columns: 1fr;
+
+  }
+
+  .ranking-lista {
+
+    grid-template-columns: 1fr;
+
+  }
+
+}
+
+
+@media (max-width: 550px) {
+
+  .atenciones-container {
+
+    padding: 13px;
+
+  }
+
+  .atenciones-header h1 {
+
+    font-size: 23px;
+
+  }
+
+  .acciones-header {
+
+    width: 100%;
+
+    button {
+
+      flex: 1;
+
+      padding: 11px 8px;
+
+      font-size: 11px;
+
+    }
+
+  }
+
+  .filtros-section,
+  .ranking-section {
+
+    padding: 16px;
+
+  }
+
+  .filtros-grid {
+
+    grid-template-columns: 1fr;
+
+  }
+
+  .filtros-header {
+
+    align-items: flex-start;
+
+    flex-direction: column;
+
+  }
+
+  .acciones-filtros {
+
+    flex-direction: column;
+
+    button {
+
+      width: 100%;
+
+    }
+
+  }
+
+  .detalle-resumen {
+
+    grid-template-columns: 1fr;
+
+  }
+
+  .modal-overlay {
+
+    padding: 9px;
+
+  }
+
+  .modal-detalle {
+
+    padding: 18px;
+
+    max-height: 95vh;
+
+  }
+
+  .modal-header h2 {
+
+    font-size: 19px;
+
+  }
+
+  .modal-footer {
+
+    align-items: flex-start;
+
+    flex-direction: column;
+
+  }
+
+  .btn-cerrar-modal {
+
+    width: 100%;
+
+  }
+
+}

@@ -1,0 +1,919 @@
+
+<!-- ==========================================================
+     VETERINARIA ARÉVALO
+     ADMINISTRACIÓN DE ATENCIONES MÉDICAS
+     ========================================================== -->
+
+<div class="atenciones-container">
+
+
+  <!-- ========================================================
+       1. CABECERA
+       ======================================================== -->
+
+  <header class="atenciones-header">
+
+    <div class="header-texto">
+
+      <span class="etiqueta-pagina">
+        PANEL ADMINISTRATIVO
+      </span>
+
+      <h1>
+        Atenciones Médicas 🩺
+      </h1>
+
+      <p>
+        Supervisa las consultas, diagnósticos y tratamientos
+        realizados por los profesionales veterinarios.
+      </p>
+
+    </div>
+
+    <div class="acciones-header">
+
+      <button
+        type="button"
+        class="btn-actualizar"
+        (click)="actualizarDatos()"
+        [disabled]="cargando"
+      >
+        ↻ Actualizar
+      </button>
+
+      <button
+        type="button"
+        class="btn-volver"
+        (click)="volverDashboard()"
+      >
+        ← Volver al panel
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <!-- ========================================================
+       2. MENSAJES
+       ======================================================== -->
+
+  <div
+    class="mensaje-exito"
+    *ngIf="mensajeExito"
+    role="status"
+  >
+    ✓ {{ mensajeExito }}
+  </div>
+
+
+  <div
+    class="mensaje-error"
+    *ngIf="mensajeError"
+    role="alert"
+  >
+
+    ⚠ {{ mensajeError }}
+
+    <button
+      type="button"
+      *ngIf="errorCarga"
+      (click)="cargarAtenciones()"
+    >
+      Reintentar
+    </button>
+
+  </div>
+
+
+  <!-- ========================================================
+       3. ESTADÍSTICAS GENERALES
+       ======================================================== -->
+
+  <section class="estadisticas-section">
+
+    <div class="seccion-titulo">
+
+      <div>
+        <h2>Resumen general</h2>
+
+        <p>
+          Estadísticas globales de la veterinaria.
+        </p>
+      </div>
+
+      <span class="estadisticas-etiqueta">
+        DATOS GENERALES
+      </span>
+
+    </div>
+
+
+    <div
+      class="estadisticas-grid"
+      *ngIf="!cargandoEstadisticas && !errorEstadisticas"
+    >
+
+      <!-- TOTAL ATENCIONES -->
+
+      <article class="estadistica-card">
+
+        <div class="estadistica-icono icono-verde">
+          🩺
+        </div>
+
+        <div class="estadistica-datos">
+
+          <span>Total de atenciones</span>
+
+          <strong>
+            {{ estadisticas.totalAtenciones }}
+          </strong>
+
+          <small>
+            Consultas registradas
+          </small>
+
+        </div>
+
+      </article>
+
+
+      <!-- MASCOTAS -->
+
+      <article class="estadistica-card">
+
+        <div class="estadistica-icono icono-azul">
+          🐾
+        </div>
+
+        <div class="estadistica-datos">
+
+          <span>Mascotas atendidas</span>
+
+          <strong>
+            {{ estadisticas.totalMascotasAtendidas }}
+          </strong>
+
+          <small>
+            Mascotas diferentes
+          </small>
+
+        </div>
+
+      </article>
+
+
+      <!-- VETERINARIOS -->
+
+      <article class="estadistica-card">
+
+        <div class="estadistica-icono icono-violeta">
+          👨‍⚕️
+        </div>
+
+        <div class="estadistica-datos">
+
+          <span>Veterinarios activos en atención</span>
+
+          <strong>
+            {{ estadisticas.totalVeterinariosConAtenciones }}
+          </strong>
+
+          <small>
+            Profesionales con registros
+          </small>
+
+        </div>
+
+      </article>
+
+    </div>
+
+
+    <div
+      class="estado-cargando"
+      *ngIf="cargandoEstadisticas"
+    >
+      Calculando estadísticas...
+    </div>
+
+
+    <div
+      class="estadisticas-error"
+      *ngIf="errorEstadisticas"
+    >
+
+      {{ mensajeErrorEstadisticas }}
+
+      <button
+        type="button"
+        (click)="cargarEstadisticas()"
+      >
+        Reintentar
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <!-- ========================================================
+       4. RESUMEN POR VETERINARIO
+       ======================================================== -->
+
+  <section
+    class="ranking-section"
+    *ngIf="
+      !cargandoEstadisticas &&
+      !errorEstadisticas &&
+      estadisticas.atencionesPorVeterinario.length > 0
+    "
+  >
+
+    <div class="seccion-titulo">
+
+      <div>
+
+        <h2>Atenciones por veterinario</h2>
+
+        <p>
+          Distribución de las consultas registradas.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="ranking-lista">
+
+      <article
+        class="ranking-item"
+        *ngFor="
+          let veterinario of estadisticas.atencionesPorVeterinario
+        "
+      >
+
+        <div class="ranking-datos">
+
+          <div class="ranking-avatar">
+            👨‍⚕️
+          </div>
+
+          <div class="ranking-nombre">
+
+            <strong>
+              {{ veterinario.nombreVeterinario }}
+            </strong>
+
+            <span>
+              {{ veterinario.totalAtenciones }}
+              atenciones realizadas
+            </span>
+
+          </div>
+
+          <strong class="ranking-total">
+            {{ veterinario.totalAtenciones }}
+          </strong>
+
+        </div>
+
+
+        <progress
+          class="barra-progreso"
+          [value]="porcentajeVeterinario(veterinario.totalAtenciones)"
+          max="100"
+        ></progress>
+
+      </article>
+
+    </div>
+
+  </section>
+
+
+  <!-- ========================================================
+       5. BUSCADOR Y FILTROS
+       ======================================================== -->
+
+  <section class="filtros-section">
+
+    <div class="filtros-header">
+
+      <div>
+
+        <h2>Registro de atenciones</h2>
+
+        <p>
+          Busca y consulta los registros médicos.
+        </p>
+
+      </div>
+
+      <span class="contador-registros">
+        {{ atencionesFiltradas.length }}
+        resultados
+      </span>
+
+    </div>
+
+
+    <div class="filtros-grid">
+
+
+      <!-- BUSCADOR -->
+
+      <div class="campo-filtro campo-busqueda">
+
+        <label for="buscarAtencion">
+          Buscar atención
+        </label>
+
+        <input
+          id="buscarAtencion"
+          type="text"
+          [(ngModel)]="busqueda"
+          placeholder="Mascota, veterinario, diagnóstico..."
+        />
+
+      </div>
+
+
+      <!-- VETERINARIO -->
+
+      <div class="campo-filtro">
+
+        <label for="filtroVeterinario">
+          Veterinario
+        </label>
+
+        <select
+          id="filtroVeterinario"
+          [(ngModel)]="filtroVeterinario"
+        >
+
+          <option value="TODOS">
+            Todos los veterinarios
+          </option>
+
+          <option
+            *ngFor="let veterinario of veterinariosDisponibles"
+            [value]="veterinario.veterinarioId"
+          >
+            {{ veterinario.nombreVeterinario }}
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- FECHA INICIAL -->
+
+      <div class="campo-filtro">
+
+        <label for="fechaDesde">
+          Fecha desde
+        </label>
+
+        <input
+          id="fechaDesde"
+          type="date"
+          [(ngModel)]="fechaDesde"
+        />
+
+      </div>
+
+
+      <!-- FECHA FINAL -->
+
+      <div class="campo-filtro">
+
+        <label for="fechaHasta">
+          Fecha hasta
+        </label>
+
+        <input
+          id="fechaHasta"
+          type="date"
+          [(ngModel)]="fechaHasta"
+        />
+
+      </div>
+
+    </div>
+
+
+    <div class="acciones-filtros">
+
+      <button
+        type="button"
+        class="btn-aplicar"
+        (click)="cargarAtenciones()"
+        [disabled]="cargando"
+      >
+        Aplicar fechas
+      </button>
+
+      <button
+        type="button"
+        class="btn-limpiar"
+        (click)="limpiarFiltros()"
+        [disabled]="cargando"
+      >
+        Limpiar filtros
+      </button>
+
+    </div>
+
+    <p class="ayuda-filtros">
+      El rango de fechas se consulta en el servidor.
+      La búsqueda y el filtro por veterinario se aplican
+      sobre los resultados obtenidos.
+    </p>
+
+  </section>
+
+
+  <!-- ========================================================
+       6. TABLA DE ATENCIONES
+       ======================================================== -->
+
+  <section class="tabla-section">
+
+
+    <!-- CARGANDO -->
+
+    <div
+      class="estado-cargando"
+      *ngIf="cargando"
+    >
+      <span class="spinner"></span>
+
+      Consultando registros médicos...
+
+    </div>
+
+
+    <div
+      class="tabla-responsive"
+      *ngIf="!cargando && !errorCarga"
+    >
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>Fecha</th>
+
+            <th>Mascota</th>
+
+            <th>Veterinario</th>
+
+            <th>Diagnóstico</th>
+
+            <th>Tratamiento</th>
+
+            <th>Acciones</th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          <tr
+            *ngFor="let atencion of atencionesFiltradas"
+          >
+
+            <!-- FECHA -->
+
+            <td>
+
+              <span class="fecha-principal">
+                {{ atencion.fechaAtencion | date:'dd/MM/yyyy' }}
+              </span>
+
+              <small>
+                {{ atencion.fechaAtencion | date:'HH:mm' }}
+              </small>
+
+            </td>
+
+
+            <!-- MASCOTA -->
+
+            <td>
+
+              <div class="celda-mascota">
+
+                <span class="mascota-icono">
+                  🐾
+                </span>
+
+                <div>
+
+                  <strong>
+                    {{ atencion.nombreMascota }}
+                  </strong>
+
+                  <small>
+                    Mascota #{{ atencion.mascotaId }}
+                  </small>
+
+                </div>
+
+              </div>
+
+            </td>
+
+
+            <!-- VETERINARIO -->
+
+            <td>
+
+              <div class="celda-veterinario">
+
+                <strong>
+                  {{ atencion.nombreVeterinario }}
+                </strong>
+
+                <small>
+                  Profesional #{{ atencion.veterinarioId }}
+                </small>
+
+              </div>
+
+            </td>
+
+
+            <!-- DIAGNÓSTICO -->
+
+            <td>
+
+              <span class="texto-resumen">
+                {{ atencion.diagnostico }}
+              </span>
+
+            </td>
+
+
+            <!-- TRATAMIENTO -->
+
+            <td>
+
+              <span class="texto-resumen">
+                {{ atencion.tratamiento }}
+              </span>
+
+            </td>
+
+
+            <!-- ACCIONES -->
+
+            <td>
+
+              <button
+                type="button"
+                class="btn-detalle"
+                (click)="abrirDetalle(atencion)"
+              >
+                Ver detalle
+              </button>
+
+            </td>
+
+          </tr>
+
+
+          <!-- SIN RESULTADOS -->
+
+          <tr
+            *ngIf="atencionesFiltradas.length === 0"
+          >
+
+            <td colspan="6">
+
+              <div class="sin-resultados">
+
+                <span>🔎</span>
+
+                <strong>
+                  No se encontraron atenciones médicas.
+                </strong>
+
+                <p>
+                  Prueba cambiando los filtros de búsqueda.
+                </p>
+
+              </div>
+
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </section>
+
+
+  <!-- ========================================================
+       7. MODAL DE DETALLE
+       ======================================================== -->
+
+  <div
+    class="modal-overlay"
+    *ngIf="atencionSeleccionada as atencion"
+    (click)="cerrarDetalle()"
+  >
+
+    <section
+      class="modal-detalle"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="titulo-detalle"
+      (click)="$event.stopPropagation()"
+    >
+
+
+      <!-- CABECERA DEL MODAL -->
+
+      <header class="modal-header">
+
+        <div>
+
+          <span class="modal-etiqueta">
+            HISTORIAL MÉDICO
+          </span>
+
+          <h2 id="titulo-detalle">
+            Detalle de atención
+          </h2>
+
+          <p>
+            Registro médico #{{ atencion.id }}
+          </p>
+
+        </div>
+
+
+        <button
+          type="button"
+          class="btn-cerrar"
+          aria-label="Cerrar detalle"
+          (click)="cerrarDetalle()"
+        >
+          ×
+        </button>
+
+      </header>
+
+
+      <!-- INFORMACIÓN GENERAL -->
+
+      <div class="detalle-resumen">
+
+        <article>
+
+          <span>Mascota</span>
+
+          <strong>
+            🐾 {{ atencion.nombreMascota }}
+          </strong>
+
+        </article>
+
+
+        <article>
+
+          <span>Veterinario</span>
+
+          <strong>
+            {{ atencion.nombreVeterinario }}
+          </strong>
+
+        </article>
+
+
+        <article>
+
+          <span>Fecha de atención</span>
+
+          <strong>
+            {{ atencion.fechaAtencion | date:'dd/MM/yyyy HH:mm' }}
+          </strong>
+
+        </article>
+
+
+        <article>
+
+          <span>Cita relacionada</span>
+
+          <strong>
+            #{{ atencion.citaId }}
+          </strong>
+
+        </article>
+
+      </div>
+
+
+      <!-- DIAGNÓSTICO -->
+
+      <div class="detalle-bloque">
+
+        <h3>🩺 Diagnóstico</h3>
+
+        <p>
+          {{ atencion.diagnostico }}
+        </p>
+
+      </div>
+
+
+      <!-- TRATAMIENTO -->
+
+      <div class="detalle-bloque">
+
+        <h3>💚 Tratamiento</h3>
+
+        <p>
+          {{ atencion.tratamiento }}
+        </p>
+
+      </div>
+
+
+      <!-- OBSERVACIONES -->
+
+      <div
+        class="detalle-bloque"
+        *ngIf="atencion.observaciones"
+      >
+
+        <h3>📝 Observaciones</h3>
+
+        <p>
+          {{ atencion.observaciones }}
+        </p>
+
+      </div>
+
+
+      <!-- MEDICAMENTOS UTILIZADOS -->
+
+      <div class="detalle-bloque">
+
+        <h3>💊 Medicamentos utilizados</h3>
+
+        <p>
+          {{
+            atencion.medicamentosUtilizados ||
+            'No se registraron medicamentos utilizados.'
+          }}
+        </p>
+
+      </div>
+
+
+      <!-- MEDICAMENTOS RECETADOS -->
+
+      <div class="detalle-bloque">
+
+        <h3>📋 Medicamentos recetados</h3>
+
+        <p>
+          {{
+            atencion.medicamentosRecetados ||
+            'No se registraron medicamentos recetados.'
+          }}
+        </p>
+
+      </div>
+
+
+      <!-- HISTORIAL DE LA MASCOTA -->
+
+      <div class="historial-acciones">
+
+        <button
+          type="button"
+          class="btn-historial"
+          (click)="verHistorialMascota()"
+          [disabled]="cargandoHistorial"
+        >
+
+          {{
+            cargandoHistorial
+              ? 'Consultando historial...'
+              : '📚 Ver historial clínico de esta mascota'
+          }}
+
+        </button>
+
+      </div>
+
+
+      <!-- RESULTADOS DEL HISTORIAL -->
+
+      <section
+        class="historial-panel"
+        *ngIf="historialVisible"
+      >
+
+        <div class="historial-header">
+
+          <h3>
+            Historial de {{ atencion.nombreMascota }}
+          </h3>
+
+          <button
+            type="button"
+            (click)="cerrarHistorial()"
+          >
+            Cerrar
+          </button>
+
+        </div>
+
+
+        <div
+          class="estado-cargando"
+          *ngIf="cargandoHistorial"
+        >
+          Consultando historial...
+        </div>
+
+
+        <div
+          class="historial-vacio"
+          *ngIf="
+            !cargandoHistorial &&
+            historialMascota.length === 0
+          "
+        >
+          No existen registros en el historial.
+        </div>
+
+
+        <article
+          class="historial-item"
+          *ngFor="let registro of historialMascota"
+        >
+
+          <div class="historial-fecha">
+
+            {{ registro.fechaAtencion | date:'dd/MM/yyyy HH:mm' }}
+
+          </div>
+
+          <strong>
+            {{ registro.nombreVeterinario }}
+          </strong>
+
+          <span>
+            Diagnóstico: {{ registro.diagnostico }}
+          </span>
+
+          <span>
+            Tratamiento: {{ registro.tratamiento }}
+          </span>
+
+        </article>
+
+      </section>
+
+
+      <!-- PIE -->
+
+      <footer class="modal-footer">
+
+        <span>
+          Consulta administrativa de solo lectura.
+        </span>
+
+        <button
+          type="button"
+          class="btn-cerrar-modal"
+          (click)="cerrarDetalle()"
+        >
+          Cerrar
+        </button>
+
+      </footer>
+
+    </section>
+
+  </div>
+
+</div>

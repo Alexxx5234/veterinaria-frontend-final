@@ -1,0 +1,1003 @@
+
+<!-- ==========================================================
+     VETERINARIA ARÉVALO
+     FACTURACIÓN ADMINISTRATIVA
+
+     El administrador puede:
+     - Consultar todas las facturas.
+     - Filtrar por propietario y mascota.
+     - Buscar por veterinario.
+     - Consultar ingresos.
+     - Descargar PDF.
+     - Consultar detalles de medicamentos.
+
+     No permite modificar ni emitir facturas.
+========================================================== -->
+
+<div class="facturas-admin">
+
+  <!-- ========================================================
+       1. ENCABEZADO
+  ========================================================= -->
+
+  <header class="facturas-admin__header">
+
+    <div>
+      <span class="facturas-admin__eyebrow">
+        PANEL ADMINISTRATIVO
+      </span>
+
+      <h1>🧾 Facturación de la clínica</h1>
+
+      <p>
+        Supervisa las facturas emitidas por todos los veterinarios
+        y consulta los ingresos de Veterinaria Arévalo.
+      </p>
+    </div>
+
+    <div class="facturas-admin__acciones">
+
+      <button
+        type="button"
+        class="btn btn--secundario"
+        (click)="cargarFacturas()"
+        [disabled]="cargando">
+
+        {{ cargando ? 'Consultando...' : '↻ Actualizar' }}
+
+      </button>
+
+      <button
+        type="button"
+        class="btn btn--principal"
+        (click)="exportarCSV()"
+        [disabled]="facturasFiltradas.length === 0">
+
+        ↓ Exportar CSV
+
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <!-- ========================================================
+       2. MENSAJES
+  ========================================================= -->
+
+  <div
+    *ngIf="error"
+    class="alerta alerta--error"
+    role="alert">
+
+    <span>⚠️ {{ error }}</span>
+
+    <button
+      type="button"
+      (click)="cargarFacturas()">
+
+      Reintentar
+
+    </button>
+
+  </div>
+
+
+  <div
+    *ngIf="mensaje"
+    class="alerta"
+    [ngClass]="'alerta--' + tipoMensaje"
+    role="status"
+    aria-live="polite">
+
+    {{ mensaje }}
+
+    <button
+      type="button"
+      aria-label="Cerrar mensaje"
+      (click)="mensaje = ''">
+
+      ×
+
+    </button>
+
+  </div>
+
+
+  <!-- ========================================================
+       3. INDICADORES FINANCIEROS
+  ========================================================= -->
+
+  <section
+    class="facturas-admin__indicadores"
+    aria-label="Resumen financiero">
+
+    <!-- TOTAL HISTÓRICO -->
+
+    <article class="indicador">
+
+      <div class="indicador__icono indicador__icono--verde">
+        💰
+      </div>
+
+      <div>
+        <span>Total facturado</span>
+
+        <strong>
+          {{ formatoDinero(totalFacturado) }}
+        </strong>
+
+        <small>
+          Facturas emitidas históricamente
+        </small>
+      </div>
+
+    </article>
+
+
+    <!-- INGRESOS DEL DÍA -->
+
+    <article class="indicador">
+
+      <div class="indicador__icono indicador__icono--azul">
+        📅
+      </div>
+
+      <div>
+        <span>Ingresos de hoy</span>
+
+        <strong>
+          {{ formatoDinero(ingresosHoy) }}
+        </strong>
+
+        <small>
+          {{ facturasHoy }} facturas emitidas hoy
+        </small>
+      </div>
+
+    </article>
+
+
+    <!-- INGRESOS DEL MES -->
+
+    <article class="indicador">
+
+      <div class="indicador__icono indicador__icono--morado">
+        📊
+      </div>
+
+      <div>
+        <span>Ingresos del mes</span>
+
+        <strong>
+          {{ formatoDinero(ingresosMesActual) }}
+        </strong>
+
+        <small>
+          Mes actual
+        </small>
+      </div>
+
+    </article>
+
+
+    <!-- CORREOS ENVIADOS -->
+
+    <article class="indicador">
+
+      <div class="indicador__icono indicador__icono--naranja">
+        ✉️
+      </div>
+
+      <div>
+        <span>Correos enviados</span>
+
+        <strong>
+          {{ correosEnviados }}
+        </strong>
+
+        <small>
+          {{ correosPendientes }} pendientes de envío
+        </small>
+      </div>
+
+    </article>
+
+  </section>
+
+
+  <!-- ========================================================
+       4. FILTROS DE FACTURACIÓN
+  ========================================================= -->
+
+  <section
+    class="panel-filtros"
+    aria-labelledby="titulo-filtros">
+
+    <div class="panel-filtros__heading">
+
+      <div>
+        <span class="panel-filtros__eyebrow">
+          BÚSQUEDA
+        </span>
+
+        <h2 id="titulo-filtros">
+          Buscar y filtrar facturas
+        </h2>
+
+        <p>
+          Localiza rápidamente cualquier comprobante.
+        </p>
+      </div>
+
+      <span class="contador-resultados">
+        {{ totalResultados }} resultados
+      </span>
+
+    </div>
+
+
+    <!-- FILTROS -->
+
+    <div class="filtros-grid">
+
+      <!-- BÚSQUEDA GENERAL -->
+
+      <div class="campo campo--busqueda">
+
+        <label for="buscarFacturaAdmin">
+          Propietario, mascota, veterinario o número
+        </label>
+
+        <input
+          id="buscarFacturaAdmin"
+          type="search"
+          [(ngModel)]="filtros.busqueda"
+          (ngModelChange)="aplicarFiltros()"
+          placeholder="Ej. Juan Pérez, Max o INT-00000001"
+          autocomplete="off">
+
+      </div>
+
+
+      <!-- FECHA EXACTA -->
+
+      <div class="campo">
+
+        <label for="fechaFacturaAdmin">
+          Día específico
+        </label>
+
+        <input
+          id="fechaFacturaAdmin"
+          type="date"
+          [(ngModel)]="filtros.fecha"
+          (ngModelChange)="aplicarFiltros()">
+
+      </div>
+
+
+      <!-- DESDE -->
+
+      <div class="campo">
+
+        <label for="fechaDesdeAdmin">
+          Desde
+        </label>
+
+        <input
+          id="fechaDesdeAdmin"
+          type="date"
+          [(ngModel)]="filtros.desde"
+          (ngModelChange)="aplicarFiltros()">
+
+      </div>
+
+
+      <!-- HASTA -->
+
+      <div class="campo">
+
+        <label for="fechaHastaAdmin">
+          Hasta
+        </label>
+
+        <input
+          id="fechaHastaAdmin"
+          type="date"
+          [(ngModel)]="filtros.hasta"
+          (ngModelChange)="aplicarFiltros()">
+
+      </div>
+
+
+      <!-- ESTADO -->
+
+      <div class="campo">
+
+        <label for="estadoFacturaAdmin">
+          Estado de factura
+        </label>
+
+        <select
+          id="estadoFacturaAdmin"
+          [(ngModel)]="filtros.estado"
+          (ngModelChange)="aplicarFiltros()">
+
+          <option value="TODOS">
+            Todos los estados
+          </option>
+
+          <option value="EMITIDA">
+            Emitidas
+          </option>
+
+          <option value="PENDIENTE">
+            Pendientes
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- CORREO -->
+
+      <div class="campo">
+
+        <label for="correoFacturaAdmin">
+          Estado del correo
+        </label>
+
+        <select
+          id="correoFacturaAdmin"
+          [(ngModel)]="filtros.correo"
+          (ngModelChange)="aplicarFiltros()">
+
+          <option value="TODOS">
+            Todos
+          </option>
+
+          <option value="ENVIADO">
+            Enviado
+          </option>
+
+          <option value="PENDIENTE">
+            Pendiente
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+
+    <!-- FILTROS RÁPIDOS -->
+
+    <div class="filtros-rapidos">
+
+      <span>Accesos rápidos:</span>
+
+      <button
+        type="button"
+        (click)="filtrarHoy()">
+
+        📅 Facturas de hoy
+
+      </button>
+
+      <button
+        type="button"
+        (click)="filtrarMesActual()">
+
+        📊 Este mes
+
+      </button>
+
+      <button
+        type="button"
+        class="btn-limpiar"
+        (click)="limpiarFiltros()">
+
+        Limpiar filtros
+
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <!-- ========================================================
+       5. LISTADO DE FACTURAS
+  ========================================================= -->
+
+  <section
+    class="panel-listado"
+    aria-labelledby="titulo-listado">
+
+    <div class="panel-listado__heading">
+
+      <div>
+
+        <span class="panel-filtros__eyebrow">
+          REGISTROS
+        </span>
+
+        <h2 id="titulo-listado">
+          Todas las facturas
+        </h2>
+
+        <p>
+          Comprobantes emitidos por los profesionales de la clínica.
+        </p>
+
+      </div>
+
+      <span class="total-registros">
+        {{ totalFacturas }} facturas registradas
+      </span>
+
+    </div>
+
+
+    <!-- CARGANDO -->
+
+    <div
+      *ngIf="cargando"
+      class="estado-vacio"
+      role="status"
+      aria-live="polite">
+
+      <span>⏳</span>
+
+      <strong>
+        Consultando facturación...
+      </strong>
+
+      <small>
+        Espera mientras se recuperan los registros.
+      </small>
+
+    </div>
+
+
+    <!-- SIN FACTURAS -->
+
+    <div
+      *ngIf="
+        !cargando &&
+        !error &&
+        facturas.length === 0
+      "
+      class="estado-vacio">
+
+      <span>🧾</span>
+
+      <strong>
+        Todavía no hay facturas
+      </strong>
+
+      <small>
+        Cuando los veterinarios emitan comprobantes,
+        aparecerán en este apartado.
+      </small>
+
+    </div>
+
+
+    <!-- SIN RESULTADOS -->
+
+    <div
+      *ngIf="
+        !cargando &&
+        !error &&
+        facturas.length > 0 &&
+        facturasFiltradas.length === 0
+      "
+      class="estado-vacio">
+
+      <span>🔎</span>
+
+      <strong>
+        No encontramos resultados
+      </strong>
+
+      <small>
+        Modifica los filtros para encontrar otras facturas.
+      </small>
+
+      <button
+        type="button"
+        class="btn btn--secundario"
+        (click)="limpiarFiltros()">
+
+        Limpiar búsqueda
+
+      </button>
+
+    </div>
+
+
+    <!-- TABLA -->
+
+    <div
+      class="tabla-contenedor"
+      *ngIf="
+        !cargando &&
+        facturasFiltradas.length > 0
+      ">
+
+      <table class="tabla-facturas">
+
+        <thead>
+
+          <tr>
+
+            <th>Número</th>
+
+            <th>Fecha</th>
+
+            <th>Propietario</th>
+
+            <th>Mascota</th>
+
+            <th>Veterinario</th>
+
+            <th>Total</th>
+
+            <th>Estado</th>
+
+            <th>Correo</th>
+
+            <th>Acciones</th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          <tr
+            *ngFor="
+              let factura of facturasPagina;
+              trackBy: identificarFactura
+            ">
+
+            <!-- NÚMERO -->
+
+            <td data-label="Número">
+
+              <strong class="numero-factura">
+                {{ factura.numeroFactura }}
+              </strong>
+
+            </td>
+
+
+            <!-- FECHA -->
+
+            <td data-label="Fecha">
+
+              {{ mostrarFecha(factura) }}
+
+            </td>
+
+
+            <!-- PROPIETARIO -->
+
+            <td data-label="Propietario">
+
+              <strong>
+                {{ factura.nombreCliente }}
+              </strong>
+
+              <small class="correo-cliente">
+                {{ factura.correoCliente }}
+              </small>
+
+            </td>
+
+
+            <!-- MASCOTA -->
+
+            <td data-label="Mascota">
+
+              🐾 {{ factura.nombreMascota }}
+
+            </td>
+
+
+            <!-- VETERINARIO -->
+
+            <td data-label="Veterinario">
+
+              {{ factura.nombreVeterinario }}
+
+            </td>
+
+
+            <!-- TOTAL -->
+
+            <td
+              data-label="Total"
+              class="columna-total">
+
+              {{ formatoDinero(factura.total) }}
+
+            </td>
+
+
+            <!-- ESTADO -->
+
+            <td data-label="Estado">
+
+              <span
+                [class]="claseEstado(factura.estado)">
+
+                {{ nombreEstado(factura.estado) }}
+
+              </span>
+
+            </td>
+
+
+            <!-- CORREO -->
+
+            <td data-label="Correo">
+
+              <span
+                class="estado-correo"
+                [class.estado-correo--enviado]="factura.correoEnviado"
+                [class.estado-correo--pendiente]="!factura.correoEnviado">
+
+                {{ factura.correoEnviado ? '✓ Enviado' : 'Pendiente' }}
+
+              </span>
+
+            </td>
+
+
+            <!-- ACCIONES -->
+
+            <td data-label="Acciones">
+
+              <div class="acciones-tabla">
+
+                <button
+                  type="button"
+                  class="btn-accion btn-accion--detalle"
+                  (click)="abrirDetalle(factura)"
+                  [attr.aria-label]="'Ver factura ' + factura.numeroFactura">
+
+                  Ver
+
+                </button>
+
+                <button
+                  type="button"
+                  class="btn-accion btn-accion--pdf"
+                  (click)="descargarPdf(factura)"
+                  [disabled]="descargandoId !== null"
+                  [attr.aria-label]="'Descargar PDF ' + factura.numeroFactura">
+
+                  {{
+                    descargandoId === factura.id
+                      ? 'Descargando...'
+                      : 'PDF'
+                  }}
+
+                </button>
+
+              </div>
+
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+
+    <!-- ======================================================
+         6. PAGINACIÓN
+    ======================================================= -->
+
+    <div
+      class="paginacion"
+      *ngIf="
+        !cargando &&
+        facturasFiltradas.length > 0
+      ">
+
+      <span>
+        Página {{ paginaActual }} de {{ totalPaginas }}
+      </span>
+
+      <div>
+
+        <button
+          type="button"
+          class="btn btn--secundario"
+          (click)="paginaAnterior()"
+          [disabled]="paginaActual === 1">
+
+          ← Anterior
+
+        </button>
+
+        <button
+          type="button"
+          class="btn btn--secundario"
+          (click)="paginaSiguiente()"
+          [disabled]="paginaActual >= totalPaginas">
+
+          Siguiente →
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- ========================================================
+       7. MODAL DE DETALLE
+  ========================================================= -->
+
+  <div
+    class="modal-fondo"
+    *ngIf="facturaSeleccionada as factura"
+    (click)="cerrarDetalle()">
+
+    <section
+      class="modal-factura"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="titulo-detalle-factura"
+      (click)="$event.stopPropagation()">
+
+
+      <!-- CABECERA -->
+
+      <header class="modal-factura__header">
+
+        <div>
+
+          <span>DETALLE DEL COMPROBANTE</span>
+
+          <h2 id="titulo-detalle-factura">
+            {{ factura.numeroFactura }}
+          </h2>
+
+          <small>
+            {{ mostrarFecha(factura) }}
+          </small>
+
+        </div>
+
+        <button
+          type="button"
+          class="modal-cerrar"
+          aria-label="Cerrar detalle"
+          (click)="cerrarDetalle()">
+
+          ×
+
+        </button>
+
+      </header>
+
+
+      <!-- DATOS GENERALES -->
+
+      <div class="modal-factura__contenido">
+
+        <section class="detalle-seccion">
+
+          <h3>Información del propietario</h3>
+
+          <div class="detalle-grid">
+
+            <div>
+              <small>Cliente</small>
+              <strong>{{ factura.nombreCliente }}</strong>
+            </div>
+
+            <div>
+              <small>Correo</small>
+              <strong>{{ factura.correoCliente }}</strong>
+            </div>
+
+            <div>
+              <small>Mascota</small>
+              <strong>{{ factura.nombreMascota }}</strong>
+            </div>
+
+            <div>
+              <small>Veterinario</small>
+              <strong>{{ factura.nombreVeterinario }}</strong>
+            </div>
+
+            <div>
+              <small>Servicio</small>
+              <strong>{{ factura.nombreServicio }}</strong>
+            </div>
+
+            <div>
+              <small>Atención médica</small>
+              <strong>#{{ factura.atencionId }}</strong>
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- SERVICIO -->
+
+        <section class="detalle-seccion">
+
+          <h3>Conceptos facturados</h3>
+
+          <div class="detalle-linea">
+
+            <div>
+              <strong>
+                {{ factura.nombreServicio }}
+              </strong>
+
+              <small>
+                Servicio veterinario
+              </small>
+            </div>
+
+            <strong>
+              {{ formatoDinero(factura.precioServicio) }}
+            </strong>
+
+          </div>
+
+
+          <!-- MEDICAMENTOS -->
+
+          <div
+            class="detalle-linea"
+            *ngFor="let medicamento of factura.medicamentos">
+
+            <div>
+
+              <strong>
+                {{ medicamento.nombreMedicamento }}
+              </strong>
+
+              <small>
+                {{ medicamento.tipoRegistro | titlecase }}
+                · {{ medicamento.cantidad }}
+                {{ medicamento.unidadMedida }}
+              </small>
+
+              <small *ngIf="medicamento.indicaciones">
+                {{ medicamento.indicaciones }}
+              </small>
+
+            </div>
+
+            <strong>
+              {{ formatoDinero(medicamento.subtotal) }}
+            </strong>
+
+          </div>
+
+          <p
+            class="sin-medicamentos"
+            *ngIf="factura.medicamentos.length === 0">
+
+            Esta atención no registra medicamentos facturados.
+
+          </p>
+
+        </section>
+
+
+        <!-- RESUMEN -->
+
+        <section class="resumen-factura">
+
+          <div>
+            <span>Total medicamentos</span>
+            <strong>
+              {{ formatoDinero(factura.totalMedicamentos) }}
+            </strong>
+          </div>
+
+          <div>
+            <span>Subtotal</span>
+            <strong>
+              {{ formatoDinero(factura.subtotal) }}
+            </strong>
+          </div>
+
+          <div>
+            <span>Impuestos registrados</span>
+            <strong>
+              {{ formatoDinero(factura.impuestos) }}
+            </strong>
+          </div>
+
+          <div class="resumen-factura__total">
+            <span>TOTAL</span>
+            <strong>
+              {{ formatoDinero(factura.total) }}
+            </strong>
+          </div>
+
+        </section>
+
+
+        <!-- ESTADO DEL CORREO -->
+
+        <div class="nota-correo">
+
+          <strong>Estado del envío por correo</strong>
+
+          <p>
+            {{
+              factura.correoEnviado
+                ? 'El sistema registra que el servidor de correo aceptó el envío.'
+                : 'La factura todavía no figura como enviada por correo.'
+            }}
+          </p>
+
+          <small>
+            El administrador puede supervisar el estado.
+            El envío está reservado al veterinario responsable.
+          </small>
+
+        </div>
+
+      </div>
+
+
+      <!-- BOTONES -->
+
+      <footer class="modal-factura__footer">
+
+        <button
+          type="button"
+          class="btn btn--secundario"
+          (click)="cerrarDetalle()">
+
+          Cerrar
+
+        </button>
+
+        <button
+          type="button"
+          class="btn btn--principal"
+          (click)="descargarPdf(factura)"
+          [disabled]="descargandoId !== null">
+
+          {{
+            descargandoId === factura.id
+              ? 'Descargando...'
+              : '↓ Descargar PDF'
+          }}
+
+        </button>
+
+      </footer>
+
+    </section>
+
+  </div>
+
+</div>

@@ -1,225 +1,139 @@
 
 <!-- ==========================================================
-     VETERINARIA AREVALO
-     PÁGINA: SERVICIOS (USER)
+ VETERINARIA ARÉVALO · SERVICIOS · USER
 
-     MEJORAS DE UI / UX:
-     - Encabezado organizado.
-     - Resumen de servicios disponibles.
-     - Búsqueda y ordenamiento.
-     - Precios claros.
-     - Navegación a Mis Citas.
-     - Mensajes accesibles.
-     - Diseño responsivo.
+ Funcionalidades conservadas:
+ 1. Consultar catálogo de servicios.
+ 2. Buscar por nombre y descripción.
+ 3. Ordenar por nombre o precio.
+ 4. Mostrar precios reales de Spring Boot.
+ 5. Consultar detalles de cada servicio.
+ 6. Navegar a Mis Citas.
 
-     El menú lateral y la accesibilidad están
-     integrados en LayoutPrivado.
-     ========================================================== -->
+ Nuevo: accesos rápidos y diseño verde.
+========================================================== -->
 
 <div class="servicios-container">
 
-
-  <!-- ========================================================
-       1. CABECERA
-       ======================================================== -->
-
+  <!-- 1. ENCABEZADO -->
   <header class="servicios-header">
-
     <div class="header-texto">
-
-      <span class="etiqueta-pagina">
-        NUESTROS SERVICIOS
-      </span>
-
-      <h1>
-        Servicios Veterinarios 🩺
-      </h1>
-
+      <span class="etiqueta-pagina">NUESTROS SERVICIOS</span>
+      <h1>Servicios Veterinarios 🩺</h1>
       <p>
         Conoce los servicios disponibles para el
         cuidado y bienestar de tus mascotas.
       </p>
-
     </div>
 
-
-    <!-- BOTONES DE NAVEGACIÓN -->
     <div class="acciones-header">
-
       <button
         type="button"
         class="btn-agendar"
-        (click)="irCitas()"
-      >
+        (click)="irCitas()">
         📅 Agendar cita
       </button>
 
       <button
         type="button"
         class="btn-volver"
-        (click)="volverDashboard()"
-      >
+        (click)="volverDashboard()">
         ← Volver al panel
       </button>
-
     </div>
-
   </header>
 
+  <!-- 2. ACCESOS RÁPIDOS -->
+  <nav class="user-accesos" aria-label="Accesos rápidos del cliente">
+    <a href="/usuario/dashboard">🏠 Inicio</a>
+    <a href="/usuario/mascotas">🐾 Mis Mascotas</a>
+    <a href="/usuario/citas">📅 Mis Citas</a>
+    <a href="/usuario/atenciones">🩺 Mis Atenciones</a>
+    <a href="/usuario/facturas">🧾 Mis Facturas</a>
+    <a href="/usuario/veterinarios">👨‍⚕️ Veterinarios</a>
+  </nav>
 
-  <!-- ========================================================
-       2. MENSAJES DE LA APLICACIÓN
-       ======================================================== -->
-
-  <!-- MENSAJE DE ÉXITO -->
+  <!-- 3. MENSAJES -->
   <div
     class="mensaje-exito"
     *ngIf="mensajeExito"
-    role="status"
-  >
-    <span aria-hidden="true">✅</span>
-    {{ mensajeExito }}
+    role="status">
+    ✅ {{ mensajeExito }}
   </div>
 
-
-  <!-- MENSAJE DE ERROR -->
   <div
     class="mensaje-error"
     *ngIf="mensajeError"
-    role="alert"
-  >
-
-    <span aria-hidden="true">⚠️</span>
-
-    {{ mensajeError }}
+    role="alert">
+    ⚠️ {{ mensajeError }}
 
     <button
       type="button"
       class="btn-reintentar"
       *ngIf="errorCarga"
-      (click)="cargarServicios(true)"
-    >
+      (click)="cargarServicios(true)">
       Reintentar consulta
     </button>
-
   </div>
 
-
-  <!-- ========================================================
-       3. RESUMEN DEL CATÁLOGO
-       ======================================================== -->
-
+  <!-- 4. RESUMEN DE SERVICIOS -->
   <section
     class="resumen-servicios"
     *ngIf="!cargando && !errorCarga"
-    aria-label="Resumen del catálogo de servicios"
-  >
+    aria-label="Resumen del catálogo de servicios">
 
-    <div class="resumen-icono" aria-hidden="true">
-      🩺
-    </div>
+    <div class="resumen-icono" aria-hidden="true">🩺</div>
 
     <div class="resumen-texto">
-
-      <span>
-        Servicios disponibles
-      </span>
-
-      <strong>
-        {{ servicios.length }}
-      </strong>
-
+      <span>Servicios disponibles</span>
+      <strong>{{ servicios.length }}</strong>
       <small>
         Consulta las opciones registradas en la veterinaria.
       </small>
-
     </div>
 
-    <div class="resumen-decoration" aria-hidden="true">
-      🐾
-    </div>
-
+    <div class="resumen-decoration" aria-hidden="true">🐾</div>
   </section>
 
-
-  <!-- ========================================================
-       4. ENCABEZADO DEL LISTADO
-       ======================================================== -->
-
+  <!-- 5. CATÁLOGO -->
   <section
     class="listado-section"
-    aria-labelledby="titulo-listado"
-  >
+    aria-labelledby="titulo-listado">
 
     <div class="listado-header">
-
       <div>
-
-        <h2 id="titulo-listado">
-          Catálogo de servicios
-        </h2>
-
+        <h2 id="titulo-listado">Catálogo de servicios</h2>
         <p>
           Explora nuestras opciones y elige
           el servicio que necesita tu mascota.
         </p>
-
       </div>
 
-
       <div class="listado-acciones">
-
-        <!-- CONTADOR -->
         <span
           class="total-servicios"
-          *ngIf="!cargando && !errorCarga"
-        >
+          *ngIf="!cargando && !errorCarga">
           {{ servicios.length }}
           {{ servicios.length === 1 ? 'servicio' : 'servicios' }}
         </span>
 
-
-        <!-- ACTUALIZAR SIN RECARGAR LA PÁGINA -->
         <button
           type="button"
           class="btn-actualizar"
           (click)="cargarServicios(true)"
-          [disabled]="cargando"
-        >
-
-          {{
-            cargando
-              ? 'Consultando...'
-              : '↻ Actualizar'
-          }}
-
+          [disabled]="cargando">
+          {{ cargando ? 'Consultando...' : '↻ Actualizar' }}
         </button>
-
       </div>
-
     </div>
 
-
-    <!-- ======================================================
-         5. BUSCADOR Y ORDENAMIENTO
-         ====================================================== -->
-
+    <!-- 6. FILTROS -->
     <div
       class="filtros-card"
-      *ngIf="
-        !cargando &&
-        !errorCarga &&
-        servicios.length > 0
-      "
-    >
+      *ngIf="!cargando && !errorCarga && servicios.length > 0">
 
-
-      <!-- BUSCADOR -->
       <div class="filtro-grupo">
-
-        <label for="buscarServicio">
-          Buscar servicio
-        </label>
+        <label for="buscarServicio">Buscar servicio</label>
 
         <input
           id="buscarServicio"
@@ -227,97 +141,50 @@
           [(ngModel)]="busqueda"
           placeholder="Ejemplo: vacunación o consulta"
           autocomplete="off"
-          aria-describedby="busqueda-ayuda"
-        >
+          aria-describedby="busqueda-ayuda">
 
-        <small
-          id="busqueda-ayuda"
-          class="filtro-ayuda"
-        >
+        <small id="busqueda-ayuda" class="filtro-ayuda">
           Puedes buscar por nombre o descripción.
         </small>
-
       </div>
 
-
-      <!-- ORDENAMIENTO -->
       <div class="filtro-grupo">
-
-        <label for="ordenarServicios">
-          Ordenar servicios
-        </label>
+        <label for="ordenarServicios">Ordenar servicios</label>
 
         <select
           id="ordenarServicios"
-          [(ngModel)]="ordenarPor"
-        >
+          [(ngModel)]="ordenarPor">
 
-          <option value="nombre">
-            Nombre (A-Z)
-          </option>
-
-          <option value="precioAsc">
-            Menor precio primero
-          </option>
-
-          <option value="precioDesc">
-            Mayor precio primero
-          </option>
-
+          <option value="nombre">Nombre (A-Z)</option>
+          <option value="precioAsc">Menor precio primero</option>
+          <option value="precioDesc">Mayor precio primero</option>
         </select>
-
       </div>
-
     </div>
 
-
-    <!-- ======================================================
-         6. ESTADO DE CARGA
-         ====================================================== -->
-
+    <!-- 7. CARGANDO -->
     <div
       class="mensaje-info"
       *ngIf="cargando"
       role="status"
-      aria-live="polite"
-    >
+      aria-live="polite">
       Consultando los servicios veterinarios...
     </div>
 
-
-    <!-- ======================================================
-         7. SIN SERVICIOS
-         ====================================================== -->
-
+    <!-- 8. SIN SERVICIOS -->
     <div
       class="sin-servicios"
-      *ngIf="
-        !cargando &&
-        !errorCarga &&
-        servicios.length === 0
-      "
-    >
+      *ngIf="!cargando && !errorCarga && servicios.length === 0">
 
-      <div class="sin-icono" aria-hidden="true">
-        🩺
-      </div>
-
-      <h3>
-        No hay servicios disponibles
-      </h3>
-
+      <div class="sin-icono" aria-hidden="true">🩺</div>
+      <h3>No hay servicios disponibles</h3>
       <p>
         Por el momento, el administrador no ha
         registrado servicios en la veterinaria.
       </p>
-
     </div>
 
-
-    <!-- ======================================================
-         8. SIN RESULTADOS DE BÚSQUEDA
-         ====================================================== -->
-
+    <!-- 9. SIN RESULTADOS -->
     <div
       class="sin-resultados"
       *ngIf="
@@ -325,17 +192,10 @@
         !errorCarga &&
         servicios.length > 0 &&
         serviciosFiltrados.length === 0
-      "
-    >
+      ">
 
-      <div class="sin-icono" aria-hidden="true">
-        🔎
-      </div>
-
-      <h3>
-        No encontramos servicios con esa búsqueda
-      </h3>
-
+      <div class="sin-icono" aria-hidden="true">🔎</div>
+      <h3>No encontramos servicios con esa búsqueda</h3>
       <p>
         Prueba escribiendo otro nombre o
         elimina los filtros para ver el catálogo.
@@ -344,147 +204,74 @@
       <button
         type="button"
         class="btn-limpiar"
-        (click)="limpiarFiltros()"
-      >
+        (click)="limpiarFiltros()">
         Limpiar filtros
       </button>
-
     </div>
 
-
-    <!-- ======================================================
-         9. LISTA DE SERVICIOS
-         ====================================================== -->
-
+    <!-- 10. TARJETAS DE SERVICIOS -->
     <div
       class="servicios-grid"
-      *ngIf="
-        !cargando &&
-        !errorCarga &&
-        serviciosFiltrados.length > 0
-      "
-    >
-
-
-      <!-- ====================================================
-           TARJETA INDIVIDUAL
-           ==================================================== -->
+      *ngIf="!cargando && !errorCarga && serviciosFiltrados.length > 0">
 
       <article
         class="servicio-card"
-        *ngFor="
-          let servicio of serviciosFiltrados;
-          trackBy: trackByServicio
-        "
-      >
+        *ngFor="let servicio of serviciosFiltrados; trackBy: trackByServicio">
 
-
-        <!-- PARTE SUPERIOR -->
         <div class="tarjeta-superior">
-
-          <div
-            class="servicio-icono"
-            aria-hidden="true"
-          >
-            🐾
-          </div>
-
+          <div class="servicio-icono" aria-hidden="true">🐾</div>
           <span class="etiqueta-servicio">
             Servicio veterinario
           </span>
-
         </div>
 
+        <!-- Nombre original del servicio -->
+        <h3>{{ servicio.nombre }}</h3>
 
-        <!-- NOMBRE DEL SERVICIO -->
-        <h3>
-          {{ servicio.nombre }}
-        </h3>
-
-
-        <!-- DESCRIPCIÓN -->
         <p class="descripcion">
-
           {{
             servicio.descripcion ||
             'Servicio disponible para la atención y cuidado de tu mascota.'
           }}
-
         </p>
 
-
-        <!-- PRECIO -->
+        <!-- Precio del backend -->
         <div class="tarjeta-precio">
-
-          <span>
-            Precio del servicio
-          </span>
+          <span>Precio del servicio</span>
 
           <strong
             class="precio"
-            *ngIf="precioValido(servicio.precio)"
-          >
+            *ngIf="precioValido(servicio.precio)">
             {{
               obtenerPrecio(servicio.precio)
-                | currency:'USD':'symbol':'1.2-2'
+                | currency:'USD':'symbol':'1.2-2':'en-US'
             }}
           </strong>
 
           <strong
             class="precio precio-no-disponible"
-            *ngIf="!precioValido(servicio.precio)"
-          >
+            *ngIf="!precioValido(servicio.precio)">
             Consultar precio
           </strong>
-
         </div>
 
-
-        <!-- ==================================================
-             AGENDAR CITA
-             ================================================== -->
-
-        <!--
-          El usuario se dirige a Mis Citas.
-          En el formulario selecciona el servicio
-          que desea reservar.
-
-          No registramos citas desde esta pantalla.
-        -->
-
+        <!-- Agendamiento sin alterar el flujo existente -->
         <button
           type="button"
           class="btn-cita"
           (click)="irCitas()"
-          [attr.aria-label]="
-            'Ir a agendar una cita para el servicio ' +
-            servicio.nombre
-          "
-        >
+          [attr.aria-label]="'Ir a agendar una cita para el servicio ' + servicio.nombre">
           📅 Ir a agendar
         </button>
-
       </article>
-
     </div>
 
-
-    <!-- ======================================================
-         10. AYUDA FINAL
-         ====================================================== -->
-
+    <!-- 11. AYUDA -->
     <div
       class="ayuda-catalogo"
-      *ngIf="
-        !cargando &&
-        !errorCarga &&
-        servicios.length > 0
-      "
-    >
+      *ngIf="!cargando && !errorCarga && servicios.length > 0">
 
-      <span aria-hidden="true">
-        💡
-      </span>
+      <span aria-hidden="true">💡</span>
 
       <p>
         Para solicitar atención, entra a
@@ -492,9 +279,6 @@
         la mascota, el servicio, el veterinario
         y la fecha deseada.
       </p>
-
     </div>
-
   </section>
-
 </div>

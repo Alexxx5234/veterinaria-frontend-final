@@ -1,201 +1,116 @@
 
 <!-- ==========================================================
-     VETERINARIA AREVALO
-     LAYOUT PRIVADO COMPARTIDO
+     VETERINARIA ARÉVALO
+     LAYOUT PRIVADO GENERAL
+
+     ROLES DEL SISTEMA:
+     - ADMIN
+     - VETERINARIO
+     - USER
 
      FUNCIONALIDADES:
-     - Menú lateral para ADMIN y USER.
-     - Menú desplegable en teléfonos.
-     - Barra superior compartida.
-     - Campana de notificaciones.
-     - Nuevo panel global de accesibilidad.
-     - Información del rol actual.
-     - Cierre de sesión.
-     - Navegación mediante router-outlet.
+     1. Menú lateral dinámico según el rol.
+     2. Información del usuario autenticado.
+     3. Barra superior institucional.
+     4. Notificaciones globales.
+     5. Panel de accesibilidad.
+     6. Cierre de sesión.
+     7. Accesos rápidos para ADMIN.
+     8. Accesos rápidos para VETERINARIO.
+     9. Diseño adaptable a celulares.
+     10. Visualización mediante router-outlet.
 
      IMPORTANTE:
-     La accesibilidad ahora es controlada por el
-     componente PanelAccesibilidad.
-
-     El panel anterior fue eliminado para evitar
-     tener dos configuraciones visuales distintas.
-     ========================================================== -->
-
-
-<!-- ========================================================
-     1. CONTENEDOR PRINCIPAL
-     ======================================================== -->
+     - Se conservan los métodos del TypeScript.
+     - No se modifican los permisos.
+     - Los enlaces utilizan Angular Router.
+     - USER mantiene sus accesos en cada módulo.
+========================================================== -->
 
 <div class="layout-privado">
 
-
   <!-- ======================================================
-       2. FONDO DEL MENÚ EN CELULARES
-       ====================================================== -->
-
-  <!--
-    Cuando el menú móvil está abierto,
-    se muestra un fondo que permite cerrarlo.
-  -->
+       1. FONDO OSCURO DEL MENÚ EN CELULARES
+  ====================================================== -->
 
   <button
     *ngIf="menuAbierto"
     type="button"
     class="fondo-menu"
     (click)="cerrarPaneles()"
-    aria-label="Cerrar menú de navegación"
-  ></button>
-
-
+    aria-label="Cerrar menú de navegación">
+  </button>
 
   <!-- ======================================================
-       3. MENÚ LATERAL
-       ====================================================== -->
+       2. MENÚ LATERAL
+  ====================================================== -->
 
   <aside
     id="menu-principal"
     class="menu-principal"
     [class.abierto]="menuAbierto"
-    aria-label="Menú principal de la veterinaria"
-  >
+    aria-label="Menú principal de Veterinaria Arévalo">
 
-
-    <!-- ====================================================
-         LOGO Y NOMBRE
-         ==================================================== -->
+    <!-- MARCA DE LA VETERINARIA -->
 
     <div class="menu-cabecera">
 
       <div class="menu-marca">
 
-        <!-- ICONO -->
-        <div
-          class="menu-logo"
-          aria-hidden="true"
-        >
+        <div class="menu-logo" aria-hidden="true">
           🐾
         </div>
 
-
-        <!-- NOMBRE DE LA VETERINARIA -->
         <div>
-
-          <strong>
-            Veterinaria
-          </strong>
-
-          <small>
-            Arevalo
-          </small>
-
+          <strong>Veterinaria</strong>
+          <small>Arévalo</small>
         </div>
 
       </div>
 
-
-
-      <!-- ==================================================
-           CERRAR MENÚ EN CELULARES
-           ================================================== -->
+      <!-- CERRAR MENÚ EN CELULARES -->
 
       <button
         type="button"
         class="cerrar-menu-movil"
         (click)="cerrarPaneles()"
-        aria-label="Cerrar menú"
-      >
+        aria-label="Cerrar menú lateral">
         ✕
       </button>
 
     </div>
 
-
-
     <!-- ====================================================
-         4. INFORMACIÓN DEL USUARIO
-         ==================================================== -->
-
-    <!--
-      El contenido cambia automáticamente
-      según el rol de la sesión actual.
-    -->
+         3. PERFIL DEL ROL ACTUAL
+    ==================================================== -->
 
     <div class="menu-perfil">
 
-      <!-- ICONO DEL ROL -->
-      <div
-        class="perfil-logo"
-        aria-hidden="true"
-      >
-        {{ rol === 'ADMIN' ? '👨‍💼' : '👤' }}
+      <div class="perfil-logo" aria-hidden="true">
+        {{ iconoRol }}
       </div>
 
-
-      <!-- INFORMACIÓN DEL ROL -->
       <div>
-
-        <strong>
-          {{
-            rol === 'ADMIN'
-              ? 'Administrador'
-              : 'Mi cuenta'
-          }}
-        </strong>
-
-
-        <small>
-          {{
-            rol === 'ADMIN'
-              ? 'Panel de control'
-              : 'Panel de usuario'
-          }}
-        </small>
-
+        <strong>{{ nombreRol }}</strong>
+        <small>{{ descripcionRol }}</small>
       </div>
 
     </div>
 
-
-
     <!-- ====================================================
-         5. NAVEGACIÓN DEL SISTEMA
-         ==================================================== -->
+         4. NAVEGACIÓN LATERAL DINÁMICA
+
+         Las opciones se obtienen desde layout-privado.ts.
+         Se mantiene la navegación original.
+    ==================================================== -->
 
     <nav
       class="menu-navegacion"
-      aria-label="Opciones del sistema"
-    >
+      aria-label="Opciones de navegación">
 
-      <!-- TÍTULO -->
       <p class="titulo-menu">
         MENÚ PRINCIPAL
       </p>
-
-
-
-      <!-- ==================================================
-           OPCIONES DINÁMICAS POR ROL
-           ================================================== -->
-
-      <!--
-        La variable opciones se configura en
-        layout-privado.ts.
-
-        ADMIN:
-        - Inicio
-        - Usuarios
-        - Mascotas
-        - Citas
-        - Servicios
-        - Veterinarios
-
-        USER:
-        - Inicio
-        - Mis Mascotas
-        - Mis Citas
-        - Servicios
-        - Veterinarios
-      -->
 
       <a
         *ngFor="let opcion of opciones"
@@ -204,19 +119,12 @@
         routerLinkActive="activo"
         [routerLinkActiveOptions]="{ exact: true }"
         ariaCurrentWhenActive="page"
-        (click)="cerrarPaneles()"
-      >
+        (click)="cerrarPaneles()">
 
-        <!-- ICONO DE LA OPCIÓN -->
-        <span
-          class="enlace-icono"
-          aria-hidden="true"
-        >
+        <span class="enlace-icono" aria-hidden="true">
           {{ opcion.icono }}
         </span>
 
-
-        <!-- NOMBRE DE LA OPCIÓN -->
         <span>
           {{ opcion.nombre }}
         </span>
@@ -225,60 +133,41 @@
 
     </nav>
 
-
-
     <!-- ====================================================
-         6. PARTE INFERIOR DEL MENÚ
-         ==================================================== -->
+         5. CIERRE DE SESIÓN
+    ==================================================== -->
 
     <div class="menu-pie">
 
-
-      <!-- CERRAR SESIÓN -->
       <button
         type="button"
         class="boton-salir"
-        (click)="cerrarSesion()"
-      >
+        (click)="cerrarSesion()">
 
-        <span aria-hidden="true">
-          🚪
-        </span>
-
+        <span aria-hidden="true">🚪</span>
         Cerrar sesión
 
       </button>
 
-
-
-      <!-- NOMBRE DE LA VETERINARIA -->
-      <p>
-        Veterinaria Arevalo
-      </p>
+      <p>Veterinaria Arévalo</p>
 
     </div>
 
   </aside>
 
-
-
   <!-- ======================================================
-       7. ÁREA DE TRABAJO
-       ====================================================== -->
+       6. ÁREA PRINCIPAL DE TRABAJO
+  ====================================================== -->
 
   <div class="area-trabajo">
 
-
     <!-- ====================================================
-         8. BARRA SUPERIOR GLOBAL
-         ==================================================== -->
+         7. BARRA SUPERIOR
+    ==================================================== -->
 
     <header class="barra-global">
 
-
-      <!-- ==================================================
-           BOTÓN DEL MENÚ MÓVIL
-           ================================================== -->
+      <!-- BOTÓN PARA ABRIR MENÚ EN CELULARES -->
 
       <button
         type="button"
@@ -286,149 +175,110 @@
         (click)="cambiarMenu()"
         [attr.aria-expanded]="menuAbierto"
         aria-controls="menu-principal"
-        aria-label="Abrir menú de navegación"
-      >
+        aria-label="Abrir menú de navegación">
         ☰
       </button>
 
-
-
-      <!-- ==================================================
-           NOMBRE Y DESCRIPCIÓN DE LA APLICACIÓN
-           ================================================== -->
+      <!-- INFORMACIÓN INSTITUCIONAL -->
 
       <div class="titulo-barra">
 
         <strong>
-          Veterinaria Arevalo
+          Veterinaria Arévalo
         </strong>
 
         <small>
-          {{
-            rol === 'ADMIN'
-              ? 'Administración'
-              : 'Mi espacio personal'
-          }}
+          {{ descripcionRol }}
         </small>
 
       </div>
 
-
-
       <!-- ==================================================
-           9. HERRAMIENTAS GLOBALES
-           ================================================== -->
+           8. HERRAMIENTAS GLOBALES
+      ================================================== -->
 
       <div class="herramientas-globales">
 
-
         <!-- ================================================
-             NOTIFICACIONES
-             ================================================ -->
-
-        <!--
-          Conservamos la campana original y
-          el servicio de notificaciones existente.
-        -->
+             CAMPANA DE NOTIFICACIONES
+        ================================================ -->
 
         <div class="herramienta">
 
-
-          <!-- BOTÓN DE NOTIFICACIONES -->
           <button
             type="button"
             class="boton-herramienta"
             (click)="cambiarNotificaciones()"
             [attr.aria-expanded]="notificacionesAbiertas"
+            [attr.aria-label]="
+              notificacionesAbiertas
+                ? 'Cerrar notificaciones'
+                : 'Abrir notificaciones'
+            "
             aria-controls="avisos-globales"
-            aria-label="Abrir notificaciones"
-            title="Notificaciones"
-          >
+            title="Notificaciones">
 
-            <span aria-hidden="true">
-              🔔
-            </span>
-
-
+            <span aria-hidden="true">🔔</span>
 
             <!-- CONTADOR DE NOTIFICACIONES -->
+
             <span
               class="numero-avisos"
               *ngIf="avisosNoLeidos > 0"
-            >
+              aria-hidden="true">
+
               {{ avisosNoLeidos }}
+
             </span>
 
           </button>
 
-
-
           <!-- ==============================================
                PANEL DE NOTIFICACIONES
-               ============================================== -->
+          ============================================== -->
 
           <section
             *ngIf="notificacionesAbiertas"
             id="avisos-globales"
             class="panel-flotante"
-            aria-label="Notificaciones"
-          >
+            aria-label="Notificaciones del sistema">
 
-
-            <!-- ENCABEZADO -->
             <div class="panel-titulo">
 
-              <h2>
-                Notificaciones
-              </h2>
+              <h2>Notificaciones</h2>
 
-
-              <!-- CERRAR NOTIFICACIONES -->
               <button
                 type="button"
                 class="boton-cerrar-panel"
                 (click)="cambiarNotificaciones()"
-                aria-label="Cerrar notificaciones"
-              >
+                aria-label="Cerrar notificaciones">
                 ✕
               </button>
 
             </div>
 
-
-
-            <!-- ============================================
-                 SIN NOTIFICACIONES
-                 ============================================ -->
+            <!-- CUANDO NO HAY NOTIFICACIONES -->
 
             <p
               class="sin-avisos"
-              *ngIf="avisos.length === 0"
-            >
-              No tienes notificaciones globales
-              por ahora.
+              *ngIf="avisos.length === 0">
+
+              No tienes notificaciones por ahora.
+
             </p>
 
-
-
-            <!-- ============================================
-                 LISTADO DE NOTIFICACIONES
-                 ============================================ -->
+            <!-- LISTADO DE NOTIFICACIONES -->
 
             <div
               class="lista-avisos"
-              *ngIf="avisos.length > 0"
-            >
+              *ngIf="avisos.length > 0">
 
-
-              <!-- NOTIFICACIÓN INDIVIDUAL -->
               <article
-                *ngFor="let aviso of avisos"
                 class="aviso-item"
-              >
+                *ngFor="let aviso of avisos">
 
+                <!-- ICONO DE ESTADO -->
 
-                <!-- ICONO SEGÚN EL TIPO -->
                 <span aria-hidden="true">
 
                   {{
@@ -441,20 +291,17 @@
 
                 </span>
 
+                <!-- CONTENIDO DEL AVISO -->
 
-
-                <!-- INFORMACIÓN -->
                 <div>
 
                   <strong>
                     {{ aviso.titulo }}
                   </strong>
 
-
                   <p>
                     {{ aviso.mensaje }}
                   </p>
-
 
                   <small>
                     {{ aviso.fecha }}
@@ -464,18 +311,15 @@
 
               </article>
 
-
-
-              <!-- ==========================================
-                   LIMPIAR NOTIFICACIONES
-                   ========================================== -->
+              <!-- LIMPIAR NOTIFICACIONES -->
 
               <button
                 type="button"
                 class="boton-restablecer"
-                (click)="limpiarNotificaciones()"
-              >
+                (click)="limpiarNotificaciones()">
+
                 Limpiar notificaciones
+
               </button>
 
             </div>
@@ -484,36 +328,16 @@
 
         </div>
 
-
-
         <!-- ================================================
-             10. NUEVO PANEL DE ACCESIBILIDAD
-             ================================================ -->
+             9. PANEL DE ACCESIBILIDAD
 
-        <!--
-          CAMBIO PRINCIPAL:
-
-          Eliminamos el botón y panel antiguos.
-
-          Ahora utilizamos el componente global
-          PanelAccesibilidad, que incluye:
-
-          - Contraste normal.
-          - Contraste suave.
-          - Alto contraste.
-          - Modo oscuro.
-          - Tamaño de visualización.
-          - Navegación hablada.
-          - Lectura de página.
-          - Control de volumen.
-          - Control de velocidad.
-          - Espaciado de texto.
-          - Resaltado de enlaces.
-          - Reducción de animaciones.
-          - Restablecer configuración.
-
-          El componente incluye su propio botón ♿.
-        -->
+             Se conserva el componente existente:
+             - Lectura hablada.
+             - Navegación por voz.
+             - Alto contraste.
+             - Ajuste de tamaño.
+             - Reducción de movimiento.
+        ================================================ -->
 
         <div class="herramienta">
 
@@ -522,57 +346,254 @@
 
         </div>
 
-
-
-        <!-- ================================================
-             11. INDICADOR DEL ROL ACTUAL
-             ================================================ -->
+        <!-- ROL DEL USUARIO AUTENTICADO -->
 
         <span class="rol-superior">
-
-          {{
-            rol === 'ADMIN'
-              ? 'ADMIN'
-              : 'USER'
-          }}
-
+          {{ rol }}
         </span>
 
       </div>
 
     </header>
 
+    <!-- ====================================================
+         10. ACCESOS RÁPIDOS DEL ADMINISTRADOR
 
+         Solo aparecen cuando el rol es ADMIN.
+
+         Permiten navegar entre todos los módulos
+         administrativos sin regresar al dashboard.
+
+         Se resalta automáticamente la ruta activa.
+    ==================================================== -->
+
+    <nav
+      *ngIf="rol === 'ADMIN'"
+      class="accesos-rol accesos-rol--admin"
+      aria-label="Accesos rápidos del administrador">
+
+      <span class="accesos-rol__titulo">
+        <span aria-hidden="true">⚡</span>
+        ACCESOS RÁPIDOS · ADMINISTRADOR
+      </span>
+
+      <div class="accesos-rol__lista">
+
+        <!-- INICIO -->
+
+        <a
+          routerLink="/admin/dashboard"
+          routerLinkActive="acceso-activo"
+          [routerLinkActiveOptions]="{ exact: true }"
+          ariaCurrentWhenActive="page"
+          (click)="cerrarPaneles()">
+          🏠 Inicio
+        </a>
+
+        <!-- USUARIOS -->
+
+        <a
+          routerLink="/admin/usuarios"
+          routerLinkActive="acceso-activo"
+          [routerLinkActiveOptions]="{ exact: true }"
+          ariaCurrentWhenActive="page"
+          (click)="cerrarPaneles()">
+          👥 Usuarios
+        </a>
+
+        <!-- MASCOTAS -->
+
+        <a
+          routerLink="/admin/mascotas"
+          routerLinkActive="acceso-activo"
+          [routerLinkActiveOptions]="{ exact: true }"
+          ariaCurrentWhenActive="page"
+          (click)="cerrarPaneles()">
+          🐾 Mascotas
+        </a>
+
+        <!-- CITAS -->
+
+        <a
+          routerLink="/admin/citas"
+          routerLinkActive="acceso-activo"
+          [routerLinkActiveOptions]="{ exact: true }"
+          ariaCurrentWhenActive="page"
+          (click)="cerrarPaneles()">
+          📅 Citas
+        </a>
+
+        <!-- ATENCIONES MÉDICAS -->
+
+        <a
+          routerLink="/admin/atenciones"
+          routerLinkActive="acceso-activo"
+          [routerLinkActiveOptions]="{ exact: true }"
+          ariaCurrentWhenActive="page"
+          (click)="cerrarPaneles()">
+          🩺 Atenciones
+        </a>
+
+        <!-- SERVICIOS -->
+
+        <a
+          routerLink="/admin/servicios"
+          routerLinkActive="acceso-activo"
+          [routerLinkActiveOptions]="{ exact: true }"
+          ariaCurrentWhenActive="page"
+          (click)="cerrarPaneles()">
+          💚 Servicios
+        </a>
+
+        <!-- VETERINARIOS -->
+
+        <a
+          routerLink="/admin/veterinarios"
+          routerLinkActive="acceso-activo"
+          [routerLinkActiveOptions]="{ exact: true }"
+          ariaCurrentWhenActive="page"
+          (click)="cerrarPaneles()">
+          👨‍⚕️ Veterinarios
+        </a>
+
+        <!-- MEDICAMENTOS / INVENTARIO -->
+
+        <a
+          routerLink="/admin/medicamentos"
+          routerLinkActive="acceso-activo"
+          [routerLinkActiveOptions]="{ exact: true }"
+          ariaCurrentWhenActive="page"
+          (click)="cerrarPaneles()">
+          💊 Medicamentos
+        </a>
+
+        <!-- FACTURACIÓN -->
+
+        <a
+          routerLink="/admin/facturas"
+          routerLinkActive="acceso-activo"
+          [routerLinkActiveOptions]="{ exact: true }"
+          ariaCurrentWhenActive="page"
+          (click)="cerrarPaneles()">
+          🧾 Facturas
+        </a>
+
+      </div>
+
+    </nav>
 
     <!-- ====================================================
-         12. CONTENIDO DINÁMICO DE ANGULAR
-         ==================================================== -->
+         11. ACCESOS RÁPIDOS DEL VETERINARIO
 
-    <!--
-      Solo cambia esta parte al navegar.
+         Solo aparecen cuando el rol es VETERINARIO.
 
-      Ejemplos de rutas:
+         Se mantienen separados:
+         - Medicamentos disponibles.
+         - Medicamentos de la atención.
 
-      ADMIN:
-      /admin/dashboard
-      /admin/usuarios
-      /admin/mascotas
-      /admin/citas
-      /admin/servicios
-      /admin/veterinarios
+         El veterinario consulta el inventario,
+         pero no puede administrar el catálogo.
+    ==================================================== -->
 
-      USER:
-      /usuario/dashboard
-      /usuario/mascotas
-      /usuario/citas
-      /usuario/servicios
-      /usuario/veterinarios
-    -->
+    <nav
+      *ngIf="rol === 'VETERINARIO'"
+      class="accesos-rol accesos-rol--veterinario"
+      aria-label="Accesos rápidos del veterinario">
+
+      <span class="accesos-rol__titulo">
+        <span aria-hidden="true">⚡</span>
+        ACCESOS RÁPIDOS · VETERINARIO
+      </span>
+
+      <div class="accesos-rol__lista">
+
+        <!-- INICIO -->
+
+        <a
+          routerLink="/veterinario/dashboard"
+          routerLinkActive="acceso-activo"
+          [routerLinkActiveOptions]="{ exact: true }"
+          ariaCurrentWhenActive="page"
+          (click)="cerrarPaneles()">
+          🏠 Inicio
+        </a>
+
+        <!-- MIS CITAS -->
+
+        <a
+          routerLink="/veterinario/citas"
+          routerLinkActive="acceso-activo"
+          [routerLinkActiveOptions]="{ exact: true }"
+          ariaCurrentWhenActive="page"
+          (click)="cerrarPaneles()">
+          📅 Mis Citas
+        </a>
+
+        <!-- ATENCIONES MÉDICAS -->
+
+        <a
+          routerLink="/veterinario/atenciones"
+          routerLinkActive="acceso-activo"
+          [routerLinkActiveOptions]="{ exact: true }"
+          ariaCurrentWhenActive="page"
+          (click)="cerrarPaneles()">
+          🩺 Atenciones Médicas
+        </a>
+
+        <!-- CATÁLOGO DE MEDICAMENTOS -->
+
+        <a
+          routerLink="/veterinario/medicamentos"
+          routerLinkActive="acceso-activo"
+          [routerLinkActiveOptions]="{ exact: true }"
+          ariaCurrentWhenActive="page"
+          (click)="cerrarPaneles()">
+          💊 Medicamentos disponibles
+        </a>
+
+        <!-- MEDICAMENTOS UTILIZADOS Y RECETADOS -->
+
+        <a
+          routerLink="/veterinario/medicamentos-atencion"
+          routerLinkActive="acceso-activo"
+          [routerLinkActiveOptions]="{ exact: true }"
+          ariaCurrentWhenActive="page"
+          (click)="cerrarPaneles()">
+          💉 Medicamentos de la atención
+        </a>
+
+        <!-- FACTURAS DE SUS ATENCIONES -->
+
+        <a
+          routerLink="/veterinario/facturas"
+          routerLinkActive="acceso-activo"
+          [routerLinkActiveOptions]="{ exact: true }"
+          ariaCurrentWhenActive="page"
+          (click)="cerrarPaneles()">
+          🧾 Mis Facturas
+        </a>
+
+      </div>
+
+    </nav>
+
+    <!-- ====================================================
+         12. CONTENIDO DINÁMICO
+
+         Angular Router muestra aquí cada módulo.
+
+         No se modifican:
+         - Formularios.
+         - Filtros.
+         - Tablas.
+         - Facturas.
+         - Registros de medicamentos.
+         - Atenciones médicas.
+    ==================================================== -->
 
     <main
       id="contenido-principal"
-      class="contenido-ruta"
-    >
+      class="contenido-ruta">
 
       <router-outlet>
       </router-outlet>

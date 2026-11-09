@@ -1,0 +1,520 @@
+
+<!-- ==========================================================
+     VETERINARIA ARÉVALO
+     MÓDULO USER: MIS ATENCIONES MÉDICAS
+
+     FUNCIONALIDADES:
+     1. Consultar el historial clínico de sus mascotas.
+     2. Buscar por mascota, veterinario y diagnóstico.
+     3. Filtrar por mascota.
+     4. Filtrar por rango de fechas.
+     5. Consultar diagnóstico y tratamiento.
+     6. Consultar observaciones.
+     7. Consultar medicamentos utilizados y recetados.
+     8. Navegar entre los módulos del usuario.
+
+     SEGURIDAD:
+     - Historial exclusivamente de sus mascotas.
+     - No permite modificar diagnósticos.
+     - No permite administrar medicamentos.
+========================================================== -->
+
+<div class="atenciones-user">
+
+  <!-- ======================================================
+       1. ENCABEZADO
+  ====================================================== -->
+
+  <header class="page-header">
+
+    <div>
+
+      <span class="eyebrow">
+        MI ESPACIO PERSONAL
+      </span>
+
+      <h1>
+        🩺 Mis Atenciones Médicas
+      </h1>
+
+      <p>
+        Consulta los diagnósticos, tratamientos
+        e historial clínico de tus mascotas.
+      </p>
+
+    </div>
+
+    <button
+      type="button"
+      class="btn btn--outline"
+      (click)="cargarAtenciones()"
+      [disabled]="cargando">
+
+      {{
+        cargando
+          ? 'Actualizando...'
+          : '↻ Actualizar datos'
+      }}
+
+    </button>
+
+  </header>
+
+  <!-- ======================================================
+       2. ACCESOS RÁPIDOS
+  ====================================================== -->
+
+  <nav
+    class="quick-nav"
+    aria-label="Accesos rápidos del cliente">
+
+    <a routerLink="/usuario/dashboard">
+      🏠 Inicio
+    </a>
+
+    <a routerLink="/usuario/mascotas">
+      🐾 Mis Mascotas
+    </a>
+
+    <a routerLink="/usuario/citas">
+      📅 Mis Citas
+    </a>
+
+    <a routerLink="/usuario/facturas">
+      🧾 Mis Facturas
+    </a>
+
+    <a routerLink="/usuario/servicios">
+      💚 Servicios
+    </a>
+
+    <a routerLink="/usuario/veterinarios">
+      👨‍⚕️ Veterinarios
+    </a>
+
+  </nav>
+
+  <!-- ======================================================
+       3. MENSAJES DE ERROR
+  ====================================================== -->
+
+  <p
+    class="alerta"
+    *ngIf="error"
+    role="alert">
+
+    ⚠️ {{ error }}
+
+  </p>
+
+  <!-- ADVERTENCIA DE HISTORIAL INCOMPLETO -->
+
+  <p
+    class="advertencia"
+    *ngIf="advertencia"
+    role="status">
+
+    ⚠️ {{ advertencia }}
+
+  </p>
+
+  <!-- ======================================================
+       4. RESUMEN CLÍNICO
+  ====================================================== -->
+
+  <section
+    class="resumen"
+    aria-label="Resumen clínico de mis mascotas">
+
+    <article>
+
+      <span>Mis mascotas</span>
+
+      <strong>
+        {{ mascotas.length }}
+      </strong>
+
+    </article>
+
+    <article>
+
+      <span>Atenciones registradas</span>
+
+      <strong>
+        {{ atenciones.length }}
+      </strong>
+
+    </article>
+
+  </section>
+
+  <!-- ======================================================
+       5. HISTORIAL CLÍNICO
+  ====================================================== -->
+
+  <section
+    class="panel"
+    aria-labelledby="titulo-historial">
+
+    <div class="panel-header">
+
+      <h2 id="titulo-historial">
+        Historial clínico
+      </h2>
+
+      <span aria-live="polite">
+        {{ atencionesFiltradas.length }} resultados
+      </span>
+
+    </div>
+
+    <!-- ====================================================
+         6. BUSCADOR Y FILTROS
+    ==================================================== -->
+
+    <div class="filtros">
+
+      <!-- BÚSQUEDA -->
+
+      <div>
+
+        <label for="buscar-atencion">
+          Buscar atención
+        </label>
+
+        <input
+          id="buscar-atencion"
+          type="search"
+          [(ngModel)]="busqueda"
+          placeholder="Mascota, diagnóstico o veterinario"
+          autocomplete="off">
+
+      </div>
+
+      <!-- MASCOTA -->
+
+      <div>
+
+        <label for="mascota-atencion">
+          Filtrar por mascota
+        </label>
+
+        <select
+          id="mascota-atencion"
+          [(ngModel)]="mascotaSeleccionada">
+
+          <option [ngValue]="0">
+            Todas mis mascotas
+          </option>
+
+          <option
+            *ngFor="let mascota of mascotas"
+            [ngValue]="mascota.id">
+
+            {{ mascota.nombre }}
+
+          </option>
+
+        </select>
+
+      </div>
+
+      <!-- FECHA DESDE -->
+
+      <div>
+
+        <label for="desde-atencion">
+          Fecha desde
+        </label>
+
+        <input
+          id="desde-atencion"
+          type="date"
+          [(ngModel)]="desde">
+
+      </div>
+
+      <!-- FECHA HASTA -->
+
+      <div>
+
+        <label for="hasta-atencion">
+          Fecha hasta
+        </label>
+
+        <input
+          id="hasta-atencion"
+          type="date"
+          [(ngModel)]="hasta"
+          [min]="desde || null">
+
+      </div>
+
+      <!-- LIMPIAR -->
+
+      <button
+        type="button"
+        class="btn btn--outline"
+        (click)="limpiarFiltros()">
+
+        Limpiar filtros
+
+      </button>
+
+    </div>
+
+    <!-- ====================================================
+         7. ESTADOS DE CONSULTA
+    ==================================================== -->
+
+    <!-- CARGANDO -->
+
+    <p
+      *ngIf="cargando"
+      class="vacio"
+      role="status">
+
+      Consultando el historial médico
+      de tus mascotas...
+
+    </p>
+
+    <!-- SIN MASCOTAS -->
+
+    <div
+      class="vacio"
+      *ngIf="
+        !cargando &&
+        !error &&
+        mascotas.length === 0
+      ">
+
+      <p>
+        Todavía no tienes mascotas registradas.
+      </p>
+
+      <a
+        class="btn btn--outline"
+        routerLink="/usuario/mascotas">
+
+        🐾 Registrar mi mascota
+
+      </a>
+
+    </div>
+
+    <!-- SIN ATENCIONES -->
+
+    <div
+      class="vacio"
+      *ngIf="
+        !cargando &&
+        !error &&
+        !advertencia &&
+        mascotas.length > 0 &&
+        atenciones.length === 0
+      ">
+
+      <p>
+        Tus mascotas todavía no tienen
+        atenciones médicas registradas.
+      </p>
+
+      <a
+        class="btn btn--outline"
+        routerLink="/usuario/citas">
+
+        📅 Consultar mis citas
+
+      </a>
+
+    </div>
+
+    <!-- SIN RESULTADOS DE FILTROS -->
+
+    <p
+      *ngIf="
+        !cargando &&
+        atenciones.length > 0 &&
+        atencionesFiltradas.length === 0
+      "
+      class="vacio">
+
+      No se encontraron atenciones
+      con los filtros seleccionados.
+
+    </p>
+
+    <!-- ====================================================
+         8. TARJETAS DE ATENCIONES
+    ==================================================== -->
+
+    <div
+      class="atenciones-grid"
+      *ngIf="!cargando">
+
+      <article
+        class="atencion-card"
+        *ngFor="
+          let atencion of atencionesFiltradas;
+          trackBy: identificarAtencion
+        ">
+
+        <!-- INFORMACIÓN DE LA ATENCIÓN -->
+
+        <div class="atencion-card__top">
+
+          <div>
+
+            <small>
+              ATENCIÓN #{{ atencion.id }}
+            </small>
+
+            <h3>
+              {{ atencion.nombreMascota }}
+            </h3>
+
+          </div>
+
+          <span class="estado">
+            Registrada
+          </span>
+
+        </div>
+
+        <!-- FECHA Y VETERINARIO -->
+
+        <dl>
+
+          <div>
+
+            <dt>Fecha</dt>
+
+            <dd>
+              {{
+                atencion.fechaAtencion
+                  | date:'dd/MM/yyyy HH:mm'
+              }}
+            </dd>
+
+          </div>
+
+          <div>
+
+            <dt>Veterinario</dt>
+
+            <dd>
+              {{ atencion.nombreVeterinario }}
+            </dd>
+
+          </div>
+
+        </dl>
+
+        <!-- DIAGNÓSTICO -->
+
+        <div class="diagnostico">
+
+          <strong>Diagnóstico</strong>
+
+          <p>
+            {{ atencion.diagnostico }}
+          </p>
+
+        </div>
+
+        <!-- BOTÓN PARA EXPANDIR -->
+
+        <button
+          type="button"
+          class="btn btn--primary"
+          (click)="cambiarDetalle(atencion.id)"
+          [attr.aria-expanded]="detalleId === atencion.id"
+          [attr.aria-controls]="
+            'detalle-atencion-' + atencion.id
+          ">
+
+          {{
+            detalleId === atencion.id
+              ? 'Ocultar detalle'
+              : 'Ver atención completa'
+          }}
+
+        </button>
+
+        <!-- ==================================================
+             9. DETALLE CLÍNICO
+        ================================================== -->
+
+        <div
+          class="detalle"
+          [id]="'detalle-atencion-' + atencion.id"
+          *ngIf="detalleId === atencion.id">
+
+          <!-- TRATAMIENTO -->
+
+          <h4>Tratamiento</h4>
+
+          <p>
+            {{ atencion.tratamiento }}
+          </p>
+
+          <!-- OBSERVACIONES -->
+
+          <h4>Observaciones</h4>
+
+          <p>
+            {{
+              atencion.observaciones ||
+              'Sin observaciones adicionales.'
+            }}
+          </p>
+
+          <!-- MEDICAMENTOS UTILIZADOS -->
+
+          <h4>Medicamentos utilizados</h4>
+
+          <p>
+            {{
+              atencion.medicamentosUtilizados ||
+              'No constan medicamentos utilizados en este campo clínico.'
+            }}
+          </p>
+
+          <!-- MEDICAMENTOS RECETADOS -->
+
+          <h4>Medicamentos recetados</h4>
+
+          <p>
+            {{
+              atencion.medicamentosRecetados ||
+              'No constan medicamentos recetados en este campo clínico.'
+            }}
+          </p>
+
+          <!-- NOTA -->
+
+          <p class="nota">
+            Los medicamentos registrados en la factura
+            pueden consultarse desde Mis Facturas.
+          </p>
+
+          <!-- ACCESO RÁPIDO A FACTURACIÓN -->
+
+          <a
+            class="btn btn--outline enlace-factura"
+            routerLink="/usuario/facturas">
+
+            🧾 Consultar mis facturas
+
+          </a>
+
+        </div>
+
+      </article>
+
+    </div>
+
+  </section>
+
+</div>

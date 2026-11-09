@@ -1,20 +1,29 @@
-/* ==========================================================
-   LOGIN - VETERINARIA AREVALO
-   DISEÑO MODERNO CON DOS COLUMNAS
 
-   COLORES:
-   - Morado principal: #6652e8
-   - Morado secundario: #8b5cf6
-   - Fondo claro: #eef2ff
-   - Tarjeta: blanco
+/* ==========================================================
+   VETERINARIA ARÉVALO
+   DISEÑO PÚBLICO RESPONSIVO - VERSIÓN CORREGIDA
+
+   APLICAR EN:
+   1. login-compents.scss
+   2. registro.scss
+   3. verificar-codigo.scss
+
+   CORRECCIONES:
+   - La imagen ya no se monta sobre los textos.
+   - Los encabezados mantienen buena legibilidad.
+   - Se adapta a computadoras, tablets y celulares.
+   - Conserva los formularios reactivos de Angular.
+   - Compatible con el panel global de accesibilidad.
    ========================================================== */
 
+
 /* ==========================================================
-   1. ESTILOS GENERALES
+   1. CONFIGURACIÓN GENERAL
    ========================================================== */
 
 :host {
   display: block;
+  min-width: 0;
 }
 
 :host *,
@@ -23,639 +32,1234 @@
   box-sizing: border-box;
 }
 
+
 /* ==========================================================
-   2. FONDO DE LA PÁGINA
+   2. COLORES Y FONDO DE LA PÁGINA
    ========================================================== */
 
-.login-page {
+.vet-auth {
+
+  --verde-principal: #08745c;
+  --verde-oscuro: #075744;
+  --verde-claro: #e7f8ef;
+
+  --texto-principal: #16312d;
+  --texto-secundario: #607570;
+
+  --borde-formulario: #d6e5df;
+
+  display: grid;
+  place-items: center;
+
+  width: 100%;
   min-height: 100vh;
   min-height: 100dvh;
 
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  padding: 35px 85px 35px 25px;
 
-  padding: 30px;
+  background:
+    radial-gradient(
+      circle at 5% 5%,
+      #d0f3e5,
+      transparent 35%
+    ),
+    linear-gradient(
+      120deg,
+      #f5fcf9,
+      #e9f9f2
+    );
 
-  background: linear-gradient(
-    135deg,
-    #eef2ff,
-    #f8f9ff,
-    #ede9fe
-  );
+  color: var(--texto-principal);
 
-  /* Mejora: tipografía moderna y legible en toda la pantalla. */
   font-family: 'Segoe UI', Arial, sans-serif;
 }
 
+
 /* ==========================================================
-   3. CONTENEDOR PRINCIPAL
+   3. CONTENEDOR PRINCIPAL DE DOS COLUMNAS
    ========================================================== */
 
-/* Divide la pantalla en dos columnas. */
-.login-container {
+.vet-auth__shell {
+
   display: grid;
-  grid-template-columns: 1fr 1fr;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 0.94fr);
 
   width: 100%;
-  max-width: 1050px;
-  min-height: 590px;
+  max-width: 1180px;
+
+  min-height: 670px;
 
   overflow: hidden;
-  border-radius: 22px;
+
+  border: 1px solid #d5e7df;
+  border-radius: 25px;
+
   background: #ffffff;
 
-  box-shadow: 0 20px 55px rgba(55, 45, 110, 0.14);
+  box-shadow:
+    0 25px 60px rgba(19, 93, 71, 0.11);
 }
+
 
 /* ==========================================================
    4. PANEL IZQUIERDO
+
+   CORRECCIÓN PRINCIPAL:
+   La información y la imagen siguen el flujo normal
+   de la página.
+
+   Antes la imagen tenía position: absolute y se
+   superponía al texto.
+
+   Ahora utilizamos Flexbox en columna.
    ========================================================== */
 
-.login-info {
+.vet-auth__hero {
+
   position: relative;
 
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
 
-  padding: 42px;
+  min-width: 0;
+  min-height: 670px;
+
+  padding: 34px 38px;
+
   overflow: hidden;
-
-  color: white;
 
   background: linear-gradient(
     145deg,
-    #5649d8,
-    #7454ee,
-    #8b5cf6
+    #f5fffa 0%,
+    #e2f7eb 78%,
+    #d6f1e3 100%
   );
+
+  color: #163f34;
 }
 
-/* Elementos decorativos del fondo. */
-.login-info::before {
-  content: "";
-  position: absolute;
-
-  width: 330px;
-  height: 330px;
-  right: -165px;
-  top: -130px;
-
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
-  pointer-events: none;
-}
-
-.login-info::after {
-  content: "";
-  position: absolute;
-
-  width: 260px;
-  height: 260px;
-  left: -140px;
-  bottom: -150px;
-
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.07);
-  pointer-events: none;
-}
 
 /* ==========================================================
-   5. MARCA DE LA VETERINARIA
+   5. MARCA VETERINARIA ARÉVALO
    ========================================================== */
 
-.marca {
-  position: relative;
-  z-index: 1;
+.vet-auth__brand {
 
   display: flex;
   align-items: center;
+
   gap: 12px;
 
-  font-size: 17px;
-  font-weight: 700;
-}
-
-.marca-icono {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-
-  background: rgba(255, 255, 255, 0.20);
-  font-size: 23px;
-}
-
-/* ==========================================================
-   6. INFORMACIÓN CENTRAL
-   ========================================================== */
-
-.informacion {
   position: relative;
-  z-index: 1;
-  margin: 45px 0;
-}
 
-.etiqueta {
-  display: inline-block;
-
-  padding: 9px 13px;
-  margin-bottom: 22px;
-
-  background: rgba(255, 255, 255, 0.16);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 20px;
-
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 1px;
-}
-
-.informacion h1 {
-  margin: 0 0 20px;
-
-  color: #ffffff;
-  font-size: clamp(30px, 3vw, 42px);
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-.informacion h1 span {
-  display: block;
-  color: #ffffff;
-}
-
-.informacion p {
-  max-width: 390px;
-
-  color: #f2eeff;
-  font-size: 15px;
-  line-height: 1.8;
-}
-
-/* ==========================================================
-   7. BENEFICIOS
-   ========================================================== */
-
-.beneficios {
-  display: flex;
-  flex-direction: column;
-
-  gap: 16px;
-  margin-top: 30px;
-}
-
-.beneficio {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-
-  color: #ffffff;
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-.beneficio span {
-  display: flex;
-  align-items: center;
-  justify-content: center;
   flex-shrink: 0;
 
-  width: 25px;
-  height: 25px;
-  border-radius: 50%;
-
-  background: rgba(255, 255, 255, 0.20);
-  color: #ffffff;
-  font-weight: bold;
-}
-
-/* ==========================================================
-   8. TEXTO INFERIOR IZQUIERDO
-   ========================================================== */
-
-.info-footer {
-  position: relative;
-  z-index: 1;
-
-  color: #f2eeff;
-  font-size: 12px;
-  line-height: 1.6;
-}
-
-/* ==========================================================
-   9. PANEL DERECHO
-   ========================================================== */
-
-.login-formulario {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  padding: 45px 50px;
-  background: #ffffff;
-}
-
-.login-card {
   width: 100%;
-  max-width: 390px;
+
+  color: #075744;
+  text-decoration: none;
 }
 
-/* ==========================================================
-   10. ENCABEZADO DEL FORMULARIO
-   ========================================================== */
+.vet-auth__marca-icono {
 
-.logo-area {
-  text-align: center;
-  margin-bottom: 32px;
-}
+  display: grid;
+  place-items: center;
 
-.logo-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-shrink: 0;
 
-  width: 58px;
-  height: 58px;
-  margin: 0 auto 17px;
-  border-radius: 17px;
+  width: 54px;
+  height: 54px;
 
-  background: #eee9ff;
-  font-size: 28px;
-}
+  border-radius: 16px;
 
-.logo-area h2 {
-  margin: 0;
+  background: #d0f1e3;
 
-  color: #25233a;
   font-size: 27px;
-  font-weight: 700;
+}
+
+.vet-auth__marca-nombre {
+
+  display: block;
+
+  color: #075744;
+
+  font-size: 19px;
+  font-weight: 800;
+
   line-height: 1.3;
 }
 
-.logo-area p {
-  margin: 10px 0 0;
+.vet-auth__marca-sub {
 
-  color: #666377;
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-/* ==========================================================
-   11. FORMULARIO
-   ========================================================== */
-
-.login-form {
-  width: 100%;
-}
-
-.form-group {
-  margin-bottom: 21px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 8px;
-
-  color: #343247;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-/* ==========================================================
-   12. CAMPOS
-   ========================================================== */
-
-.form-group input {
   display: block;
 
-  width: 100%;
-  min-height: 49px;
-  padding: 13px 14px;
+  margin-top: 3px;
 
-  border: 1px solid #d8d8e5;
-  border-radius: 10px;
-  outline: none;
+  color: #4b7769;
 
-  background: #fafafe;
-  color: #25233a;
-
-  font-size: 15px;
-  font-family: inherit;
-
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.form-group input::placeholder {
-  color: #858195;
-}
-
-.form-group input:focus {
-  border-color: #6652e8;
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(102, 82, 232, 0.13);
-}
-
-/* ==========================================================
-   13. CAMPOS INCORRECTOS
-   ========================================================== */
-
-/* Identifica visualmente un campo con error. */
-.form-group input.input-error {
-  border-color: #dc3545;
-  background: #fffafa;
-}
-
-.error {
-  display: block;
-  margin-top: 7px;
-
-  color: #b42332;
   font-size: 12px;
+}
+
+
+/* ==========================================================
+   6. TEXTOS DEL PANEL INFORMATIVO
+   ========================================================== */
+
+.vet-auth__relato {
+
+  position: relative;
+
+  flex-shrink: 0;
+
+  width: 100%;
+  max-width: 100%;
+
+  margin-top: 28px;
+}
+
+.vet-auth__eyebrow {
+
+  display: inline-block;
+
+  max-width: 100%;
+
+  padding: 8px 12px;
+
+  border: 1px solid #acdcc7;
+  border-radius: 25px;
+
+  background: #ffffff;
+
+  color: #176f56;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: 0.5px;
   line-height: 1.5;
 }
 
+.vet-auth__relato h1 {
+
+  margin: 18px 0 12px;
+
+  color: #133f34;
+
+  font-size: clamp(29px, 3.1vw, 43px);
+
+  font-weight: 800;
+  line-height: 1.17;
+
+  letter-spacing: -0.6px;
+
+  overflow-wrap: break-word;
+}
+
+.vet-auth__relato h1 span {
+  color: #0c8563;
+}
+
+.vet-auth__relato p {
+
+  max-width: 100%;
+
+  margin: 0;
+
+  color: #385d51;
+
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+
 /* ==========================================================
-   14. CONTRASEÑA
+   7. BENEFICIOS DEL LOGIN
    ========================================================== */
 
-.password-container {
+.vet-auth__beneficios {
+
+  display: grid;
+  gap: 12px;
+
+  margin-top: 22px;
+}
+
+.vet-auth__beneficio {
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  color: #254d41;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  line-height: 1.5;
+}
+
+.vet-auth__beneficio-icono {
+
+  display: grid;
+  place-items: center;
+
+  flex-shrink: 0;
+
+  width: 30px;
+  height: 30px;
+
+  border-radius: 50%;
+
+  background: #d0f1e3;
+  color: #08745c;
+}
+
+
+/* ==========================================================
+   8. PASOS DEL REGISTRO Y VERIFICACIÓN
+   ========================================================== */
+
+.vet-auth__pasos {
+
+  display: grid;
+  gap: 13px;
+
+  margin-top: 25px;
+}
+
+.vet-auth__paso {
+
+  display: flex;
+  align-items: flex-start;
+
+  gap: 11px;
+
+  color: #265547;
+
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.vet-auth__paso-numero {
+
+  display: grid;
+  place-items: center;
+
+  flex-shrink: 0;
+
+  width: 31px;
+  height: 31px;
+
+  border-radius: 10px;
+
+  background: #d2f0e1;
+  color: #096b51;
+
+  font-weight: 800;
+}
+
+.vet-auth__paso strong {
+
+  display: block;
+
+  color: #164c39;
+
+  font-size: 13px;
+}
+
+.vet-auth__paso small {
+
+  display: block;
+
+  margin-top: 3px;
+
+  color: #517567;
+
+  font-size: 12px;
+}
+
+
+/* ==========================================================
+   9. IMAGEN DEL PERRO Y GATO
+
+   CAMBIO IMPORTANTE:
+   - Sin position: absolute.
+   - Ocupa su propio espacio.
+   - No tapa los títulos ni párrafos.
+   - Mantiene su proporción dentro del panel.
+   ========================================================== */
+
+.vet-auth__foto {
+
   position: relative;
+
+  display: block;
+
+  flex-shrink: 0;
+
+  width: 100%;
+  max-width: 100%;
+
+  height: 235px;
+
+  margin-top: 25px;
+
+  border-radius: 17px;
+
+  object-fit: cover;
+  object-position: center 52%;
+
+  pointer-events: none;
+
+  -webkit-mask-image: none;
+  mask-image: none;
 }
 
-.password-container input {
-  padding-right: 58px;
+
+/* ==========================================================
+   10. FRASE INFERIOR
+   ========================================================== */
+
+.vet-auth__lema {
+
+  position: relative;
+
+  display: inline-block;
+
+  align-self: flex-start;
+
+  margin-top: 12px;
+
+  padding: 9px 13px;
+
+  border-radius: 12px;
+
+  background: #ffffff;
+
+  color: #076447;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  line-height: 1.5;
 }
 
-.btn-ver-password {
-  position: absolute;
-  top: 50%;
-  right: 4px;
-  transform: translateY(-50%);
+
+/* ==========================================================
+   11. PANEL DERECHO DEL FORMULARIO
+   ========================================================== */
+
+.vet-auth__derecha {
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  width: 44px;
-  height: 44px;
+  min-width: 0;
 
-  border: none;
-  border-radius: 8px;
-  background: transparent;
+  padding: 45px 42px;
 
-  font-size: 19px;
-  cursor: pointer;
+  background: #ffffff;
 }
 
-.btn-ver-password:hover {
-  background: #f0edff;
-}
+.vet-auth__form-card {
 
-.btn-ver-password:focus-visible {
-  outline: 3px solid #6652e8;
-  outline-offset: 1px;
-}
-
-/* ==========================================================
-   15. MENSAJE DE ERROR DEL LOGIN
-   ========================================================== */
-
-.mensaje-error {
-  margin-bottom: 18px;
-  padding: 12px 14px;
-
-  border: 1px solid #f3b4b4;
-  border-radius: 9px;
-
-  background: #fff1f0;
-  color: #a32020;
-
-  font-size: 13px;
-  line-height: 1.5;
-  text-align: center;
-}
-
-/* ==========================================================
-   16. BOTÓN INICIAR SESIÓN
-   ========================================================== */
-
-.btn-login {
   width: 100%;
-  min-height: 49px;
-  padding: 13px 16px;
+  max-width: 430px;
 
-  border: none;
-  border-radius: 10px;
-
-  background: linear-gradient(
-    135deg,
-    #6254e8,
-    #7c5ce7
-  );
-
-  color: #ffffff;
-  font-size: 15px;
-  font-family: inherit;
-  font-weight: 600;
-
-  cursor: pointer;
-
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+  min-width: 0;
 }
 
-.btn-login:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 18px rgba(98, 84, 232, 0.25);
-}
-
-.btn-login:focus-visible {
-  outline: 3px solid #4435b5;
-  outline-offset: 3px;
-}
-
-.btn-login:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-}
 
 /* ==========================================================
-   17. REGISTRO
+   12. ENCABEZADO DEL FORMULARIO
    ========================================================== */
 
-.registro {
-  margin-top: 25px;
-  text-align: center;
+.vet-auth__cabecera {
 
-  color: #666377;
+  margin-bottom: 28px;
+
+  text-align: center;
+}
+
+.vet-auth__logo-form {
+
+  display: grid;
+  place-items: center;
+
+  width: 63px;
+  height: 63px;
+
+  margin: 0 auto 16px;
+
+  border-radius: 19px;
+
+  background: #daf5e8;
+
+  font-size: 30px;
+}
+
+.vet-auth__cabecera h2 {
+
+  margin: 0;
+
+  color: #16312d;
+
+  font-size: clamp(24px, 2.4vw, 31px);
+
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.vet-auth__cabecera p {
+
+  margin: 10px 0 0;
+
+  color: #607570;
+
   font-size: 14px;
   line-height: 1.6;
 }
 
-.registro a {
-  display: inline-block;
-  margin-left: 5px;
 
-  color: #5843d5;
+/* ==========================================================
+   13. FORMULARIOS REACTIVOS
+   ========================================================== */
+
+.vet-auth__form {
+
+  display: grid;
+  gap: 18px;
+
+  width: 100%;
+}
+
+.vet-auth__campo {
+  min-width: 0;
+}
+
+.vet-auth__campo label {
+
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: #1d3c32;
+
+  font-size: 13px;
   font-weight: 700;
+}
+
+.vet-auth__obligatorio {
+  color: #ac263c;
+}
+
+
+/* ==========================================================
+   14. INPUTS
+   ========================================================== */
+
+.vet-auth__campo input {
+
+  display: block;
+
+  width: 100%;
+  min-height: 52px;
+
+  padding: 12px 15px;
+
+  border: 1px solid #d6e5df;
+  border-radius: 11px;
+
+  background: #fbfefd;
+
+  color: #1b332d;
+
+  font-family: inherit;
+  font-size: 16px;
+
+  outline: none;
+
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.vet-auth__campo input::placeholder {
+  color: #687e75;
+}
+
+.vet-auth__campo input:focus {
+
+  border-color: #138266;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 0 0 3px rgba(19, 130, 102, 0.14);
+}
+
+.vet-auth__campo input.input-error {
+  border-color: #c13649;
+}
+
+
+/* ==========================================================
+   15. MOSTRAR Y OCULTAR CONTRASEÑA
+   ========================================================== */
+
+.vet-auth__password {
+  position: relative;
+}
+
+.vet-auth__password input {
+  padding-right: 62px;
+}
+
+.vet-auth__ojo {
+
+  position: absolute;
+
+  top: 50%;
+  right: 6px;
+
+  transform: translateY(-50%);
+
+  display: grid;
+  place-items: center;
+
+  width: 44px;
+  height: 40px;
+
+  border: none;
+  border-radius: 9px;
+
+  background: #ecf9f3;
+
+  color: #0b684f;
+
+  font-size: 19px;
+
+  cursor: pointer;
+}
+
+.vet-auth__ojo:hover {
+  background: #d5f1e4;
+}
+
+
+/* ==========================================================
+   16. MENSAJES DE ERROR Y AYUDA
+   ========================================================== */
+
+.vet-auth__error-campo {
+
+  display: block;
+
+  margin-top: 7px;
+
+  color: #ad2839;
+
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.vet-auth__ayuda {
+
+  display: block;
+
+  margin-top: 6px;
+
+  color: #607570;
+
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.vet-auth__mensaje {
+
+  padding: 12px 14px;
+
+  border-radius: 11px;
+
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.vet-auth__mensaje--error {
+
+  border: 1px solid #f1bdc4;
+
+  background: #fff0f1;
+  color: #922334;
+}
+
+.vet-auth__mensaje--exito {
+
+  border: 1px solid #b0e3c8;
+
+  background: #e9fbf0;
+  color: #076142;
+}
+
+
+/* ==========================================================
+   17. BOTÓN PRINCIPAL
+   ========================================================== */
+
+.vet-auth__enviar {
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 9px;
+
+  width: 100%;
+  min-height: 53px;
+
+  padding: 13px 17px;
+
+  border: none;
+  border-radius: 11px;
+
+  background: #08745c;
+  color: #ffffff;
+
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition:
+    background 0.16s ease,
+    transform 0.16s ease;
+}
+
+.vet-auth__enviar:hover:not(:disabled) {
+
+  background: #055b47;
+
+  transform: translateY(-1px);
+}
+
+.vet-auth__enviar:disabled {
+
+  opacity: 0.65;
+
+  cursor: not-allowed;
+}
+
+
+/* ==========================================================
+   18. ENLACES Y NAVEGACIÓN
+   ========================================================== */
+
+.vet-auth__enlace-fila {
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+
+  gap: 5px;
+
+  margin-top: 24px;
+
+  color: #526c62;
+
+  font-size: 13px;
+  text-align: center;
+}
+
+.vet-auth__enlace-fila a,
+.vet-auth__enlace-fila button {
+
+  padding: 0;
+
+  border: 0;
+
+  background: transparent;
+
+  color: #06775a;
+
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 800;
+
   text-decoration: underline;
   text-underline-offset: 3px;
+
+  cursor: pointer;
 }
 
-.registro a:hover {
-  color: #39279c;
+.vet-auth__separador {
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  margin-top: 20px;
+
+  color: #7d968b;
+
+  font-size: 12px;
 }
 
-.registro a:focus-visible {
-  outline: 3px solid #6652e8;
+.vet-auth__separador::before,
+.vet-auth__separador::after {
+
+  content: '';
+
+  flex: 1;
+
+  height: 1px;
+
+  background: #dcece3;
+}
+
+
+/* ==========================================================
+   19. INFORMACIÓN ADICIONAL DEL REGISTRO
+   ========================================================== */
+
+.vet-auth__bloque-info {
+
+  padding: 14px 16px;
+
+  border: 1px solid #d0ebde;
+  border-radius: 12px;
+
+  background: #ecf9f3;
+
+  color: #365c4d;
+
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.vet-auth__bloque-info p {
+  margin: 5px 0;
+}
+
+
+/* ==========================================================
+   20. CORREO DE VERIFICACIÓN
+   ========================================================== */
+
+.vet-auth__correo {
+
+  display: grid;
+  gap: 5px;
+
+  margin-bottom: 20px;
+  padding: 13px 15px;
+
+  border: 1px solid #d6eae0;
+  border-radius: 12px;
+
+  background: #effaf4;
+
+  text-align: center;
+}
+
+.vet-auth__correo small {
+
+  color: #527565;
+
+  font-size: 12px;
+}
+
+.vet-auth__correo strong {
+
+  color: #0a7257;
+
+  font-size: 13px;
+
+  overflow-wrap: anywhere;
+}
+
+
+/* ==========================================================
+   21. CÓDIGO DE CUATRO DÍGITOS
+   ========================================================== */
+
+.vet-auth__campo .vet-auth__codigo {
+
+  min-height: 68px;
+
+  margin-top: 11px;
+
+  padding: 12px 18px;
+
+  color: #16312d;
+
+  font-size: 28px;
+  font-weight: 800;
+
+  letter-spacing: 0.4em;
+
+  text-align: center;
+}
+
+
+/* ==========================================================
+   22. BOTONES SECUNDARIOS DE VERIFICACIÓN
+   ========================================================== */
+
+.vet-auth__acciones {
+
+  display: flex;
+
+  gap: 10px;
+
+  margin-top: 20px;
+}
+
+.vet-auth__acciones button {
+
+  flex: 1;
+
+  min-height: 44px;
+
+  padding: 10px 12px;
+
+  border: 1px solid #d4e8dc;
+  border-radius: 10px;
+
+  background: #f7fdf9;
+
+  color: #0c7658;
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+
+/* ==========================================================
+   23. ACCESIBILIDAD POR TECLADO
+   ========================================================== */
+
+.vet-auth :is(
+  input,
+  button,
+  a
+):focus-visible {
+
+  outline: 3px solid #08745c;
   outline-offset: 3px;
 }
 
+
 /* ==========================================================
-   18. TABLETS
+   24. TABLETS
    ========================================================== */
 
-@media (max-width: 900px) {
-  .login-info {
-    padding: 30px;
+@media (max-width: 1040px) {
+
+  .vet-auth {
+    padding: 78px 22px 25px;
   }
 
-  .login-formulario {
-    padding: 35px 28px;
+  .vet-auth__shell {
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(0, 0.95fr);
   }
 
-  .informacion h1 {
-    font-size: 30px;
+  .vet-auth__hero {
+    padding: 28px 25px;
   }
+
+  .vet-auth__derecha {
+    padding: 35px 26px;
+  }
+
+  .vet-auth__relato h1 {
+    font-size: 32px;
+  }
+
+  .vet-auth__foto {
+    height: 200px;
+  }
+
 }
 
+
 /* ==========================================================
-   19. CELULARES
+   25. CELULARES
+
+   CAMBIO PRINCIPAL:
+   - Una sola columna.
+   - Texto completamente arriba.
+   - Imagen debajo del texto.
+   - Formulario debajo de la imagen.
+   - Sin superposición.
    ========================================================== */
 
-/* La sección izquierda pasa arriba y el formulario abajo. */
-@media (max-width: 700px) {
-  .login-page {
-    padding: 15px;
+@media (max-width: 760px) {
+
+  .vet-auth {
+
+    display: block;
+
+    padding: 75px 12px 24px;
   }
 
-  .login-container {
-    grid-template-columns: 1fr;
+  .vet-auth__shell {
+
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+    max-width: 550px;
+
     min-height: auto;
-    border-radius: 18px;
+
+    margin: 0 auto;
+
+    border-radius: 20px;
   }
 
-  .login-info {
-    padding: 25px;
+  .vet-auth__hero {
+
+    display: flex;
+    flex-direction: column;
+
+    min-height: 0;
+
+    padding: 23px 21px;
+
+    overflow: hidden;
   }
 
-  .marca {
-    font-size: 15px;
+  .vet-auth__brand {
+    gap: 10px;
   }
 
-  .informacion {
-    margin: 25px 0 15px;
+  .vet-auth__marca-icono {
+
+    width: 43px;
+    height: 43px;
+
+    font-size: 23px;
   }
 
-  .informacion h1 {
-    margin-bottom: 12px;
-    font-size: 28px;
+  .vet-auth__marca-nombre {
+    font-size: 16px;
   }
 
-  .informacion p {
-    font-size: 13px;
-    line-height: 1.6;
+  .vet-auth__marca-sub {
+    font-size: 11px;
   }
 
-  .etiqueta {
-    margin-bottom: 14px;
+  /* El texto utiliza todo el ancho disponible. */
+
+  .vet-auth__relato {
+
+    width: 100%;
+    max-width: 100%;
+
+    margin-top: 19px;
+  }
+
+  .vet-auth__eyebrow {
+
     font-size: 9px;
+
+    padding: 7px 10px;
+
+    letter-spacing: 0.2px;
   }
 
-  .beneficios {
+  .vet-auth__relato h1 {
+
+    width: 100%;
+
+    margin: 13px 0 9px;
+
+    font-size: clamp(23px, 6vw, 29px);
+
+    line-height: 1.2;
+    letter-spacing: -0.3px;
+  }
+
+  .vet-auth__relato p {
+
+    width: 100%;
+    max-width: 100%;
+
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  /* Simplificamos los elementos secundarios en móvil. */
+
+  .vet-auth__beneficios,
+  .vet-auth__pasos,
+  .vet-auth__lema {
     display: none;
   }
 
-  .info-footer {
-    display: none;
+  /*
+    La imagen ya no ocupa una posición absoluta.
+
+    Su espacio comienza después del párrafo,
+    por eso nunca tapa las letras.
+  */
+
+  .vet-auth__foto {
+
+    position: relative;
+
+    left: auto;
+    right: auto;
+    bottom: auto;
+    top: auto;
+
+    display: block;
+
+    width: 100%;
+    max-width: 100%;
+
+    height: 165px;
+
+    margin: 19px 0 0;
+
+    border-radius: 14px;
+
+    object-fit: cover;
+    object-position: center 52%;
+
+    -webkit-mask-image: none;
+    mask-image: none;
   }
 
-  .login-formulario {
-    padding: 35px 25px;
+  .vet-auth__derecha {
+
+    width: 100%;
+
+    padding: 32px 23px 38px;
   }
 
-  .logo-area {
+  .vet-auth__cabecera {
     margin-bottom: 25px;
   }
 
-  .logo-area h2 {
-    font-size: 24px;
+  .vet-auth__logo-form {
+
+    width: 59px;
+    height: 59px;
+
+    font-size: 28px;
   }
 
-  .form-group input {
-    font-size: 16px;
-  }
-}
-
-/* ==========================================================
-   20. CELULARES MUY PEQUEÑOS
-   ========================================================== */
-
-@media (max-width: 360px) {
-  .login-page {
-    padding: 8px;
-  }
-
-  .login-info,
-  .login-formulario {
-    padding: 22px 18px;
-  }
-
-  .informacion h1 {
+  .vet-auth__cabecera h2 {
     font-size: 25px;
   }
+
+  .vet-auth__cabecera p {
+    font-size: 13px;
+  }
+
+  /* Tamaño adecuado para escribir desde teléfonos. */
+
+  .vet-auth__campo input {
+    font-size: 16px;
+  }
+
+  .vet-auth__campo .vet-auth__codigo {
+    font-size: 27px;
+    letter-spacing: 0.3em;
+  }
+
 }
 
+
 /* ==========================================================
-   21. REDUCIR ANIMACIONES
+   26. CELULARES PEQUEÑOS
+   ========================================================== */
+
+@media (max-width: 380px) {
+
+  .vet-auth {
+    padding: 72px 7px 18px;
+  }
+
+  .vet-auth__hero {
+    padding: 20px 17px;
+  }
+
+  .vet-auth__relato h1 {
+    font-size: 23px;
+  }
+
+  .vet-auth__relato p {
+    font-size: 12px;
+  }
+
+  .vet-auth__foto {
+    height: 145px;
+  }
+
+  .vet-auth__derecha {
+    padding: 28px 17px 33px;
+  }
+
+  .vet-auth__acciones {
+    flex-direction: column;
+  }
+
+}
+
+
+/* ==========================================================
+   27. ACCESIBILIDAD Y ANIMACIONES
    ========================================================== */
 
 @media (prefers-reduced-motion: reduce) {
-  .form-group input,
-  .btn-login {
+
+  .vet-auth :is(
+    input,
+    button
+  ) {
     transition: none;
   }
 
-  .btn-login:hover:not(:disabled) {
+  .vet-auth__enviar:hover:not(:disabled) {
     transform: none;
   }
+
 }
+
 
 /* ==========================================================
-   22. MEJORA FINAL: TIPOGRAFÍA Y LEGIBILIDAD
+   28. ALTO CONTRASTE
+
+   Ocultamos la imagen decorativa cuando el usuario
+   selecciona el modo de alto contraste.
+
+   El formulario y el texto siguen disponibles.
    ========================================================== */
 
-/*
-   Algunos estilos globales del proyecto pueden establecer
-   tipografías serif. Aplicamos Segoe UI también a los textos
-   y controles del Login para mantener una apariencia uniforme.
-*/
-.login-page h1,
-.login-page h2,
-.login-page p,
-.login-page label,
-.login-page input,
-.login-page button,
-.login-page a,
-.login-page span,
-.login-page small {
-  font-family: 'Segoe UI', Arial, sans-serif;
+:host-context(
+  html[data-vet-contraste='alto']
+) .vet-auth__foto {
+  display: none;
 }
+
+
+/* ==========================================================
+   FIN - VETERINARIA ARÉVALO
+   LOGIN / REGISTRO / VERIFICACIÓN
+   ========================================================== */

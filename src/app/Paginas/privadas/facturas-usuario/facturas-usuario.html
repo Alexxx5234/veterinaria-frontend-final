@@ -1,0 +1,589 @@
+
+<!-- ==========================================================
+     VETERINARIA ARÉVALO
+     MÓDULO USER - MIS FACTURAS
+
+     FUNCIONALIDADES:
+     1. Consultar facturas del propietario.
+     2. Mostrar un único contador de facturas.
+     3. Buscar por mascota, servicio o número.
+     4. Filtrar por fecha y estado.
+     5. Ordenar resultados.
+     6. Consultar detalles y medicamentos.
+     7. Descargar comprobantes PDF.
+     8. Navegar mediante accesos rápidos.
+
+     PRIVACIDAD:
+     - No muestra ingresos generales.
+     - No muestra facturas de otros clientes.
+     - El usuario no puede emitir ni modificar facturas.
+========================================================== -->
+
+<div class="user-facturas">
+
+  <!-- ======================================================
+       1. ENCABEZADO
+  ====================================================== -->
+
+  <header class="user-facturas__header">
+
+    <div>
+      <span class="eyebrow">
+        MI ESPACIO PERSONAL
+      </span>
+
+      <h1>🧾 Mis Facturas</h1>
+
+      <p>
+        Consulta y descarga las facturas correspondientes
+        a las atenciones veterinarias de tus mascotas.
+      </p>
+    </div>
+
+    <button
+      type="button"
+      class="btn btn--outline"
+      (click)="cargarFacturas()"
+      [disabled]="cargando">
+
+      {{ cargando ? 'Actualizando...' : '↻ Actualizar datos' }}
+
+    </button>
+
+  </header>
+
+  <!-- ======================================================
+       2. ACCESOS RÁPIDOS
+  ====================================================== -->
+
+  <nav
+    class="quick-nav"
+    aria-label="Accesos rápidos del cliente">
+
+    <a routerLink="/usuario/dashboard">
+      🏠 Inicio
+    </a>
+
+    <a routerLink="/usuario/mascotas">
+      🐾 Mis Mascotas
+    </a>
+
+    <a routerLink="/usuario/citas">
+      📅 Mis Citas
+    </a>
+
+    <a routerLink="/usuario/atenciones">
+      🩺 Mis Atenciones
+    </a>
+
+    <a routerLink="/usuario/servicios">
+      💚 Servicios
+    </a>
+
+    <a routerLink="/usuario/veterinarios">
+      👨‍⚕️ Veterinarios
+    </a>
+
+  </nav>
+
+  <!-- ======================================================
+       3. MENSAJES DE ERROR
+  ====================================================== -->
+
+  <div
+    *ngIf="error"
+    class="alerta"
+    role="alert">
+
+    ⚠️ {{ error }}
+
+    <button
+      type="button"
+      (click)="cargarFacturas()"
+      [disabled]="cargando">
+      Reintentar
+    </button>
+
+  </div>
+
+  <!-- ======================================================
+       4. RESUMEN SIMPLIFICADO
+
+       Solo mostramos la cantidad de facturas
+       correspondientes al cliente.
+
+       Se eliminan los contadores:
+       - Comprobantes emitidos.
+       - Total emitido.
+  ====================================================== -->
+
+  <section
+    class="resumen resumen--simple"
+    aria-label="Resumen de mis facturas">
+
+    <article class="resumen__principal">
+
+      <div class="resumen__icono" aria-hidden="true">
+        🧾
+      </div>
+
+      <div class="resumen__contenido">
+
+        <span>Mis Facturas</span>
+
+        <strong aria-live="polite">
+          {{ cargando ? '—' : facturas.length }}
+        </strong>
+
+        <small>
+          Comprobantes asociados a mis mascotas
+        </small>
+
+      </div>
+
+    </article>
+
+  </section>
+
+  <!-- ======================================================
+       5. HISTORIAL DE FACTURACIÓN
+  ====================================================== -->
+
+  <section
+    class="panel"
+    aria-labelledby="titulo-facturas">
+
+    <div class="panel__titulo">
+
+      <h2 id="titulo-facturas">
+        Historial de mis facturas
+      </h2>
+
+      <span aria-live="polite">
+        {{ facturasFiltradas.length }} resultados
+      </span>
+
+    </div>
+
+    <!-- ====================================================
+         6. BUSCADOR Y FILTROS
+    ==================================================== -->
+
+    <div class="filtros">
+
+      <div>
+        <label for="buscar-factura">
+          Buscar factura
+        </label>
+
+        <input
+          id="buscar-factura"
+          type="search"
+          [(ngModel)]="busqueda"
+          placeholder="Factura, mascota o servicio"
+          autocomplete="off">
+      </div>
+
+      <div>
+        <label for="fecha-desde-factura">
+          Fecha desde
+        </label>
+
+        <input
+          id="fecha-desde-factura"
+          type="date"
+          [(ngModel)]="desde">
+      </div>
+
+      <div>
+        <label for="fecha-hasta-factura">
+          Fecha hasta
+        </label>
+
+        <input
+          id="fecha-hasta-factura"
+          type="date"
+          [(ngModel)]="hasta"
+          [min]="desde || null">
+      </div>
+
+      <div>
+        <label for="estado-factura">
+          Estado
+        </label>
+
+        <select
+          id="estado-factura"
+          [(ngModel)]="estado">
+
+          <option value="TODOS">Todos</option>
+          <option value="EMITIDA">Emitida</option>
+
+        </select>
+      </div>
+
+      <div>
+        <label for="orden-facturas">
+          Ordenar por
+        </label>
+
+        <select
+          id="orden-facturas"
+          [(ngModel)]="orden">
+
+          <option value="RECIENTES">
+            Más recientes
+          </option>
+
+          <option value="ANTIGUAS">
+            Más antiguas
+          </option>
+
+          <option value="MAYOR_TOTAL">
+            Mayor valor de factura
+          </option>
+
+          <option value="MENOR_TOTAL">
+            Menor valor de factura
+          </option>
+
+        </select>
+      </div>
+
+      <button
+        type="button"
+        class="btn btn--outline"
+        (click)="limpiarFiltros()">
+
+        Limpiar filtros
+
+      </button>
+
+    </div>
+
+    <!-- ====================================================
+         7. ESTADOS DE CONSULTA
+    ==================================================== -->
+
+    <p
+      *ngIf="cargando"
+      class="vacio"
+      role="status">
+
+      Consultando tus facturas...
+
+    </p>
+
+    <p
+      *ngIf="!cargando && !error && facturas.length === 0"
+      class="vacio">
+
+      Todavía no tienes facturas registradas.
+      Cuando se registre una factura por la atención
+      de una de tus mascotas, aparecerá aquí.
+
+    </p>
+
+    <p
+      *ngIf="
+        !cargando &&
+        !error &&
+        facturas.length > 0 &&
+        facturasFiltradas.length === 0
+      "
+      class="vacio">
+
+      No se encontraron facturas con los filtros seleccionados.
+
+    </p>
+
+    <!-- ====================================================
+         8. LISTADO DE FACTURAS
+    ==================================================== -->
+
+    <div
+      class="facturas-grid"
+      *ngIf="!cargando && !error">
+
+      <article
+        class="factura-card"
+        *ngFor="
+          let factura of facturasFiltradas;
+          trackBy: identificarFactura
+        ">
+
+        <div class="factura-card__top">
+
+          <div>
+            <small>MI COMPROBANTE</small>
+
+            <h3>
+              {{ factura.numeroFactura }}
+            </h3>
+          </div>
+
+          <span class="estado">
+            {{ factura.estado }}
+          </span>
+
+        </div>
+
+        <!-- DATOS DEL COMPROBANTE -->
+
+        <dl>
+
+          <div>
+            <dt>Mascota</dt>
+            <dd>{{ factura.nombreMascota }}</dd>
+          </div>
+
+          <div>
+            <dt>Servicio</dt>
+            <dd>{{ factura.nombreServicio }}</dd>
+          </div>
+
+          <div>
+            <dt>Veterinario</dt>
+            <dd>{{ factura.nombreVeterinario }}</dd>
+          </div>
+
+          <div>
+            <dt>Fecha</dt>
+
+            <dd>
+              {{
+                (factura.fechaEmision || factura.fechaCreacion)
+                  | date:'dd/MM/yyyy HH:mm'
+              }}
+            </dd>
+          </div>
+
+        </dl>
+
+        <!-- VALOR DE LA FACTURA INDIVIDUAL -->
+
+        <div class="factura-card__total">
+
+          <span>
+            Total de esta factura
+          </span>
+
+          <strong>
+            {{
+              numero(factura.total)
+                | currency:'USD':'symbol':'1.2-2':'en-US'
+            }}
+          </strong>
+
+        </div>
+
+        <!-- ACCIONES -->
+
+        <div class="acciones">
+
+          <button
+            type="button"
+            class="btn btn--outline"
+            (click)="verDetalle(factura)"
+            [attr.aria-expanded]="
+              facturaSeleccionada?.id === factura.id
+            ">
+
+            {{
+              facturaSeleccionada?.id === factura.id
+                ? 'Ocultar detalle'
+                : 'Ver detalle'
+            }}
+
+          </button>
+
+          <button
+            type="button"
+            class="btn btn--primary"
+            [disabled]="
+              descargandoId !== null ||
+              factura.estado !== 'EMITIDA'
+            "
+            (click)="descargarPdf(factura)">
+
+            {{
+              descargandoId === factura.id
+                ? 'Descargando...'
+                : '⬇ Descargar PDF'
+            }}
+
+          </button>
+
+        </div>
+
+      </article>
+
+    </div>
+
+  </section>
+
+  <!-- ======================================================
+       9. DETALLE DE LA FACTURA
+  ====================================================== -->
+
+  <section
+    class="panel detalle"
+    *ngIf="facturaSeleccionada as factura"
+    aria-labelledby="titulo-detalle-factura">
+
+    <div class="panel__titulo">
+
+      <h2 id="titulo-detalle-factura">
+        Detalle: {{ factura.numeroFactura }}
+      </h2>
+
+      <button
+        type="button"
+        class="btn btn--outline"
+        (click)="cerrarDetalle()">
+
+        Cerrar
+
+      </button>
+
+    </div>
+
+    <p>
+      <strong>Propietario:</strong>
+      {{ factura.nombreCliente }}
+    </p>
+
+    <p>
+      <strong>Mascota:</strong>
+      {{ factura.nombreMascota }}
+    </p>
+
+    <p>
+      <strong>Atención médica:</strong>
+      #{{ factura.atencionId }}
+    </p>
+
+    <!-- SERVICIO -->
+
+    <h3>Servicio veterinario</h3>
+
+    <div class="detalle-linea">
+
+      <span>
+        {{ factura.nombreServicio }}
+      </span>
+
+      <strong>
+        {{
+          numero(factura.precioServicio)
+            | currency:'USD':'symbol':'1.2-2':'en-US'
+        }}
+      </strong>
+
+    </div>
+
+    <!-- MEDICAMENTOS -->
+
+    <h3>Medicamentos de mi atención</h3>
+
+    <p *ngIf="!factura.medicamentos?.length">
+      Esta factura no contiene medicamentos.
+    </p>
+
+    <div
+      class="detalle-linea"
+      *ngFor="let medicamento of factura.medicamentos">
+
+      <div>
+
+        <strong>
+          {{ medicamento.nombreMedicamento }}
+        </strong>
+
+        <small>
+          {{ medicamento.cantidad }}
+          {{ medicamento.unidadMedida }}
+          · {{ medicamento.tipoRegistro }}
+        </small>
+
+        <small *ngIf="medicamento.indicaciones">
+          {{ medicamento.indicaciones }}
+        </small>
+
+      </div>
+
+      <strong>
+        {{
+          numero(medicamento.subtotal)
+            | currency:'USD':'symbol':'1.2-2':'en-US'
+        }}
+      </strong>
+
+    </div>
+
+    <!-- TOTALES DE ESTA FACTURA -->
+
+    <div class="totales">
+
+      <p>
+        <span>Subtotal</span>
+
+        <strong>
+          {{
+            numero(factura.subtotal)
+              | currency:'USD':'symbol':'1.2-2':'en-US'
+          }}
+        </strong>
+      </p>
+
+      <p>
+        <span>Impuestos registrados</span>
+
+        <strong>
+          {{
+            numero(factura.impuestos)
+              | currency:'USD':'symbol':'1.2-2':'en-US'
+          }}
+        </strong>
+      </p>
+
+      <p class="total-final">
+
+        <span>Total de mi factura</span>
+
+        <strong>
+          {{
+            numero(factura.total)
+              | currency:'USD':'symbol':'1.2-2':'en-US'
+          }}
+        </strong>
+
+      </p>
+
+    </div>
+
+    <p class="aclaracion">
+      Los valores corresponden únicamente a esta factura.
+      Los medicamentos recetados pueden tener subtotal cero
+      cuando no fueron entregados.
+    </p>
+
+    <!-- ACCESO A HISTORIAL CLÍNICO -->
+
+    <nav
+      class="quick-nav"
+      aria-label="Información relacionada">
+
+      <a routerLink="/usuario/atenciones">
+        🩺 Mis Atenciones Médicas
+      </a>
+
+      <a routerLink="/usuario/citas">
+        📅 Mis Citas
+      </a>
+
+    </nav>
+
+  </section>
+
+</div>

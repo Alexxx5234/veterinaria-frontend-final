@@ -1,0 +1,608 @@
+
+<!-- ==========================================================
+     VETERINARIA ARÉVALO
+     ATENCIONES MÉDICAS - VETERINARIO
+
+     SECCIONES:
+     1. Encabezado.
+     2. Estadísticas.
+     3. Formulario clínico.
+     4. Mensajes de confirmación.
+     5. Historial de atenciones.
+
+     El menú lateral y la accesibilidad se mantienen
+     en LayoutPrivado.
+     ========================================================== -->
+
+<div class="vet-atenciones">
+
+  <!-- ======================================================
+       1. ENCABEZADO
+       ====================================================== -->
+
+  <header class="vet-atenciones__header">
+
+    <div>
+
+      <span class="vet-atenciones__etiqueta">
+        🩺 ESPACIO PROFESIONAL
+      </span>
+
+      <h1>Atenciones médicas</h1>
+
+      <p>
+        Registra el diagnóstico y tratamiento de tus
+        pacientes y consulta las atenciones realizadas.
+      </p>
+
+    </div>
+
+    <!-- Actualizar información desde Spring Boot -->
+    <button
+      type="button"
+      class="vet-atenciones__actualizar"
+      (click)="cargarDatos()"
+      [disabled]="cargando || guardando"
+    >
+      {{ cargando ? 'Actualizando...' : '↻ Actualizar datos' }}
+    </button>
+
+  </header>
+
+
+  <!-- ======================================================
+       2. RESUMEN DE ACTIVIDAD
+       ====================================================== -->
+
+  <section
+    class="vet-atenciones__estadisticas"
+    aria-label="Resumen de atenciones"
+  >
+
+    <article class="vet-atenciones__estadistica">
+
+      <span class="vet-atenciones__icono" aria-hidden="true">
+        🩺
+      </span>
+
+      <div>
+        <small>Listas para atender</small>
+
+        <strong>
+          {{
+            cargando || errorCitas || errorAtenciones
+              ? '—'
+              : totalConfirmadas
+          }}
+        </strong>
+      </div>
+
+    </article>
+
+
+    <article class="vet-atenciones__estadistica">
+
+      <span class="vet-atenciones__icono" aria-hidden="true">
+        📋
+      </span>
+
+      <div>
+        <small>Mis atenciones</small>
+
+        <strong>
+          {{
+            cargando || errorAtenciones
+              ? '—'
+              : totalAtenciones
+          }}
+        </strong>
+      </div>
+
+    </article>
+
+
+    <article class="vet-atenciones__estadistica">
+
+      <span class="vet-atenciones__icono" aria-hidden="true">
+        ⏳
+      </span>
+
+      <div>
+        <small>Citas pendientes</small>
+
+        <strong>
+          {{
+            cargando || errorCitas
+              ? '—'
+              : totalPendientes
+          }}
+        </strong>
+      </div>
+
+    </article>
+
+  </section>
+
+
+  <!-- ======================================================
+       3. MENSAJES DE LA API
+       ====================================================== -->
+
+  <div
+    *ngIf="mensajeError"
+    class="vet-atenciones__mensaje vet-atenciones__mensaje--error"
+    role="alert"
+  >
+    ⚠️ {{ mensajeError }}
+  </div>
+
+
+  <div
+    *ngIf="mensajeExito"
+    class="vet-atenciones__mensaje vet-atenciones__mensaje--exito"
+    role="status"
+  >
+    ✅ {{ mensajeExito }}
+  </div>
+
+
+  <!-- Error de consulta parcial -->
+  <div
+    *ngIf="!cargando && (errorCitas || errorAtenciones)"
+    class="vet-atenciones__mensaje vet-atenciones__mensaje--error"
+    role="alert"
+  >
+    No se pudo cargar toda la información clínica.
+    Comprueba la conexión con el backend y
+    presiona Actualizar datos.
+  </div>
+
+
+  <!-- ======================================================
+       4. FORMULARIO DE ATENCIÓN
+       ====================================================== -->
+
+  <section
+    class="vet-atenciones__panel"
+    aria-labelledby="titulo-registro-atencion"
+  >
+
+    <div class="vet-atenciones__panel-header">
+
+      <div>
+
+        <h2 id="titulo-registro-atencion">
+          🐾 Nueva atención médica
+        </h2>
+
+        <p>
+          Selecciona una cita confirmada y registra
+          la información médica del paciente.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <!-- Aviso sobre los estados de las citas -->
+    <div class="vet-atenciones__informacion">
+
+      <strong>Información importante</strong>
+
+      <p>
+        Solo puedes registrar atenciones de citas
+        CONFIRMADAS que tengas asignadas.
+        Al guardar la atención, el backend marcará
+        automáticamente la cita como COMPLETADA.
+      </p>
+
+    </div>
+
+
+    <!-- Espera de datos -->
+    <p
+      class="vet-atenciones__vacio"
+      *ngIf="cargando"
+      role="status"
+    >
+      Consultando citas y atenciones médicas...
+    </p>
+
+
+    <!-- No hay citas disponibles -->
+    <p
+      class="vet-atenciones__vacio"
+      *ngIf="
+        !cargando &&
+        !errorCitas &&
+        !errorAtenciones &&
+        citasConfirmadas.length === 0
+      "
+    >
+      No tienes citas confirmadas disponibles para
+      registrar una atención. Puedes revisar tus
+      citas desde el menú lateral.
+    </p>
+
+
+    <!-- ====================================================
+         FORMULARIO REACTIVO
+         ==================================================== -->
+
+    <form
+      class="vet-atenciones__formulario"
+      [formGroup]="atencionForm"
+      (ngSubmit)="registrarAtencion()"
+      [attr.aria-busy]="guardando"
+      novalidate
+      *ngIf="
+        !cargando &&
+        !errorCitas &&
+        !errorAtenciones &&
+        citasConfirmadas.length > 0
+      "
+    >
+
+
+      <!-- ================================================
+           SELECCIÓN DE CITA
+           ================================================ -->
+
+      <div class="vet-atenciones__campo">
+
+        <label for="atencion-cita">
+          Seleccionar cita confirmada *
+        </label>
+
+        <select
+          id="atencion-cita"
+          formControlName="citaId"
+          [attr.aria-invalid]="
+            atencionForm.get('citaId')?.touched &&
+            atencionForm.get('citaId')?.invalid
+          "
+        >
+
+          <option [ngValue]="null">
+            Selecciona una cita...
+          </option>
+
+          <option
+            *ngFor="
+              let cita of citasConfirmadas;
+              trackBy: identificarCita
+            "
+            [ngValue]="cita.id"
+          >
+            #{{ cita.id }} —
+            {{ cita.mascota?.nombre || 'Mascota' }} —
+            {{ cita.fechaHora | date:'dd/MM/yyyy HH:mm' }}
+          </option>
+
+        </select>
+
+        <small
+          class="vet-atenciones__error-campo"
+          *ngIf="
+            atencionForm.get('citaId')?.touched &&
+            atencionForm.get('citaId')?.invalid
+          "
+        >
+          Debes seleccionar una cita confirmada.
+        </small>
+
+      </div>
+
+
+      <!-- ================================================
+           DIAGNÓSTICO
+           ================================================ -->
+
+      <div class="vet-atenciones__campo">
+
+        <label for="atencion-diagnostico">
+          Diagnóstico *
+        </label>
+
+        <textarea
+          id="atencion-diagnostico"
+          formControlName="diagnostico"
+          rows="4"
+          maxlength="2000"
+          placeholder="Describe el diagnóstico clínico..."
+          [attr.aria-invalid]="
+            atencionForm.get('diagnostico')?.touched &&
+            atencionForm.get('diagnostico')?.invalid
+          "
+        ></textarea>
+
+        <div class="vet-atenciones__ayuda">
+          <span>Campo obligatorio. Máximo 2000 caracteres.</span>
+
+          <span>
+            {{
+              atencionForm.get('diagnostico')?.value?.length || 0
+            }}/2000
+          </span>
+        </div>
+
+        <small
+          class="vet-atenciones__error-campo"
+          *ngIf="
+            atencionForm.get('diagnostico')?.touched &&
+            atencionForm.get('diagnostico')?.invalid
+          "
+        >
+          Escribe un diagnóstico válido.
+        </small>
+
+      </div>
+
+
+      <!-- ================================================
+           TRATAMIENTO
+           ================================================ -->
+
+      <div class="vet-atenciones__campo">
+
+        <label for="atencion-tratamiento">
+          Tratamiento *
+        </label>
+
+        <textarea
+          id="atencion-tratamiento"
+          formControlName="tratamiento"
+          rows="4"
+          maxlength="2000"
+          placeholder="Describe el tratamiento recomendado..."
+          [attr.aria-invalid]="
+            atencionForm.get('tratamiento')?.touched &&
+            atencionForm.get('tratamiento')?.invalid
+          "
+        ></textarea>
+
+        <div class="vet-atenciones__ayuda">
+          <span>Campo obligatorio. Máximo 2000 caracteres.</span>
+
+          <span>
+            {{
+              atencionForm.get('tratamiento')?.value?.length || 0
+            }}/2000
+          </span>
+        </div>
+
+        <small
+          class="vet-atenciones__error-campo"
+          *ngIf="
+            atencionForm.get('tratamiento')?.touched &&
+            atencionForm.get('tratamiento')?.invalid
+          "
+        >
+          Escribe el tratamiento de la mascota.
+        </small>
+
+      </div>
+
+
+      <!-- ================================================
+           OBSERVACIONES
+           ================================================ -->
+
+      <div class="vet-atenciones__campo">
+
+        <label for="atencion-observaciones">
+          Observaciones
+          <span class="vet-atenciones__opcional">(opcional)</span>
+        </label>
+
+        <textarea
+          id="atencion-observaciones"
+          formControlName="observaciones"
+          rows="3"
+          maxlength="2000"
+          placeholder="Anota indicaciones adicionales, cuidados o recomendaciones..."
+        ></textarea>
+
+        <div class="vet-atenciones__ayuda">
+          <span>Máximo 2000 caracteres.</span>
+
+          <span>
+            {{
+              atencionForm.get('observaciones')?.value?.length || 0
+            }}/2000
+          </span>
+        </div>
+
+      </div>
+
+
+      <!-- ================================================
+           BOTÓN DE GUARDADO
+           ================================================ -->
+
+      <div class="vet-atenciones__acciones">
+
+        <button
+          type="submit"
+          class="vet-atenciones__guardar"
+          [disabled]="guardando"
+        >
+
+          {{
+            guardando
+              ? 'Guardando atención...'
+              : '✓ Registrar atención médica'
+          }}
+
+        </button>
+
+      </div>
+
+    </form>
+
+  </section>
+
+
+  <!-- ======================================================
+       5. HISTORIAL DE ATENCIONES DEL VETERINARIO
+       ====================================================== -->
+
+  <section
+    class="vet-atenciones__panel"
+    aria-labelledby="titulo-mis-atenciones"
+  >
+
+    <div class="vet-atenciones__panel-header">
+
+      <div>
+
+        <h2 id="titulo-mis-atenciones">
+          📋 Mis atenciones registradas
+        </h2>
+
+        <p>
+          Historial de los pacientes que has atendido.
+        </p>
+
+      </div>
+
+      <span class="vet-atenciones__contador">
+        {{
+          errorAtenciones || cargando
+            ? '—'
+            : atenciones.length
+        }}
+      </span>
+
+    </div>
+
+
+    <!-- Cargando -->
+    <p
+      class="vet-atenciones__vacio"
+      *ngIf="cargando"
+    >
+      Cargando historial médico...
+    </p>
+
+
+    <!-- Historial vacío -->
+    <p
+      class="vet-atenciones__vacio"
+      *ngIf="
+        !cargando &&
+        !errorAtenciones &&
+        atenciones.length === 0
+      "
+    >
+      Todavía no tienes atenciones médicas registradas.
+    </p>
+
+
+    <!-- ================================================
+         LISTADO DE ATENCIONES
+         ================================================ -->
+
+    <div
+      class="vet-atenciones__lista"
+      *ngIf="
+        !cargando &&
+        !errorAtenciones &&
+        atenciones.length > 0
+      "
+    >
+
+      <article
+        class="vet-atenciones__item"
+        *ngFor="
+          let atencion of atenciones;
+          trackBy: identificarAtencion
+        "
+      >
+
+        <!-- CABECERA DE LA ATENCIÓN -->
+        <div class="vet-atenciones__item-header">
+
+          <div class="vet-atenciones__paciente">
+
+            <span
+              class="vet-atenciones__avatar"
+              aria-hidden="true"
+            >
+              🐾
+            </span>
+
+            <div>
+
+              <h3>
+                {{ atencion.nombreMascota || 'Mascota' }}
+              </h3>
+
+              <small>
+                Atención #{{ atencion.id }}
+                · Cita #{{ atencion.citaId }}
+              </small>
+
+            </div>
+
+          </div>
+
+          <span class="vet-atenciones__fecha">
+
+            {{
+              atencion.fechaAtencion
+                ? (
+                  atencion.fechaAtencion |
+                  date:'dd/MM/yyyy HH:mm'
+                )
+                : 'Fecha no disponible'
+            }}
+
+          </span>
+
+        </div>
+
+
+        <!-- DATOS CLÍNICOS -->
+        <div class="vet-atenciones__detalle">
+
+          <div>
+
+            <strong>Diagnóstico</strong>
+
+            <p>
+              {{ atencion.diagnostico }}
+            </p>
+
+          </div>
+
+          <div>
+
+            <strong>Tratamiento</strong>
+
+            <p>
+              {{ atencion.tratamiento }}
+            </p>
+
+          </div>
+
+          <div *ngIf="atencion.observaciones">
+
+            <strong>Observaciones</strong>
+
+            <p>
+              {{ atencion.observaciones }}
+            </p>
+
+          </div>
+
+        </div>
+
+      </article>
+
+    </div>
+
+  </section>
+
+</div>

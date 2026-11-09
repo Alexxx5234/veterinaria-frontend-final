@@ -1,0 +1,595 @@
+
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+:host,
+:host * {
+  box-sizing: border-box;
+}
+
+.medicamentos-disponibles-page {
+  --verde: #08745c;
+  --verde-oscuro: #075642;
+  --verde-claro: #eaf8ef;
+  --texto: #173c31;
+  --secundario: #64786f;
+  --borde: #dce9e1;
+
+  width: 100%;
+  max-width: 1250px;
+  margin: 0 auto;
+  padding: 4px 0 35px;
+  color: var(--texto);
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+/* ENCABEZADO */
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.eyebrow {
+  margin: 0 0 7px;
+  color: var(--verde);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.page-header h1 {
+  margin: 0;
+  color: var(--texto);
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 750;
+  line-height: 1.25;
+}
+
+.intro {
+  max-width: 700px;
+  margin: 9px 0 0;
+  color: var(--secundario);
+  font-size: 14px;
+}
+
+/* BOTONES */
+
+.button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 43px;
+  padding: 10px 16px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 750;
+  cursor: pointer;
+  transition: background-color .18s ease;
+}
+
+.button--secondary {
+  border-color: #c9e1d4;
+  background: #fff;
+  color: var(--verde);
+}
+
+.button--secondary:hover:not(:disabled) {
+  background: var(--verde-claro);
+}
+
+.button--clear {
+  border-color: #dce9e1;
+  background: #fff;
+  color: #587367;
+}
+
+.button--clear:hover:not(:disabled) {
+  background: #f0f8f3;
+}
+
+.button:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+/* MENSAJES */
+
+.notice {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  border-radius: 11px;
+  font-size: 13px;
+}
+
+.notice--error {
+  border: 1px solid #efc3c8;
+  background: #fff1f2;
+  color: #902b39;
+}
+
+.notice button {
+  padding: 7px 12px;
+  border: 1px solid #e9b8be;
+  border-radius: 8px;
+  background: #fff;
+  color: #902b39;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* RESUMEN */
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 15px;
+  margin-bottom: 22px;
+}
+
+.summary-card {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--borde);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(15, 65, 44, .035);
+}
+
+.summary-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 43px;
+  height: 43px;
+  border-radius: 12px;
+  background: var(--verde-claro);
+  font-size: 21px;
+}
+
+.summary-card div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.summary-card span {
+  color: var(--secundario);
+  font-size: 11px;
+}
+
+.summary-card strong {
+  color: var(--verde-oscuro);
+  font-size: 23px;
+  line-height: 1.2;
+}
+
+/* PANEL DEL CATÁLOGO */
+
+.catalog-panel {
+  min-width: 0;
+  padding: 23px;
+  border: 1px solid var(--borde);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 4px 15px rgba(15, 65, 44, .045);
+}
+
+.catalog-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.catalog-heading h2 {
+  margin: 0;
+  color: var(--texto);
+  font-size: 19px;
+  font-weight: 750;
+}
+
+.catalog-heading p {
+  margin: 5px 0 0;
+  color: var(--secundario);
+  font-size: 12px;
+}
+
+.result-count {
+  padding: 7px 11px;
+  border-radius: 30px;
+  background: var(--verde-claro);
+  color: var(--verde);
+  font-size: 11px;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+/* BUSCADOR Y FILTROS */
+
+.catalog-toolbar {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(180px, 230px) auto;
+  align-items: end;
+  gap: 14px;
+  margin-bottom: 22px;
+  padding: 17px;
+  border: 1px solid #e5eee8;
+  border-radius: 12px;
+  background: #f9fcfa;
+}
+
+.field {
+  min-width: 0;
+}
+
+.field label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--texto);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.field input,
+.field select {
+  width: 100%;
+  min-width: 0;
+  min-height: 43px;
+  padding: 10px 12px;
+  border: 1px solid #cbded3;
+  border-radius: 9px;
+  background: #fff;
+  color: var(--texto);
+  font: inherit;
+  font-size: 13px;
+}
+
+.field input:focus,
+.field select:focus {
+  outline: 2px solid #08745c;
+  outline-offset: 2px;
+}
+
+.field select {
+  cursor: pointer;
+}
+
+/* CARGA Y ESTADOS VACÍOS */
+
+.loading-panel,
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 190px;
+  padding: 25px;
+  border: 1px dashed #d5e7dc;
+  border-radius: 13px;
+  background: #f9fcfa;
+  text-align: center;
+}
+
+.loading-panel p,
+.empty-state p {
+  margin: 9px 0 0;
+  color: var(--secundario);
+  font-size: 13px;
+}
+
+.loading-icon,
+.empty-state > span {
+  font-size: 30px;
+}
+
+.empty-state h3 {
+  margin: 10px 0 0;
+  color: var(--texto);
+  font-size: 16px;
+}
+
+/* TARJETAS DE MEDICAMENTOS */
+
+.medicine-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.medicine-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 17px;
+  border: 1px solid var(--borde);
+  border-radius: 13px;
+  background: #fff;
+  transition: border-color .18s ease, box-shadow .18s ease;
+}
+
+.medicine-card:hover {
+  border-color: #b7d9c5;
+  box-shadow: 0 6px 18px rgba(15, 65, 44, .07);
+}
+
+.medicine-card__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.medicine-icon {
+  display: grid;
+  place-items: center;
+  width: 43px;
+  height: 43px;
+  border-radius: 12px;
+  background: #e5f6ed;
+  font-size: 22px;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 30px;
+  font-size: 10px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.status--available {
+  background: #e2f6e9;
+  color: #08734f;
+}
+
+.status--empty {
+  background: #fff0e6;
+  color: #a44d19;
+}
+
+.status--inactive {
+  background: #f0f1f2;
+  color: #68716c;
+}
+
+.status--unknown {
+  background: #edf1fa;
+  color: #53658c;
+}
+
+/* INFORMACIÓN PRINCIPAL */
+
+.medicine-main {
+  min-height: 105px;
+}
+
+.medicine-code {
+  color: #81968b;
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: .5px;
+}
+
+.medicine-main h3 {
+  margin: 6px 0;
+  color: var(--texto);
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.medicine-main p {
+  margin: 5px 0 0;
+  color: var(--secundario);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* DETALLES */
+
+.medicine-details {
+  display: grid;
+  gap: 11px;
+  margin-top: 13px;
+  padding-top: 14px;
+  border-top: 1px solid #e7eee9;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.detail-row span {
+  color: var(--secundario);
+  font-size: 11px;
+}
+
+.detail-row strong {
+  color: var(--texto);
+  font-size: 11px;
+  font-weight: 750;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+/* ACCESIBILIDAD */
+
+.medicamentos-disponibles-page :is(
+  button,
+  input,
+  select
+):focus-visible {
+  outline: 3px solid #08745c;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .medicamentos-disponibles-page * {
+    transition: none !important;
+  }
+}
+
+/* TABLETS */
+
+@media (max-width: 1050px) {
+  .summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .medicine-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* CELULARES */
+
+@media (max-width: 650px) {
+  .medicamentos-disponibles-page {
+    padding-bottom: 25px;
+  }
+
+  .page-header {
+    align-items: flex-start;
+  }
+
+  .page-header > button {
+    width: 100%;
+  }
+
+  .summary-grid {
+    gap: 10px;
+  }
+
+  .summary-card {
+    padding: 13px;
+  }
+
+  .summary-card strong {
+    font-size: 20px;
+  }
+
+  .catalog-panel {
+    padding: 16px;
+  }
+
+  .catalog-toolbar {
+    grid-template-columns: 1fr;
+    padding: 13px;
+  }
+
+  .catalog-toolbar .button {
+    width: 100%;
+  }
+
+  .medicine-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .medicine-main {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 380px) {
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* ==========================================================
+   VETERINARIA ARÉVALO
+   MEJORA DEL BUSCADOR, FILTROS Y ORDENAMIENTO
+
+   Permite mostrar:
+   - Buscar medicamento.
+   - Filtrar por estado.
+   - Ordenar por precio, stock o nombre.
+   - Limpiar filtros.
+
+   Conserva el diseño verde institucional.
+========================================================== */
+
+/* COMPUTADORAS */
+
+.catalog-toolbar {
+  display: grid;
+
+  grid-template-columns:
+    minmax(230px, 2fr)
+    minmax(160px, 1fr)
+    minmax(170px, 1fr)
+    auto;
+
+  align-items: end;
+  gap: 14px;
+}
+
+.catalog-toolbar .field {
+  min-width: 0;
+}
+
+.catalog-toolbar .button--clear {
+  min-height: 43px;
+  white-space: nowrap;
+}
+
+/* TABLETS */
+
+@media (max-width: 1100px) {
+
+  .catalog-toolbar {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .catalog-toolbar .button--clear {
+    width: 100%;
+  }
+
+}
+
+/* CELULARES */
+
+@media (max-width: 650px) {
+
+  .catalog-toolbar {
+    grid-template-columns: 1fr;
+    gap: 13px;
+  }
+
+  .catalog-toolbar .button--clear {
+    width: 100%;
+  }
+
+}

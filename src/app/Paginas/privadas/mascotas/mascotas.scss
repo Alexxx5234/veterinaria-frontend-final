@@ -1,25 +1,32 @@
 
 /* ==========================================================
-   VETERINARIA AREVALO - MIS MASCOTAS
+   VETERINARIA ARÉVALO
+   MIS MASCOTAS - DISEÑO VERDE INSTITUCIONAL
 
-   DISEÑO Y ACCESIBILIDAD:
-   - Colores morado y blanco.
-   - Panel de notificaciones.
+   CONSERVA:
+   - Tarjetas de mascotas.
+   - Registro y edición.
+   - Campos validados.
+   - Notificaciones.
    - Panel de accesibilidad.
    - Alto contraste.
    - Tamaño de texto ajustable.
-   - Reducción de animaciones.
+   - Reducción de movimiento.
    - Diseño responsivo.
-   ========================================================== */
 
+   NUEVO:
+   - Accesos rápidos a los módulos USER.
+
+   No modifica los estilos de ADMIN o VETERINARIO.
+========================================================== */
 
 /* ==========================================================
    1. CONFIGURACIÓN GENERAL
-   ========================================================== */
+========================================================== */
 
 :host {
   display: block;
-  min-height: 100vh;
+  min-width: 0;
 }
 
 :host *,
@@ -28,57 +35,54 @@
   box-sizing: border-box;
 }
 
-
-/* ==========================================================
-   2. CONTENEDOR PRINCIPAL
-   ========================================================== */
-
 .mascotas-container {
   --escala-fuente: 1;
 
-  min-height: 100vh;
-  min-height: 100dvh;
+  --vet-verde: #08765a;
+  --vet-verde-oscuro: #075642;
+  --vet-verde-claro: #e5f6ed;
+  --vet-borde: #dcebe2;
+  --vet-texto: #183e32;
+  --vet-secundario: #637f70;
 
-  padding: 35px;
+  width: 100%;
+  min-height: auto;
+  padding: 5px 0 30px;
 
-  background: linear-gradient(
-    135deg,
-    #f5f7ff,
-    #f0edff
-  );
-
-  color: #292742;
+  background: transparent;
+  color: var(--vet-texto);
 
   font-family: 'Segoe UI', Arial, sans-serif;
+  line-height: 1.55;
 }
 
-
 /* ==========================================================
-   3. CABECERA PRINCIPAL
-   ========================================================== */
+   2. CABECERA PRINCIPAL
+========================================================== */
 
 .mascotas-header {
   position: relative;
+  z-index: 10;
 
-  margin-bottom: 28px;
+  margin-bottom: 20px;
   padding: 27px 30px;
 
-  border: 1px solid #eeebfc;
+  border: 1px solid var(--vet-borde);
   border-radius: 18px;
 
-  background: #ffffff;
+  background: linear-gradient(
+    115deg,
+    #ffffff 0%,
+    #f0faf4 100%
+  );
 
-  box-shadow:
-    0 8px 25px rgba(53, 42, 105, 0.06);
-
-  z-index: 10;
+  box-shadow: 0 8px 25px rgba(15, 84, 55, .05);
 }
 
 .header-fila {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-
   gap: 20px;
 }
 
@@ -89,47 +93,42 @@
 
 .etiqueta-pagina {
   display: inline-block;
-
   margin-bottom: 9px;
 
-  color: #624bd4;
+  color: var(--vet-verde);
 
   font-size: calc(11px * var(--escala-fuente));
-  font-weight: 700;
-
-  letter-spacing: 1px;
+  font-weight: 800;
+  letter-spacing: 1.1px;
 }
 
 .header-texto h1 {
   margin: 0;
 
-  color: #292742;
-
+  color: var(--vet-verde-oscuro);
   font-size: calc(29px * var(--escala-fuente));
-  font-weight: 700;
+  font-weight: 750;
+  line-height: 1.3;
 }
 
 .header-texto p {
   margin: 9px 0 0;
 
-  color: #625e78;
+  color: var(--vet-secundario);
 
   font-size: calc(14px * var(--escala-fuente));
   line-height: 1.6;
 }
 
-
 /* ==========================================================
-   4. HERRAMIENTAS DE LA CABECERA
-   ========================================================== */
+   3. HERRAMIENTAS SUPERIORES
+========================================================== */
 
 .herramientas-header {
   display: flex;
   align-items: flex-start;
-
-  gap: 10px;
-
   flex-wrap: wrap;
+  gap: 10px;
 }
 
 .herramienta-contenedor {
@@ -138,22 +137,20 @@
 
 .btn-herramienta {
   display: inline-flex;
-  justify-content: center;
   align-items: center;
-
+  justify-content: center;
   gap: 8px;
-  min-height: 44px;
 
+  min-height: 44px;
   padding: 10px 13px;
 
-  border: 1px solid #e1dbff;
+  border: 1px solid #cde6d7;
   border-radius: 11px;
 
-  background: #f6f3ff;
+  background: #eaf8ef;
+  color: var(--vet-verde-oscuro);
 
-  color: #4d39b5;
-
-  font-family: inherit;
+  font: inherit;
   font-size: calc(12px * var(--escala-fuente));
   font-weight: 700;
 
@@ -161,7 +158,7 @@
 }
 
 .btn-herramienta:hover {
-  background: #ebe6ff;
+  background: #d7f0e1;
 }
 
 .btn-herramienta > span:first-child {
@@ -175,49 +172,45 @@
 
   min-width: 20px;
   height: 20px;
-
   padding: 2px 5px;
 
   border-radius: 20px;
 
-  background: #d32f4b;
+  background: #c93249;
   color: #ffffff;
 
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 800;
 }
 
-
 /* ==========================================================
-   5. PANELES DESPLEGABLES
-   ========================================================== */
+   4. PANELES DESPLEGABLES
+========================================================== */
 
 .panel-desplegable {
   position: absolute;
+
   top: calc(100% + 12px);
   right: 0;
+  z-index: 50;
 
   width: 350px;
   max-width: calc(100vw - 35px);
 
   padding: 18px;
 
-  border: 1px solid #e6e0f8;
+  border: 1px solid var(--vet-borde);
   border-radius: 15px;
 
   background: #ffffff;
 
-  box-shadow:
-    0 15px 40px rgba(43, 31, 101, 0.18);
-
-  z-index: 50;
+  box-shadow: 0 15px 40px rgba(15, 84, 55, .15);
 }
 
 .panel-encabezado {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-
+  align-items: center;
   gap: 12px;
 
   margin-bottom: 15px;
@@ -226,63 +219,56 @@
 .panel-encabezado h2 {
   margin: 0;
 
-  color: #292742;
-
+  color: var(--vet-texto);
   font-size: calc(17px * var(--escala-fuente));
 }
 
 .btn-cerrar-panel {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: grid;
+  place-items: center;
 
   width: 34px;
   height: 34px;
 
-  border: none;
+  border: 0;
   border-radius: 8px;
 
-  background: #f1eeff;
-  color: #5946d5;
+  background: #e6f6ed;
+  color: var(--vet-verde-oscuro);
 
   font-size: 14px;
-
   cursor: pointer;
 }
 
 .btn-cerrar-panel:hover {
-  background: #e4ddff;
+  background: #d5eee0;
 }
 
-
 /* ==========================================================
-   6. NOTIFICACIONES
-   ========================================================== */
+   5. NOTIFICACIONES
+========================================================== */
 
 .panel-vacio {
   padding: 25px 12px;
-
   text-align: center;
 }
 
 .panel-vacio > span {
   display: block;
   margin-bottom: 12px;
-
   font-size: 29px;
 }
 
 .panel-vacio p {
   margin: 0 0 7px;
-
-  color: #302d4f;
+  color: var(--vet-texto);
 
   font-size: calc(13px * var(--escala-fuente));
   font-weight: 600;
 }
 
 .panel-vacio small {
-  color: #68647d;
+  color: var(--vet-secundario);
 
   font-size: calc(12px * var(--escala-fuente));
   line-height: 1.6;
@@ -291,26 +277,24 @@
 .notificaciones-lista {
   display: flex;
   flex-direction: column;
-
   gap: 10px;
 }
 
 .notificacion-item {
   display: flex;
   align-items: flex-start;
-
   gap: 11px;
+
   padding: 12px;
 
-  border: 1px solid #e1f0e6;
+  border: 1px solid #d5eadd;
   border-radius: 11px;
 
-  background: #f0fbf4;
+  background: #f0faf4;
 }
 
 .notificacion-item.notificacion-error {
   border-color: #f4d8dc;
-
   background: #fff3f4;
 }
 
@@ -326,23 +310,21 @@
 .notificacion-contenido strong {
   display: block;
 
-  color: #292742;
-
+  color: var(--vet-texto);
   font-size: calc(12px * var(--escala-fuente));
 }
 
 .notificacion-contenido p {
   margin: 5px 0;
 
-  color: #555168;
+  color: #557266;
 
   font-size: calc(12px * var(--escala-fuente));
   line-height: 1.5;
 }
 
 .notificacion-contenido small {
-  color: #6c6880;
-
+  color: #6c887a;
   font-size: calc(11px * var(--escala-fuente));
 }
 
@@ -350,28 +332,27 @@
   width: 100%;
   min-height: 38px;
 
-  border: 1px solid #e0dafb;
+  border: 1px solid #cce5d7;
   border-radius: 9px;
 
   background: #ffffff;
-  color: #5946d5;
+  color: var(--vet-verde-oscuro);
 
-  font-family: inherit;
+  font: inherit;
   font-size: calc(12px * var(--escala-fuente));
   font-weight: 700;
 
   cursor: pointer;
 }
 
-
 /* ==========================================================
-   7. PANEL DE ACCESIBILIDAD
-   ========================================================== */
+   6. ACCESIBILIDAD LOCAL
+========================================================== */
 
 .panel-descripcion {
   margin: 0 0 15px;
 
-  color: #625e78;
+  color: var(--vet-secundario);
 
   font-size: calc(12px * var(--escala-fuente));
   line-height: 1.6;
@@ -381,13 +362,12 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-
   flex-wrap: wrap;
   gap: 12px;
 
   padding: 14px 0;
 
-  border-bottom: 1px solid #eeeaf7;
+  border-bottom: 1px solid #e3efe7;
 }
 
 .opcion-accesibilidad > div:first-child {
@@ -398,17 +378,15 @@
 .opcion-accesibilidad strong {
   display: block;
 
-  color: #302d4f;
-
+  color: var(--vet-texto);
   font-size: calc(13px * var(--escala-fuente));
 }
 
 .opcion-accesibilidad small {
   display: block;
-
   margin-top: 4px;
 
-  color: #77738a;
+  color: var(--vet-secundario);
 
   font-size: calc(11px * var(--escala-fuente));
   line-height: 1.5;
@@ -416,16 +394,15 @@
 
 .btn-opcion {
   min-height: 36px;
-
   padding: 8px 11px;
 
-  border: 1px solid #d9d1fa;
+  border: 1px solid #cde6d7;
   border-radius: 9px;
 
-  background: #f3f0ff;
-  color: #5843c6;
+  background: #eaf8ef;
+  color: var(--vet-verde-oscuro);
 
-  font-family: inherit;
+  font: inherit;
   font-size: calc(11px * var(--escala-fuente));
   font-weight: 700;
 
@@ -433,16 +410,14 @@
 }
 
 .btn-opcion.activado {
-  border-color: #5744c8;
-
-  background: #5744c8;
+  border-color: var(--vet-verde);
+  background: var(--vet-verde);
   color: #ffffff;
 }
 
 .controles-fuente {
   display: flex;
   align-items: center;
-
   gap: 8px;
 }
 
@@ -450,13 +425,13 @@
   min-width: 35px;
   min-height: 36px;
 
-  border: 1px solid #d9d1fa;
+  border: 1px solid #cde6d7;
   border-radius: 8px;
 
-  background: #f3f0ff;
-  color: #4d39b5;
+  background: #eaf8ef;
+  color: var(--vet-verde-oscuro);
 
-  font-family: inherit;
+  font: inherit;
   font-size: 13px;
   font-weight: 700;
 
@@ -464,18 +439,16 @@
 }
 
 .controles-fuente button:disabled {
-  opacity: 0.45;
+  opacity: .45;
   cursor: not-allowed;
 }
 
 .controles-fuente span {
   min-width: 38px;
 
-  color: #302d4f;
-
+  color: var(--vet-texto);
   font-size: 12px;
   font-weight: 700;
-
   text-align: center;
 }
 
@@ -486,13 +459,13 @@
   margin-top: 18px;
   padding: 10px;
 
-  border: 1px solid #d8d0fb;
+  border: 1px solid #cde6d7;
   border-radius: 9px;
 
   background: #ffffff;
-  color: #5641c5;
+  color: var(--vet-verde-oscuro);
 
-  font-family: inherit;
+  font: inherit;
   font-size: calc(12px * var(--escala-fuente));
   font-weight: 700;
 
@@ -500,18 +473,16 @@
 }
 
 .btn-restablecer:hover {
-  background: #f3f0ff;
+  background: #eaf8ef;
 }
 
-
 /* ==========================================================
-   8. BOTONES PRINCIPALES
-   ========================================================== */
+   7. ACCIONES PRINCIPALES
+========================================================== */
 
 .acciones-header {
   display: flex;
   align-items: center;
-
   flex-wrap: wrap;
   gap: 12px;
 
@@ -525,74 +496,105 @@
 .btn-editar,
 .btn-actualizar {
   min-height: 44px;
-
   padding: 11px 17px;
 
   border-radius: 10px;
 
-  font-family: inherit;
+  font: inherit;
   font-size: calc(13px * var(--escala-fuente));
   font-weight: 700;
 
   cursor: pointer;
 
   transition:
-    background-color 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+    background-color .2s ease,
+    box-shadow .2s ease,
+    transform .2s ease;
 }
 
 .btn-nueva,
 .btn-guardar {
-  border: none;
-
-  background: linear-gradient(
-    135deg,
-    #6254e8,
-    #7c5ce7
-  );
-
+  border: 1px solid var(--vet-verde);
+  background: var(--vet-verde);
   color: #ffffff;
 }
 
 .btn-nueva:hover,
 .btn-guardar:hover:not(:disabled) {
-  transform: translateY(-2px);
-
-  box-shadow:
-    0 7px 18px rgba(98, 84, 232, 0.22);
+  background: var(--vet-verde-oscuro);
+  border-color: var(--vet-verde-oscuro);
+  box-shadow: 0 7px 18px rgba(8, 118, 90, .18);
 }
 
 .btn-volver,
 .btn-cancelar {
-  border: 1px solid #e0dcf0;
-
-  background: #f3f1fc;
-  color: #514c68;
+  border: 1px solid #cce5d7;
+  background: #ffffff;
+  color: var(--vet-verde-oscuro);
 }
 
 .btn-volver:hover,
 .btn-cancelar:hover:not(:disabled) {
-  background: #e9e5f9;
+  background: #eaf8ef;
 }
 
 .btn-guardar:disabled,
 .btn-cancelar:disabled,
 .btn-actualizar:disabled {
-  opacity: 0.6;
+  opacity: .6;
   cursor: not-allowed;
 }
 
+/* ==========================================================
+   8. NUEVOS ACCESOS RÁPIDOS
+========================================================== */
+
+.mascotas-accesos {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  margin: 0 0 24px;
+}
+
+.mascotas-accesos a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 44px;
+  padding: 10px 15px;
+
+  border: 1px solid #cce5d7;
+  border-radius: 10px;
+
+  background: #ffffff;
+  color: var(--vet-verde-oscuro);
+
+  text-decoration: none;
+  font-size: calc(13px * var(--escala-fuente));
+  font-weight: 700;
+
+  transition:
+    background-color .15s ease,
+    border-color .15s ease;
+}
+
+.mascotas-accesos a:hover {
+  border-color: #a7d3b8;
+  background: #e5f6ed;
+}
 
 /* ==========================================================
    9. MENSAJES
-   ========================================================== */
+========================================================== */
 
 .mensaje-exito,
 .mensaje-error,
 .mensaje-info {
-  padding: 15px 18px;
   margin-bottom: 24px;
+  padding: 15px 18px;
 
   border-radius: 12px;
 
@@ -602,24 +604,20 @@
 
 .mensaje-exito {
   border: 1px solid #b7ebc9;
-
   background: #ecfdf3;
   color: #176b3a;
 }
 
 .mensaje-error {
   border: 1px solid #ffd3cf;
-
   background: #fff1f0;
   color: #a32020;
 }
 
 .mensaje-info {
-  border: 1px solid #dfd7ff;
-
-  background: #ffffff;
-  color: #5843c6;
-
+  border: 1px solid #d2e9db;
+  background: #f3faf6;
+  color: var(--vet-verde-oscuro);
   text-align: center;
 }
 
@@ -627,7 +625,6 @@
   display: inline-block;
 
   min-height: 34px;
-
   margin-left: 12px;
   padding: 7px 12px;
 
@@ -637,16 +634,14 @@
   background: #ffffff;
   color: #a32020;
 
-  font-family: inherit;
+  font: inherit;
   font-weight: 700;
-
   cursor: pointer;
 }
 
-
 /* ==========================================================
-   10. FORMULARIO DE MASCOTAS
-   ========================================================== */
+   10. FORMULARIO
+========================================================== */
 
 .formulario-card {
   max-width: 850px;
@@ -654,37 +649,32 @@
   margin: 0 auto 30px;
   padding: 30px;
 
-  border: 1px solid #ece8fa;
+  border: 1px solid var(--vet-borde);
   border-radius: 18px;
 
   background: #ffffff;
 
-  box-shadow:
-    0 10px 30px rgba(53, 42, 105, 0.07);
+  box-shadow: 0 10px 30px rgba(15, 84, 55, .06);
 }
 
 .formulario-encabezado {
   display: flex;
   align-items: center;
-
   gap: 15px;
 
   margin-bottom: 25px;
 }
 
 .formulario-logo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
 
   width: 55px;
   height: 55px;
-
   flex-shrink: 0;
 
   border-radius: 15px;
-
-  background: #eee9ff;
+  background: #dff4e8;
 
   font-size: 27px;
 }
@@ -692,31 +682,26 @@
 .formulario-encabezado h2 {
   margin: 0;
 
-  color: #302d4f;
-
+  color: var(--vet-verde-oscuro);
   font-size: calc(22px * var(--escala-fuente));
 }
 
 .formulario-encabezado p {
   margin: 7px 0 0;
 
-  color: #68647d;
+  color: var(--vet-secundario);
 
   font-size: calc(13px * var(--escala-fuente));
   line-height: 1.6;
 }
 
-
 /* ==========================================================
-   11. DISTRIBUCIÓN DEL FORMULARIO
-   ========================================================== */
+   11. CAMPOS DEL FORMULARIO
+========================================================== */
 
 .form-grid {
   display: grid;
-
-  grid-template-columns:
-    repeat(2, minmax(0, 1fr));
-
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px 20px;
 }
 
@@ -730,23 +715,17 @@
 
 .form-group label {
   display: block;
-
   margin-bottom: 8px;
 
-  color: #343247;
+  color: var(--vet-texto);
 
   font-size: calc(14px * var(--escala-fuente));
-  font-weight: 600;
+  font-weight: 650;
 }
 
 .obligatorio {
   color: #b42332;
 }
-
-
-/* ==========================================================
-   12. CAMPOS DE ENTRADA
-   ========================================================== */
 
 .form-group input,
 .form-group select {
@@ -754,49 +733,44 @@
 
   width: 100%;
   min-height: 48px;
-
   padding: 12px 14px;
 
-  border: 1px solid #d8d8e5;
+  border: 1px solid #cddfd4;
   border-radius: 10px;
 
-  outline: none;
+  background: #fcfffd;
+  color: var(--vet-texto);
 
-  background: #fafafe;
-  color: #292742;
-
-  font-family: inherit;
+  font: inherit;
   font-size: calc(14px * var(--escala-fuente));
 
   transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
+    border-color .2s ease,
+    box-shadow .2s ease;
 }
 
 .form-group input::placeholder {
-  color: #77738a;
+  color: #758b7f;
 }
 
 .form-group input:focus,
 .form-group select:focus {
-  border-color: #6254e8;
+  outline: none;
 
+  border-color: var(--vet-verde);
   background: #ffffff;
 
-  box-shadow:
-    0 0 0 3px rgba(98, 84, 232, 0.16);
+  box-shadow: 0 0 0 3px rgba(8, 118, 90, .14);
 }
 
 .form-group input.invalido,
 .form-group select.invalido {
   border-color: #c52c37;
-
   background: #fffafa;
 }
 
 .error-validacion {
   display: block;
-
   margin-top: 7px;
 
   color: #b42332;
@@ -805,25 +779,18 @@
   line-height: 1.5;
 }
 
-
-/* ==========================================================
-   13. BOTONES DEL FORMULARIO
-   ========================================================== */
-
 .form-acciones {
   display: flex;
   align-items: center;
-
   flex-wrap: wrap;
   gap: 12px;
 
   margin-top: 26px;
 }
 
-
 /* ==========================================================
-   14. ENCABEZADO DE LA LISTA
-   ========================================================== */
+   12. ENCABEZADO DE LISTADO
+========================================================== */
 
 .listado-section {
   margin-top: 30px;
@@ -833,7 +800,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-
   flex-wrap: wrap;
   gap: 15px;
 
@@ -843,25 +809,22 @@
 .listado-encabezado h2 {
   margin: 0;
 
-  color: #292742;
-
+  color: var(--vet-verde-oscuro);
   font-size: calc(22px * var(--escala-fuente));
 }
 
 .listado-encabezado p {
   margin: 7px 0 0;
 
-  color: #68647d;
-
+  color: var(--vet-secundario);
   font-size: calc(13px * var(--escala-fuente));
 }
 
 .listado-acciones {
   display: flex;
   align-items: center;
-
-  gap: 12px;
   flex-wrap: wrap;
+  gap: 12px;
 }
 
 .total-mascotas {
@@ -869,57 +832,52 @@
 
   border-radius: 20px;
 
-  background: #eee9ff;
-  color: #5541c5;
+  background: #e3f5e9;
+  color: var(--vet-verde-oscuro);
 
   font-size: calc(12px * var(--escala-fuente));
-  font-weight: 700;
+  font-weight: 750;
 }
 
 .btn-actualizar {
-  border: 1px solid #ded6ff;
-
+  border: 1px solid #cce5d7;
   background: #ffffff;
-  color: #5946d5;
+  color: var(--vet-verde-oscuro);
 }
 
 .btn-actualizar:hover:not(:disabled) {
-  background: #f3f0ff;
+  background: #eaf8ef;
 }
 
-
 /* ==========================================================
-   15. ESTADO SIN MASCOTAS
-   ========================================================== */
+   13. ESTADO SIN MASCOTAS
+========================================================== */
 
 .sin-mascotas {
   padding: 35px 25px;
 
-  border: 1px solid #ece8fa;
+  border: 1px solid var(--vet-borde);
   border-radius: 18px;
 
   background: #ffffff;
 
   text-align: center;
 
-  box-shadow:
-    0 8px 25px rgba(53, 42, 105, 0.05);
+  box-shadow: 0 8px 25px rgba(15, 84, 55, .05);
 }
 
 .sin-icono {
   margin-bottom: 12px;
-
   font-size: 48px;
 }
 
 .sin-mascotas h3 {
-  color: #302d4f;
-
+  color: var(--vet-verde-oscuro);
   font-size: calc(20px * var(--escala-fuente));
 }
 
 .sin-mascotas p {
-  color: #68647d;
+  color: var(--vet-secundario);
 
   font-size: calc(13px * var(--escala-fuente));
   line-height: 1.6;
@@ -929,67 +887,55 @@
   margin-top: 15px;
 }
 
-
 /* ==========================================================
-   16. CUADRÍCULA DE MASCOTAS
-   ========================================================== */
+   14. TARJETAS DE MASCOTAS
+========================================================== */
 
 .mascotas-grid {
   display: grid;
-
   grid-template-columns:
     repeat(auto-fit, minmax(260px, 1fr));
 
   gap: 22px;
 }
 
-
-/* ==========================================================
-   17. TARJETAS DE MASCOTAS
-   ========================================================== */
-
 .mascota-card {
   display: flex;
   flex-direction: column;
 
   min-width: 0;
-
   padding: 25px;
 
-  border: 1px solid #ece8fa;
+  border: 1px solid var(--vet-borde);
   border-radius: 18px;
 
   background: #ffffff;
 
-  box-shadow:
-    0 8px 25px rgba(53, 42, 105, 0.06);
+  box-shadow: 0 8px 25px rgba(15, 84, 55, .05);
 
   transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+    transform .2s ease,
+    box-shadow .2s ease;
 }
 
 .mascota-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-3px);
 
-  box-shadow:
-    0 12px 30px rgba(74, 56, 139, 0.12);
+  box-shadow: 0 12px 30px rgba(15, 84, 55, .09);
 }
 
 .tarjeta-superior {
   display: flex;
-  align-items: flex-start;
   justify-content: space-between;
-
+  align-items: flex-start;
   gap: 10px;
 
   margin-bottom: 14px;
 }
 
 .mascota-icono {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
 
   width: 58px;
   height: 58px;
@@ -998,8 +944,8 @@
 
   background: linear-gradient(
     135deg,
-    #ede9fe,
-    #ddd6fe
+    #d9f3e6,
+    #edf9f1
   );
 
   font-size: 28px;
@@ -1010,26 +956,25 @@
 
   border-radius: 20px;
 
-  background: #f3f0ff;
-  color: #604acb;
+  background: #e3f5e9;
+  color: var(--vet-verde-oscuro);
 
   font-size: calc(11px * var(--escala-fuente));
-  font-weight: 700;
+  font-weight: 750;
 }
 
 .mascota-card h3 {
   margin: 0 0 17px;
 
-  color: #302d4f;
+  color: var(--vet-verde-oscuro);
 
   font-size: calc(23px * var(--escala-fuente));
-  font-weight: 700;
+  font-weight: 750;
 }
 
-
 /* ==========================================================
-   18. DATOS DE CADA MASCOTA
-   ========================================================== */
+   15. INFORMACIÓN DE LAS MASCOTAS
+========================================================== */
 
 .mascota-info {
   margin-bottom: 21px;
@@ -1038,23 +983,21 @@
 .mascota-info p {
   display: flex;
   justify-content: space-between;
-
   flex-wrap: wrap;
   gap: 8px;
 
   margin: 0;
   padding: 11px 0;
 
-  border-bottom: 1px solid #f0edfa;
+  border-bottom: 1px solid #e8f1ea;
 
-  color: #625e78;
-
+  color: var(--vet-secundario);
   font-size: calc(13px * var(--escala-fuente));
 }
 
 .mascota-info strong {
-  color: #38364c;
-  font-weight: 600;
+  color: var(--vet-texto);
+  font-weight: 650;
 }
 
 .mascota-info span {
@@ -1062,51 +1005,46 @@
   overflow-wrap: anywhere;
 }
 
-
 /* ==========================================================
-   19. BOTÓN EDITAR MASCOTA
-   ========================================================== */
+   16. BOTÓN DE EDICIÓN
+========================================================== */
 
 .btn-editar {
   width: 100%;
-
   margin-top: auto;
 
-  border: 1px solid #6254e8;
+  border: 1px solid var(--vet-verde);
 
   background: #ffffff;
-  color: #5742cf;
+  color: var(--vet-verde);
 }
 
 .btn-editar:hover {
-  background: #6254e8;
+  background: var(--vet-verde);
   color: #ffffff;
 }
 
-
 /* ==========================================================
-   20. ACCESIBILIDAD POR TECLADO
-   ========================================================== */
+   17. ACCESIBILIDAD POR TECLADO
+========================================================== */
 
 .mascotas-container button:focus-visible,
 .mascotas-container input:focus-visible,
-.mascotas-container select:focus-visible {
-  outline: 3px solid #6952e6;
+.mascotas-container select:focus-visible,
+.mascotas-container a:focus-visible {
+  outline: 3px solid #08765a;
   outline-offset: 3px;
 }
 
-
 /* ==========================================================
-   21. MODO DE ALTO CONTRASTE
-   ========================================================== */
-
-/*
-   Mejora la diferenciación visual de los elementos.
-   No depende solamente del color: también conserva
-   textos, títulos, bordes y mensajes.
-*/
+   18. MODO DE ALTO CONTRASTE
+========================================================== */
 
 .mascotas-container.alto-contraste {
+  --vet-texto: #111111;
+  --vet-secundario: #222222;
+  --vet-verde-oscuro: #111111;
+
   background: #ffffff;
   color: #111111;
 }
@@ -1117,7 +1055,6 @@
 .alto-contraste .sin-mascotas,
 .alto-contraste .panel-desplegable {
   border: 2px solid #111111;
-
   background: #ffffff;
   box-shadow: none;
 }
@@ -1143,7 +1080,6 @@
 .alto-contraste .form-group input,
 .alto-contraste .form-group select {
   border: 2px solid #111111;
-
   background: #ffffff;
   color: #111111;
 }
@@ -1156,7 +1092,6 @@
 .alto-contraste .btn-guardar,
 .alto-contraste .btn-editar {
   border: 2px solid #000000;
-
   background: #000000;
   color: #ffffff;
 }
@@ -1168,9 +1103,9 @@
 .alto-contraste .btn-opcion,
 .alto-contraste .btn-restablecer,
 .alto-contraste .btn-cerrar-panel,
-.alto-contraste .controles-fuente button {
+.alto-contraste .controles-fuente button,
+.alto-contraste .mascotas-accesos a {
   border: 2px solid #000000;
-
   background: #ffffff;
   color: #000000;
 }
@@ -1183,22 +1118,21 @@
 .alto-contraste .mascota-etiqueta,
 .alto-contraste .total-mascotas {
   border: 1px solid #000000;
-
   background: #ffffff;
   color: #000000;
 }
 
 .alto-contraste button:focus-visible,
 .alto-contraste input:focus-visible,
-.alto-contraste select:focus-visible {
+.alto-contraste select:focus-visible,
+.alto-contraste a:focus-visible {
   outline: 3px solid #000000;
   outline-offset: 3px;
 }
 
-
 /* ==========================================================
-   22. REDUCIR ANIMACIONES
-   ========================================================== */
+   19. REDUCCIÓN DE MOVIMIENTO
+========================================================== */
 
 .mascotas-container.sin-animaciones *,
 .mascotas-container.sin-animaciones *::before,
@@ -1213,15 +1147,14 @@
   transform: none;
 }
 
-
 /* ==========================================================
-   23. TABLETS
-   ========================================================== */
+   20. TABLETS
+========================================================== */
 
 @media (max-width: 1000px) {
 
   .mascotas-container {
-    padding: 25px;
+    padding: 5px 0 25px;
   }
 
   .header-fila {
@@ -1234,15 +1167,14 @@
 
 }
 
-
 /* ==========================================================
-   24. CELULARES
-   ========================================================== */
+   21. CELULARES
+========================================================== */
 
 @media (max-width: 700px) {
 
   .mascotas-container {
-    padding: 15px;
+    padding: 0 0 20px;
   }
 
   .mascotas-header {
@@ -1269,6 +1201,10 @@
   .btn-nueva,
   .btn-volver {
     width: 100%;
+  }
+
+  .mascotas-accesos a {
+    flex: 1 1 145px;
   }
 
   .formulario-card {
@@ -1301,7 +1237,6 @@
     justify-content: space-between;
   }
 
-  /* El desplegable utiliza todo el ancho de la cabecera. */
   .herramienta-contenedor {
     position: static;
   }
@@ -1309,7 +1244,6 @@
   .panel-desplegable {
     left: 12px;
     right: 12px;
-
     top: calc(100% + 8px);
 
     width: auto;
@@ -1318,15 +1252,14 @@
 
 }
 
-
 /* ==========================================================
-   25. CELULARES PEQUEÑOS
-   ========================================================== */
+   22. CELULARES PEQUEÑOS
+========================================================== */
 
 @media (max-width: 400px) {
 
   .mascotas-container {
-    padding: 10px;
+    padding: 0 0 15px;
   }
 
   .mascotas-header,
@@ -1345,10 +1278,9 @@
 
 }
 
-
 /* ==========================================================
-   26. PREFERENCIAS DEL DISPOSITIVO
-   ========================================================== */
+   23. PREFERENCIAS DEL DISPOSITIVO
+========================================================== */
 
 @media (prefers-reduced-motion: reduce) {
 

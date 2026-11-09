@@ -1,0 +1,1420 @@
+
+/* ==========================================================
+   VETERINARIA ARÉVALO
+   DASHBOARD DEL VETERINARIO
+
+   ARCHIVO: dashboard-veterinario.scss
+
+   FUNCIONALIDADES VISUALES:
+   1. Encabezado profesional.
+   2. Banner de bienvenida.
+   3. Indicadores de citas y atenciones.
+   4. Listado de próximas citas.
+   5. Resumen de citas del día.
+   6. Facturas emitidas durante el día.
+   7. Total facturado y estado del correo.
+   8. Diseño adaptable a dispositivos móviles.
+   9. Accesibilidad y modos de visualización.
+
+   IMPORTANTE:
+   No crea otro menú lateral ni otra barra superior.
+   Esos elementos pertenecen a LayoutPrivado.
+
+   Se utilizan clases aisladas .dash-final para evitar
+   conflictos con los demás módulos de Angular.
+========================================================== */
+
+
+/* ==========================================================
+   1. CONFIGURACIÓN GENERAL
+========================================================== */
+
+:host {
+  display: block;
+  min-width: 0;
+}
+
+:host *,
+:host *::before,
+:host *::after {
+  box-sizing: border-box;
+}
+
+
+/* ==========================================================
+   2. CONTENEDOR PRINCIPAL
+========================================================== */
+
+.dash-final {
+
+  --df-fondo: #f5fbf8;
+  --df-panel: #ffffff;
+  --df-texto: #16372e;
+  --df-suave: #5d756c;
+  --df-borde: #dceee5;
+  --df-verde: #08785b;
+
+  color: var(--df-texto);
+  background: var(--df-fondo);
+
+  border-radius: 18px;
+
+  min-width: 0;
+
+  padding: 8px 6px 24px;
+
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+
+/* ==========================================================
+   3. ENCABEZADO
+========================================================== */
+
+.dash-final__encabezado {
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: flex-start;
+
+  flex-wrap: wrap;
+
+  gap: 16px;
+
+  margin-bottom: 22px;
+}
+
+.dash-final__eyebrow {
+
+  display: block;
+
+  font-size: 11px;
+
+  letter-spacing: .10em;
+
+  font-weight: 800;
+
+  color: var(--df-verde);
+
+  margin-bottom: 8px;
+}
+
+.dash-final__encabezado h1 {
+
+  font-size: clamp(23px, 2.7vw, 32px);
+
+  line-height: 1.22;
+
+  letter-spacing: -.6px;
+
+  margin: 0 0 7px;
+
+  color: var(--df-texto);
+}
+
+.dash-final__encabezado p {
+
+  color: var(--df-suave);
+
+  line-height: 1.55;
+
+  margin: 0;
+
+  font-size: 14px;
+}
+
+
+/* Botón de actualización */
+
+.dash-final__actualizar {
+
+  border: 1px solid var(--df-borde);
+
+  background: var(--df-panel);
+
+  color: var(--df-verde);
+
+  border-radius: 11px;
+
+  padding: 11px 16px;
+
+  font-family: inherit;
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  min-height: 44px;
+
+  transition: background .2s ease;
+}
+
+.dash-final__actualizar:hover:not(:disabled) {
+
+  background: #e7f8ef;
+}
+
+.dash-final__actualizar:disabled {
+
+  opacity: .65;
+
+  cursor: wait;
+}
+
+
+/* ==========================================================
+   4. BANNER DE BIENVENIDA
+========================================================== */
+
+/* La imagen permanece en su propia columna. */
+
+.dash-final__hero {
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(210px, 37%);
+
+  align-items: stretch;
+
+  min-height: 210px;
+
+  overflow: hidden;
+
+  margin-bottom: 20px;
+
+  border: 1px solid #ccece0;
+
+  border-radius: 20px;
+
+  background: linear-gradient(
+    110deg,
+    #e4f9ef,
+    #d3f3e3
+  );
+}
+
+.dash-final__hero-texto {
+
+  padding: 25px 28px;
+
+  min-width: 0;
+
+  align-self: center;
+}
+
+.dash-final__hero-texto > span {
+
+  display: inline-block;
+
+  margin-bottom: 10px;
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  letter-spacing: .07em;
+
+  color: #057252;
+}
+
+.dash-final__hero h2 {
+
+  color: #075942;
+
+  font-size: clamp(23px, 2.5vw, 31px);
+
+  max-width: 400px;
+
+  line-height: 1.18;
+
+  margin: 0 0 10px;
+}
+
+.dash-final__hero p {
+
+  color: #365d4d;
+
+  max-width: 470px;
+
+  font-size: 13px;
+
+  line-height: 1.55;
+
+  margin: 0 0 14px;
+}
+
+.dash-final__hero button,
+.dash-final__pie button {
+
+  border: 0;
+
+  border-radius: 10px;
+
+  padding: 11px 16px;
+
+  background: #08785b;
+
+  color: #ffffff;
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  min-height: 44px;
+}
+
+.dash-final__hero img {
+
+  width: 100%;
+
+  height: 100%;
+
+  object-fit: cover;
+
+  object-position: 57% center;
+
+  min-height: 210px;
+}
+
+
+/* ==========================================================
+   5. MENSAJES DE ERROR
+========================================================== */
+
+.dash-final__alerta {
+
+  margin: 0 0 18px;
+
+  padding: 12px 15px;
+
+  border: 1px solid #f4bdc5;
+
+  border-radius: 10px;
+
+  background: #fff1f3;
+
+  color: #9d2538;
+
+  font-size: 13px;
+
+  line-height: 1.5;
+}
+
+
+/* ==========================================================
+   6. TARJETAS DE INDICADORES
+========================================================== */
+
+/* Cuatro tarjetas para el veterinario. */
+
+.dash-final__indicadores {
+
+  display: grid;
+
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+
+  gap: 14px;
+
+  margin-bottom: 20px;
+}
+
+
+/* Tarjeta individual */
+
+.dash-final__indicador {
+
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 12px;
+
+  min-width: 0;
+
+  padding: 18px 15px;
+
+  background: var(--df-panel);
+
+  border: 1px solid var(--df-borde);
+
+  border-radius: 16px;
+
+  box-shadow: 0 8px 24px rgba(16, 80, 57, .045);
+}
+
+
+/* Iconos */
+
+.dash-final__indicador-icono {
+
+  display: grid;
+
+  place-items: center;
+
+  flex: 0 0 43px;
+
+  width: 43px;
+
+  height: 43px;
+
+  background: #ddf5e9;
+
+  border-radius: 13px;
+
+  font-size: 22px;
+}
+
+.dash-final__indicador div {
+
+  min-width: 0;
+}
+
+.dash-final__indicador div > span {
+
+  display: block;
+
+  color: var(--df-suave);
+
+  font-size: 12px;
+
+  line-height: 1.3;
+}
+
+.dash-final__indicador strong {
+
+  display: block;
+
+  color: var(--df-texto);
+
+  font-size: 28px;
+
+  line-height: 1.15;
+
+  margin: 7px 0 5px;
+}
+
+.dash-final__indicador small {
+
+  color: var(--df-suave);
+
+  font-size: 11px;
+
+  line-height: 1.4;
+}
+
+
+/* ==========================================================
+   7. PANELES DE INFORMACIÓN
+========================================================== */
+
+.dash-final__columnas {
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1.2fr)
+    minmax(0, 1fr);
+
+  gap: 18px;
+
+  margin-bottom: 18px;
+}
+
+
+/* Panel general */
+
+.dash-final__panel {
+
+  min-width: 0;
+
+  border: 1px solid var(--df-borde);
+
+  background: var(--df-panel);
+
+  border-radius: 17px;
+
+  padding: 20px;
+
+  margin-bottom: 18px;
+
+  box-shadow: 0 7px 22px rgba(16, 80, 57, .045);
+}
+
+
+/* Encabezado de cada panel */
+
+.dash-final__panel-head {
+
+  display: flex;
+
+  align-items: flex-start;
+
+  justify-content: space-between;
+
+  gap: 10px;
+
+  margin-bottom: 18px;
+}
+
+.dash-final__panel-head h2 {
+
+  margin: 0;
+
+  font-size: 18px;
+
+  color: var(--df-texto);
+
+  line-height: 1.3;
+}
+
+.dash-final__panel-head p {
+
+  margin: 4px 0 0;
+
+  color: var(--df-suave);
+
+  font-size: 12px;
+}
+
+.dash-final__panel-head button {
+
+  flex: 0 0 auto;
+
+  background: #e7f8ef;
+
+  color: #076f50;
+
+  border: 0;
+
+  border-radius: 9px;
+
+  padding: 9px 10px;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+
+/* ==========================================================
+   8. ESTADOS VACÍOS Y CARGA
+========================================================== */
+
+.dash-final__vacio {
+
+  background: #f3faf7;
+
+  color: var(--df-suave);
+
+  border-radius: 10px;
+
+  padding: 20px;
+
+  margin: 0;
+
+  text-align: center;
+
+  font-size: 13px;
+
+  line-height: 1.5;
+}
+
+
+/* ==========================================================
+   9. LISTADOS DE CITAS Y FACTURAS
+========================================================== */
+
+.dash-final__lista {
+
+  display: grid;
+
+  gap: 10px;
+}
+
+
+/* Fila individual */
+
+.dash-final__fila {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 11px;
+
+  min-width: 0;
+
+  border: 1px solid var(--df-borde);
+
+  border-radius: 12px;
+
+  background: #fbfffd;
+
+  transition: background .2s ease;
+}
+
+.dash-final__fila:hover {
+
+  background: #f3faf6;
+}
+
+
+/* Icono de la fila */
+
+.dash-final__avatar {
+
+  display: grid;
+
+  place-items: center;
+
+  width: 40px;
+
+  height: 40px;
+
+  flex: 0 0 40px;
+
+  background: #e2f7ec;
+
+  border-radius: 11px;
+
+  font-size: 20px;
+}
+
+
+/* Texto de la fila */
+
+.dash-final__fila-texto {
+
+  flex: 1 1 auto;
+
+  min-width: 0;
+
+  display: grid;
+
+  gap: 3px;
+}
+
+.dash-final__fila-texto strong {
+
+  color: var(--df-texto);
+
+  font-size: 13px;
+
+  overflow-wrap: anywhere;
+}
+
+.dash-final__fila-texto span {
+
+  color: var(--df-suave);
+
+  font-size: 12px;
+
+  overflow-wrap: anywhere;
+}
+
+.dash-final__fila-texto small {
+
+  color: var(--df-suave);
+
+  font-size: 11px;
+
+  line-height: 1.4;
+
+  overflow-wrap: anywhere;
+}
+
+
+/* ==========================================================
+   10. ETIQUETAS DE ESTADO
+========================================================== */
+
+.dash-final__estado,
+.dash-final__etiqueta {
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  flex: 0 0 auto;
+
+  padding: 6px 9px;
+
+  border-radius: 20px;
+
+  color: #087052;
+
+  background: #dbf6e8;
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  text-align: center;
+
+  overflow-wrap: anywhere;
+}
+
+
+/* Estado pendiente */
+
+.dash-final__estado--pendiente {
+
+  background: #fff0c9;
+
+  color: #795a09;
+}
+
+
+/* ==========================================================
+   11. LISTADO DE ESTADOS
+========================================================== */
+
+.dash-final__lista-estados {
+
+  display: grid;
+
+  gap: 0;
+}
+
+.dash-final__lista-estados > div {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  border-bottom: 1px solid var(--df-borde);
+
+  min-height: 47px;
+
+  gap: 12px;
+
+  font-size: 13px;
+}
+
+.dash-final__lista-estados > div span {
+
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 9px;
+
+  color: var(--df-suave);
+}
+
+.dash-final__lista-estados > div strong {
+
+  color: var(--df-texto);
+
+  font-size: 16px;
+}
+
+
+/* Puntos de colores */
+
+.dash-final__punto {
+
+  width: 9px;
+
+  height: 9px;
+
+  border-radius: 50%;
+
+  display: inline-block;
+}
+
+.dash-final__punto--verde {
+  background: #24a66a;
+}
+
+.dash-final__punto--amarillo {
+  background: #d7a225;
+}
+
+.dash-final__punto--rojo {
+  background: #d95459;
+}
+
+.dash-final__punto--gris {
+  background: #7f9091;
+}
+
+
+/* ==========================================================
+   12. RESUMEN DE CITAS DEL DÍA
+========================================================== */
+
+.dash-final__nota {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  margin-top: 17px;
+
+  padding: 13px;
+
+  border-radius: 10px;
+
+  background: #e6f7ee;
+
+  color: #156448;
+}
+
+.dash-final__nota strong {
+
+  font-size: 24px;
+}
+
+.dash-final__nota span {
+
+  font-size: 12px;
+}
+
+
+/* ==========================================================
+   13. RESUMEN DE FACTURACIÓN DEL DÍA
+
+   Esta sección complementa el dashboard existente.
+
+   Muestra:
+   - Cantidad de facturas emitidas hoy.
+   - Total facturado durante el día.
+========================================================== */
+
+.dash-final__nota--facturas {
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  flex-wrap: wrap;
+
+  gap: 16px;
+
+  padding: 17px;
+
+  margin: 0 0 17px;
+
+  border: 1px solid #ccebdc;
+
+  background: #eaf8f0;
+
+  border-radius: 12px;
+}
+
+
+/* Cada indicador de facturación */
+
+.dash-final__nota--facturas > div {
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: flex-start;
+
+  gap: 5px;
+
+  min-width: 0;
+
+  flex: 1 1 180px;
+}
+
+
+/* Número de facturas y dinero */
+
+.dash-final__nota--facturas strong {
+
+  display: block;
+
+  color: #075942;
+
+  font-size: 25px;
+
+  font-weight: 800;
+
+  line-height: 1.2;
+
+  overflow-wrap: anywhere;
+}
+
+
+/* Descripción del indicador */
+
+.dash-final__nota--facturas span {
+
+  color: #406d5b;
+
+  font-size: 12px;
+
+  font-weight: 600;
+}
+
+
+/* ==========================================================
+   14. INFORMACIÓN ECONÓMICA DE CADA FACTURA
+
+   Alinea el importe y el estado del correo a la derecha.
+========================================================== */
+
+.dash-final__factura-meta {
+
+  display: grid;
+
+  justify-items: end;
+
+  align-content: center;
+
+  gap: 5px;
+
+  flex: 0 0 auto;
+
+  min-width: 115px;
+
+  max-width: 180px;
+}
+
+
+/* Importe de la factura */
+
+.dash-final__factura-meta > strong {
+
+  color: var(--df-texto);
+
+  font-size: 15px;
+
+  font-weight: 800;
+
+  white-space: nowrap;
+}
+
+
+/* Estado del correo */
+
+.dash-final__factura-meta .dash-final__etiqueta {
+
+  max-width: 100%;
+
+  white-space: normal;
+
+  line-height: 1.3;
+
+  margin: 0;
+}
+
+
+/* Factura cuyo correo no ha sido enviado */
+
+.dash-final__factura-meta .dash-final__estado--pendiente {
+
+  background: #fff0c9;
+
+  color: #795a09;
+}
+
+
+/* Estado de la factura */
+
+.dash-final__factura-meta small {
+
+  color: var(--df-suave);
+
+  font-size: 10px;
+
+  text-align: right;
+}
+
+
+/* ==========================================================
+   15. PIE DEL DASHBOARD
+========================================================== */
+
+.dash-final__pie {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 15px;
+
+  border-radius: 18px;
+
+  padding: 16px 21px;
+
+  background: linear-gradient(
+    110deg,
+    #ddf5e9,
+    #bdebd7
+  );
+}
+
+.dash-final__pie > span {
+
+  font-size: 30px;
+}
+
+.dash-final__pie > div {
+
+  flex: 1;
+
+  min-width: 0;
+}
+
+.dash-final__pie strong {
+
+  color: #075740;
+
+  font-size: 16px;
+}
+
+.dash-final__pie p {
+
+  color: #406d5b;
+
+  font-size: 12px;
+
+  margin: 4px 0 0;
+}
+
+
+/* ==========================================================
+   16. ACCESIBILIDAD Y ENFOQUE DE TECLADO
+========================================================== */
+
+.dash-final button:focus-visible {
+
+  outline: 3px solid #08785b;
+
+  outline-offset: 3px;
+}
+
+
+/* ==========================================================
+   17. TABLETS Y PANTALLAS MEDIANAS
+========================================================== */
+
+@media (max-width: 1250px) {
+
+  /* Los indicadores pasan a dos columnas. */
+
+  .dash-final__indicadores {
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  }
+
+  /* Los paneles se muestran uno debajo del otro. */
+
+  .dash-final__columnas {
+
+    grid-template-columns: 1fr;
+
+  }
+
+}
+
+
+/* ==========================================================
+   18. CELULARES
+========================================================== */
+
+@media (max-width: 680px) {
+
+  .dash-final {
+
+    padding: 4px 0 16px;
+
+  }
+
+
+  /* Banner */
+
+  .dash-final__hero {
+
+    grid-template-columns: 1fr;
+
+  }
+
+  .dash-final__hero-texto {
+
+    padding: 22px;
+
+  }
+
+  .dash-final__hero img {
+
+    height: 150px;
+
+    min-height: 150px;
+
+    object-position: center 38%;
+
+  }
+
+
+  /* Indicadores */
+
+  .dash-final__indicadores {
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 10px;
+
+  }
+
+  .dash-final__indicador {
+
+    flex-direction: column;
+
+    padding: 13px;
+
+    gap: 8px;
+
+  }
+
+  .dash-final__indicador strong {
+
+    font-size: 24px;
+
+  }
+
+  .dash-final__indicador-icono {
+
+    flex-basis: 37px;
+
+    width: 37px;
+
+    height: 37px;
+
+  }
+
+
+  /* Paneles */
+
+  .dash-final__panel {
+
+    padding: 15px;
+
+  }
+
+  .dash-final__panel-head {
+
+    flex-wrap: wrap;
+
+  }
+
+
+  /* Resumen de facturación */
+
+  .dash-final__nota--facturas {
+
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    gap: 15px;
+
+  }
+
+  .dash-final__nota--facturas > div {
+
+    width: 100%;
+
+  }
+
+
+  /* Filas de facturas */
+
+  .dash-final__factura-meta {
+
+    justify-items: start;
+
+    align-items: flex-start;
+
+    margin-left: 50px;
+
+    max-width: calc(100% - 50px);
+
+  }
+
+  .dash-final__factura-meta small {
+
+    text-align: left;
+
+  }
+
+
+  /* Pie */
+
+  .dash-final__pie {
+
+    flex-wrap: wrap;
+
+  }
+
+}
+
+
+/* ==========================================================
+   19. CELULARES PEQUEÑOS
+========================================================== */
+
+@media (max-width: 390px) {
+
+  .dash-final__indicadores {
+
+    grid-template-columns: 1fr;
+
+  }
+
+  .dash-final__fila {
+
+    flex-wrap: wrap;
+
+  }
+
+  .dash-final__estado,
+  .dash-final__etiqueta {
+
+    margin-left: 50px;
+
+  }
+
+  /* Evitar desplazamientos innecesarios en facturas. */
+
+  .dash-final__factura-meta {
+
+    margin-left: 50px;
+
+  }
+
+  .dash-final__factura-meta .dash-final__etiqueta {
+
+    margin-left: 0;
+
+  }
+
+}
+
+
+/* ==========================================================
+   20. MOVIMIENTO REDUCIDO
+
+   Respeta las preferencias de accesibilidad del usuario.
+========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .dash-final *,
+  .dash-final *::before,
+  .dash-final *::after {
+
+    transition: none !important;
+
+    animation: none !important;
+
+  }
+
+}
+
+
+/* ==========================================================
+   21. MODO DE ALTO CONTRASTE
+
+   Se activa desde el panel de accesibilidad.
+========================================================== */
+
+:host-context(html[data-vet-contraste='alto']) .dash-final {
+
+  --df-fondo: #000000;
+
+  --df-panel: #000000;
+
+  --df-texto: #ffffff;
+
+  --df-suave: #f5f5f5;
+
+  --df-borde: #ffe45c;
+
+  --df-verde: #ffe45c;
+
+}
+
+
+/* Paneles y elementos */
+
+:host-context(html[data-vet-contraste='alto'])
+.dash-final__hero,
+
+:host-context(html[data-vet-contraste='alto'])
+.dash-final__pie,
+
+:host-context(html[data-vet-contraste='alto'])
+.dash-final__fila,
+
+:host-context(html[data-vet-contraste='alto'])
+.dash-final__vacio,
+
+:host-context(html[data-vet-contraste='alto'])
+.dash-final__nota--facturas {
+
+  background: #000000 !important;
+
+  border: 1px solid #ffe45c !important;
+
+  color: #ffffff !important;
+
+}
+
+
+/* Textos */
+
+:host-context(html[data-vet-contraste='alto'])
+.dash-final__hero :is(h2, p, span),
+
+:host-context(html[data-vet-contraste='alto'])
+.dash-final__pie :is(p, strong),
+
+:host-context(html[data-vet-contraste='alto'])
+.dash-final__fila-texto :is(strong, span, small),
+
+:host-context(html[data-vet-contraste='alto'])
+.dash-final__factura-meta :is(strong, small),
+
+:host-context(html[data-vet-contraste='alto'])
+.dash-final__nota--facturas :is(strong, span),
+
+:host-context(html[data-vet-contraste='alto'])
+.dash-final__panel-head button {
+
+  color: #ffe45c !important;
+
+}
+
+
+/* Ocultar imagen decorativa en alto contraste. */
+
+:host-context(html[data-vet-contraste='alto'])
+.dash-final__hero img {
+
+  display: none;
+
+}
+
+
+/* ==========================================================
+   22. MODO OSCURO
+
+   Se activa desde las preferencias de accesibilidad.
+========================================================== */
+
+:host-context(html[data-vet-contraste='oscuro']) .dash-final {
+
+  --df-fondo: #151720;
+
+  --df-panel: #20232e;
+
+  --df-texto: #f5f6fb;
+
+  --df-suave: #d1d5df;
+
+  --df-borde: #505768;
+
+  --df-verde: #8eddb9;
+
+}
+
+
+/* Ajustes de paneles en modo oscuro */
+
+:host-context(html[data-vet-contraste='oscuro'])
+.dash-final__fila {
+
+  background: #252a35;
+
+}
+
+:host-context(html[data-vet-contraste='oscuro'])
+.dash-final__vacio {
+
+  background: #292e39;
+
+}
+
+:host-context(html[data-vet-contraste='oscuro'])
+.dash-final__nota {
+
+  background: #243d34;
+
+  color: #b8efd1;
+
+}
+
+
+/* Resumen de facturación en modo oscuro */
+
+:host-context(html[data-vet-contraste='oscuro'])
+.dash-final__nota--facturas {
+
+  background: #243d34;
+
+  border-color: #456d5b;
+
+}
+
+:host-context(html[data-vet-contraste='oscuro'])
+.dash-final__nota--facturas strong {
+
+  color: #b8efd1;
+
+}
+
+:host-context(html[data-vet-contraste='oscuro'])
+.dash-final__nota--facturas span {
+
+  color: #d1e9dc;
+
+}
+
+
+/* Importe de facturas en modo oscuro */
+
+:host-context(html[data-vet-contraste='oscuro'])
+.dash-final__factura-meta strong {
+
+  color: #f5f6fb;
+
+}
+
+:host-context(html[data-vet-contraste='oscuro'])
+.dash-final__factura-meta small {
+
+  color: #d1d5df;
+
+}
+
+
+/* ==========================================================
+   FIN DEL DASHBOARD DEL VETERINARIO
+========================================================== */

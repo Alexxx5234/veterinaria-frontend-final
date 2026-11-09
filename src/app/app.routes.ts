@@ -1,212 +1,158 @@
 
 /* ==========================================================
-   VETERINARIA AREVALO
-   RUTAS PRINCIPALES DE ANGULAR
+   VETERINARIA ARÉVALO
+   CONFIGURACIÓN PRINCIPAL DE RUTAS
 
-   FUNCIONALIDADES:
-   - Login, Registro y Verificación con accesibilidad.
-   - Layout público sin menú lateral.
-   - Layout privado para ADMIN y USER.
-   - Protección mediante authGuard y rolGuard.
-   - Conservación de todas las URL existentes.
-   - Redirección al login para rutas desconocidas.
+   ROLES:
+   - USER
+   - ADMIN
+   - VETERINARIO
 
-   IMPORTANTE:
-   No se modifican los servicios REST ni el JWT.
-   ========================================================== */
+   NUEVAS FUNCIONALIDADES:
+   - USER: Mis Atenciones Médicas.
+   - USER: Mis Facturas.
+   - Conserva los módulos administrativos.
+   - Conserva los módulos del veterinario.
+   - Mantiene authGuard y rolGuard.
 
+   SEGURIDAD:
+   El backend debe validar los permisos sobre cada
+   mascota, atención y factura.
+========================================================== */
 
-// ==========================================================
-// 1. IMPORTACIONES DE ANGULAR
-// ==========================================================
-
-// Define las rutas de navegación de la aplicación.
 import { Routes } from '@angular/router';
 
-
 // ==========================================================
-// 2. COMPONENTES PÚBLICOS
+// PÁGINAS PÚBLICAS
 // ==========================================================
 
-// Página de inicio de sesión.
 import { LoginCompents }
   from './Paginas/publicas/login-compents/login-compents';
 
-// Página de registro de usuarios.
 import { Registro }
   from './Paginas/publicas/registro/registro';
 
-// Página de verificación por correo.
 import { VerificarCodigo }
   from './Paginas/publicas/verificar-codigo/verificar-codigo';
 
-
-// ==========================================================
-// 3. LAYOUT PÚBLICO - NUEVO
-// ==========================================================
-
-// Muestra el panel de accesibilidad en:
-// /login, /registro y /verificar-codigo.
 import { LayoutPublico }
   from './Layouts/layout-publico/layout-publico';
 
-
 // ==========================================================
-// 4. COMPONENTES PRIVADOS DEL USUARIO
+// PÁGINAS USER
 // ==========================================================
 
-// Dashboard del usuario.
 import { DashboardUsuario }
   from './Paginas/privadas/dashboard-usuario/dashboard-usuario';
 
-// Mascotas propias del usuario.
 import { Mascotas }
   from './Paginas/privadas/mascotas/mascotas';
 
-// Citas del usuario.
 import { Citas }
   from './Paginas/privadas/citas/citas';
 
-// Catálogo de servicios.
 import { Servicios }
   from './Paginas/privadas/servicios/servicios';
 
-// Catálogo de veterinarios.
 import { Veterinarios }
   from './Paginas/privadas/veterinarios/veterinarios';
 
-
 // ==========================================================
-// 5. COMPONENTES PRIVADOS DEL ADMINISTRADOR
+// PÁGINAS ADMIN
 // ==========================================================
 
-// Dashboard del administrador.
 import { DashboardAdmin }
   from './Paginas/privadas/dashboard-admin/dashboard-admin';
 
-// Administración de usuarios.
 import { AdminUsuarios }
   from './Paginas/privadas/admin-usuarios/admin-usuarios';
 
-// Administración de mascotas.
 import { AdminMascotas }
   from './Paginas/privadas/admin-mascotas/admin-mascotas';
 
-// Administración de citas.
 import { AdminCitas }
   from './Paginas/privadas/admin-citas/admin-citas';
 
-// Administración de servicios.
+import { AdminAtenciones }
+  from './Paginas/privadas/admin-atenciones/admin-atenciones';
+
 import { AdminServicios }
   from './Paginas/privadas/admin-servicios/admin-servicios';
 
-// Administración de veterinarios.
 import { AdminVeterinarios }
   from './Paginas/privadas/admin-veterinarios/admin-veterinarios';
 
+import { AdminMedicamentos }
+  from './Paginas/privadas/admin-medicamentos/admin-medicamentos';
+
+import { FacturasAdmin }
+  from './Paginas/privadas/facturas-admin/facturas-admin';
 
 // ==========================================================
-// 6. LAYOUT PRIVADO
+// DASHBOARD VETERINARIO
 // ==========================================================
 
-// Menú lateral, barra superior, notificaciones
-// y accesibilidad para ADMIN y USER.
+import { DashboardVeterinario }
+  from './Paginas/privadas/dashboard-veterinario/dashboard-veterinario';
+
+// ==========================================================
+// LAYOUT PRIVADO Y GUARDS
+// ==========================================================
+
 import { LayoutPrivado }
   from './Layouts/layout-privado/layout-privado';
 
-
-// ==========================================================
-// 7. GUARDS DE SEGURIDAD
-// ==========================================================
-
-// Comprueba que el usuario tenga una sesión válida.
 import { authGuard }
   from './Auth/auth-guard';
 
-// Comprueba que tenga el rol correspondiente.
 import { rolGuard }
   from './Auth/rol-guard';
 
-
 // ==========================================================
-// 8. CONFIGURACIÓN DE RUTAS
+// RUTAS
 // ==========================================================
 
 export const routes: Routes = [
 
-
-  // ========================================================
-  // INICIO DE LA APLICACIÓN
-  // ========================================================
-
+  // RUTA PRINCIPAL.
   {
     path: '',
     redirectTo: 'login',
     pathMatch: 'full'
   },
 
-
   // ========================================================
-  // PÁGINAS PÚBLICAS CON ACCESIBILIDAD
+  // PÚBLICAS
   // ========================================================
-
-  /*
-    Este LayoutPublico contiene el botón ♿.
-
-    No muestra menú lateral ni requiere JWT.
-
-    Sus componentes hijos conservan los formularios
-    y métodos originales de autenticación.
-  */
 
   {
     path: '',
-
     component: LayoutPublico,
 
     children: [
-
-      // ----------------------------------------------------
-      // LOGIN
-      // ----------------------------------------------------
       {
         path: 'login',
         component: LoginCompents
       },
-
-
-      // ----------------------------------------------------
-      // REGISTRO
-      // ----------------------------------------------------
       {
         path: 'registro',
         component: Registro
       },
-
-
-      // ----------------------------------------------------
-      // VERIFICACIÓN DE CORREO
-      // ----------------------------------------------------
       {
         path: 'verificar-codigo',
         component: VerificarCodigo
       }
-
     ]
   },
 
-
   // ========================================================
-  // RUTAS PRIVADAS DEL USUARIO
+  // USER - CLIENTE
   // ========================================================
 
   {
     path: 'usuario',
-
-    // Layout que contiene el menú USER.
     component: LayoutPrivado,
 
-    // Solo usuarios autenticados con rol USER.
     canActivate: [
       authGuard,
       rolGuard
@@ -218,34 +164,29 @@ export const routes: Routes = [
 
     children: [
 
-      // Página inicial.
       {
         path: '',
         redirectTo: 'dashboard',
         pathMatch: 'full'
       },
 
-
-      // Dashboard USER.
+      // Inicio del cliente.
       {
         path: 'dashboard',
         component: DashboardUsuario
       },
 
-
-      // Mascotas del usuario.
+      // Registro y edición de mascotas.
       {
         path: 'mascotas',
         component: Mascotas
       },
 
-
-      // Citas del usuario.
+      // Citas del propietario.
       {
         path: 'citas',
         component: Citas
       },
-
 
       // Catálogo de servicios.
       {
@@ -253,29 +194,45 @@ export const routes: Routes = [
         component: Servicios
       },
 
-
-      // Catálogo de veterinarios.
+      // Profesionales disponibles.
       {
         path: 'veterinarios',
         component: Veterinarios
+      },
+
+      // NUEVO: Historial clínico de sus mascotas.
+      {
+        path: 'atenciones',
+        loadComponent: () =>
+          import(
+            './Paginas/privadas/atenciones-usuario/atenciones-usuario'
+          ).then(
+            modulo => modulo.AtencionesUsuario
+          )
+      },
+
+      // NUEVO: Facturas correspondientes al cliente.
+      {
+        path: 'facturas',
+        loadComponent: () =>
+          import(
+            './Paginas/privadas/facturas-usuario/facturas-usuario'
+          ).then(
+            modulo => modulo.FacturasUsuario
+          )
       }
 
     ]
-
   },
 
-
   // ========================================================
-  // RUTAS PRIVADAS DEL ADMINISTRADOR
+  // ADMIN - ADMINISTRACIÓN COMPLETA
   // ========================================================
 
   {
     path: 'admin',
-
-    // Layout que contiene el menú ADMIN.
     component: LayoutPrivado,
 
-    // Solo usuarios autenticados con rol ADMIN.
     canActivate: [
       authGuard,
       rolGuard
@@ -287,65 +244,147 @@ export const routes: Routes = [
 
     children: [
 
-      // Página inicial.
       {
         path: '',
         redirectTo: 'dashboard',
         pathMatch: 'full'
       },
 
-
-      // Dashboard ADMIN.
       {
         path: 'dashboard',
         component: DashboardAdmin
       },
 
-
-      // Gestión de usuarios.
       {
         path: 'usuarios',
         component: AdminUsuarios
       },
 
-
-      // Gestión de mascotas.
       {
         path: 'mascotas',
         component: AdminMascotas
       },
 
-
-      // Gestión de citas.
       {
         path: 'citas',
         component: AdminCitas
       },
 
+      {
+        path: 'atenciones',
+        component: AdminAtenciones
+      },
 
-      // Gestión de servicios.
       {
         path: 'servicios',
         component: AdminServicios
       },
 
-
-      // Gestión de veterinarios.
       {
         path: 'veterinarios',
         component: AdminVeterinarios
+      },
+
+      {
+        path: 'medicamentos',
+        component: AdminMedicamentos
+      },
+
+      {
+        path: 'facturas',
+        component: FacturasAdmin
       }
 
     ]
-
   },
 
-
   // ========================================================
-  // RUTAS DESCONOCIDAS
+  // VETERINARIO - ESPACIO PROFESIONAL
   // ========================================================
 
-  // Cualquier dirección inexistente vuelve al login.
+  {
+    path: 'veterinario',
+    component: LayoutPrivado,
+
+    canActivate: [
+      authGuard,
+      rolGuard
+    ],
+
+    data: {
+      rol: 'VETERINARIO'
+    },
+
+    children: [
+
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
+      },
+
+      {
+        path: 'dashboard',
+        component: DashboardVeterinario
+      },
+
+      {
+        path: 'citas',
+        loadComponent: () =>
+          import(
+            './Paginas/privadas/citas-veterinario/citas-veterinario'
+          ).then(
+            modulo => modulo.CitasVeterinario
+          )
+      },
+
+      {
+        path: 'atenciones',
+        loadComponent: () =>
+          import(
+            './Paginas/privadas/atenciones-veterinario/atenciones-veterinario'
+          ).then(
+            modulo => modulo.AtencionesVeterinario
+          )
+      },
+
+      // Catálogo de medicamentos: solo consulta.
+      {
+        path: 'medicamentos',
+        loadComponent: () =>
+          import(
+            './Paginas/privadas/medicamentos-disponibles-veterinario/medicamentos-disponibles-veterinario'
+          ).then(
+            modulo => modulo.MedicamentosDisponiblesVeterinario
+          )
+      },
+
+      // Registro de medicamentos en una atención.
+      {
+        path: 'medicamentos-atencion',
+        loadComponent: () =>
+          import(
+            './Paginas/privadas/medicamentos-atencion-veterinario/medicamentos-atencion-veterinario'
+          ).then(
+            modulo => modulo.MedicamentosAtencionVeterinario
+          )
+      },
+
+      // Facturas del profesional.
+      {
+        path: 'facturas',
+        loadComponent: () =>
+          import(
+            './Paginas/privadas/facturas-veterinario/facturas-veterinario'
+          ).then(
+            modulo => modulo.FacturasVeterinario
+          )
+      }
+
+    ]
+  },
+
+  // RUTAS NO ENCONTRADAS.
   {
     path: '**',
     redirectTo: 'login'

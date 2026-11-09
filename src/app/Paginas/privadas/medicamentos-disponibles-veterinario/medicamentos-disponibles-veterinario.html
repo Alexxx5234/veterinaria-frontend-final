@@ -1,0 +1,643 @@
+
+<!-- ==========================================================
+     VETERINARIA ARÉVALO
+     MEDICAMENTOS DISPONIBLES - VETERINARIO
+
+     FUNCIONALIDADES:
+     - Consultar catálogo.
+     - Buscar medicamentos.
+     - Filtrar por estado.
+     - Ordenar por nombre.
+     - Ordenar por precio.
+     - Ordenar por stock.
+     - Consultar existencias.
+     - Consultar presentaciones.
+     - Consultar precios unitarios.
+
+     MÓDULO EXCLUSIVAMENTE DE CONSULTA.
+========================================================== -->
+
+<div class="medicamentos-disponibles-page">
+
+
+  <!-- ======================================================
+       1. ENCABEZADO
+  ====================================================== -->
+
+  <header class="page-header">
+
+    <div>
+
+      <p class="eyebrow">
+        VETERINARIA ARÉVALO
+      </p>
+
+      <h1>
+        Medicamentos disponibles
+      </h1>
+
+      <p class="intro">
+        Consulta los medicamentos registrados,
+        sus presentaciones, precios y existencias
+        disponibles en la veterinaria.
+      </p>
+
+    </div>
+
+
+    <button
+      type="button"
+      class="button button--secondary"
+      (click)="cargarMedicamentos()"
+      [disabled]="cargando"
+    >
+
+      {{
+        cargando
+          ? 'Actualizando...'
+          : '↻ Actualizar datos'
+      }}
+
+    </button>
+
+  </header>
+
+
+  <!-- ======================================================
+       2. MENSAJES DE ERROR
+  ====================================================== -->
+
+  <div
+    *ngIf="error"
+    class="notice notice--error"
+    role="alert"
+  >
+
+    <span>
+      {{ error }}
+    </span>
+
+    <button
+      type="button"
+      (click)="cargarMedicamentos()"
+      [disabled]="cargando"
+    >
+      Reintentar
+    </button>
+
+  </div>
+
+
+  <!-- ======================================================
+       3. ESTADÍSTICAS DEL CATÁLOGO
+  ====================================================== -->
+
+  <section
+    class="summary-grid"
+    *ngIf="!cargando && !error"
+    aria-label="Resumen de medicamentos"
+  >
+
+
+    <!-- TOTAL -->
+
+    <article class="summary-card">
+
+      <div class="summary-icon" aria-hidden="true">
+        📦
+      </div>
+
+      <div>
+
+        <span>
+          Total catálogo
+        </span>
+
+        <strong>
+          {{ medicamentos.length }}
+        </strong>
+
+      </div>
+
+    </article>
+
+
+    <!-- ACTIVOS -->
+
+    <article class="summary-card">
+
+      <div class="summary-icon" aria-hidden="true">
+        💊
+      </div>
+
+      <div>
+
+        <span>
+          Medicamentos activos
+        </span>
+
+        <strong>
+          {{ totalActivos }}
+        </strong>
+
+      </div>
+
+    </article>
+
+
+    <!-- DISPONIBLES -->
+
+    <article class="summary-card">
+
+      <div class="summary-icon" aria-hidden="true">
+        ✅
+      </div>
+
+      <div>
+
+        <span>
+          Con existencias
+        </span>
+
+        <strong>
+          {{ totalDisponibles }}
+        </strong>
+
+      </div>
+
+    </article>
+
+
+    <!-- AGOTADOS -->
+
+    <article class="summary-card">
+
+      <div class="summary-icon" aria-hidden="true">
+        ⚠️
+      </div>
+
+      <div>
+
+        <span>
+          Agotados
+        </span>
+
+        <strong>
+          {{ totalAgotados }}
+        </strong>
+
+      </div>
+
+    </article>
+
+  </section>
+
+
+  <!-- ======================================================
+       4. CATÁLOGO
+  ====================================================== -->
+
+  <section class="catalog-panel">
+
+
+    <!-- CABECERA -->
+
+    <div class="catalog-heading">
+
+      <div>
+
+        <h2>
+          Catálogo de medicamentos
+        </h2>
+
+        <p>
+          Consulta, busca, filtra y ordena los
+          medicamentos registrados.
+        </p>
+
+      </div>
+
+
+      <!-- CONTADOR -->
+
+      <span
+        class="result-count"
+        *ngIf="!cargando && !error"
+        aria-live="polite"
+      >
+
+        {{ medicamentosFiltrados.length }}
+        resultados
+
+      </span>
+
+    </div>
+
+
+    <!-- ====================================================
+         5. CARGANDO DATOS
+    ==================================================== -->
+
+    <div
+      *ngIf="cargando"
+      class="loading-panel"
+      role="status"
+      aria-live="polite"
+    >
+
+      <span class="loading-icon" aria-hidden="true">
+        ⏳
+      </span>
+
+      <p>
+        Consultando catálogo de medicamentos...
+      </p>
+
+    </div>
+
+
+    <!-- ====================================================
+         6. BUSCADOR, FILTROS Y ORDENAMIENTO
+    ==================================================== -->
+
+    <div
+      class="catalog-toolbar"
+      *ngIf="
+        !cargando &&
+        !error &&
+        medicamentos.length > 0
+      "
+    >
+
+
+      <!-- BUSCAR MEDICAMENTOS -->
+
+      <div class="field">
+
+        <label for="buscarMedicamento">
+          Buscar medicamento
+        </label>
+
+        <input
+          id="buscarMedicamento"
+          type="search"
+          [value]="busqueda"
+          (input)="cambiarBusqueda($any($event.target).value)"
+          placeholder="Nombre, código, presentación..."
+          autocomplete="off"
+        >
+
+      </div>
+
+
+      <!-- FILTRAR POR ESTADO -->
+
+      <div class="field">
+
+        <label for="filtroMedicamento">
+          Filtrar por estado
+        </label>
+
+        <select
+          id="filtroMedicamento"
+          [value]="filtro"
+          (change)="cambiarFiltro($any($event.target).value)"
+        >
+
+          <option value="TODOS">
+            Todos
+          </option>
+
+          <option value="ACTIVOS">
+            Activos
+          </option>
+
+          <option value="INACTIVOS">
+            Inactivos
+          </option>
+
+          <option value="DISPONIBLES">
+            Con existencias
+          </option>
+
+          <option value="AGOTADOS">
+            Agotados
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- ==================================================
+           NUEVO: ORDENAR MEDICAMENTOS
+      ================================================== -->
+
+      <div class="field">
+
+        <label for="ordenarMedicamentos">
+          Ordenar por
+        </label>
+
+        <select
+          id="ordenarMedicamentos"
+          [value]="ordenarPor"
+          (change)="cambiarOrden($any($event.target).value)"
+        >
+
+
+          <!-- ORDEN ALFABÉTICO -->
+
+          <option value="NOMBRE_ASC">
+            Nombre A - Z
+          </option>
+
+          <option value="NOMBRE_DESC">
+            Nombre Z - A
+          </option>
+
+
+          <!-- ORDEN POR PRECIO -->
+
+          <option value="PRECIO_ASC">
+            Menor precio
+          </option>
+
+          <option value="PRECIO_DESC">
+            Mayor precio
+          </option>
+
+
+          <!-- ORDEN POR EXISTENCIAS -->
+
+          <option value="STOCK_ASC">
+            Menor stock
+          </option>
+
+          <option value="STOCK_DESC">
+            Mayor stock
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- LIMPIAR FILTROS -->
+
+      <button
+        type="button"
+        class="button button--clear"
+        (click)="limpiarFiltros()"
+        [disabled]="
+          !busqueda &&
+          filtro === 'TODOS' &&
+          ordenarPor === 'NOMBRE_ASC'
+        "
+      >
+
+        Limpiar filtros
+
+      </button>
+
+    </div>
+
+
+    <!-- ====================================================
+         7. CATÁLOGO SIN MEDICAMENTOS
+    ==================================================== -->
+
+    <div
+      *ngIf="
+        !cargando &&
+        !error &&
+        medicamentos.length === 0
+      "
+      class="empty-state"
+    >
+
+      <span aria-hidden="true">
+        📦
+      </span>
+
+      <h3>
+        No hay medicamentos registrados
+      </h3>
+
+      <p>
+        Cuando el administrador registre medicamentos,
+        aparecerán en esta sección.
+      </p>
+
+    </div>
+
+
+    <!-- ====================================================
+         8. NO SE ENCONTRARON RESULTADOS
+    ==================================================== -->
+
+    <div
+      *ngIf="
+        !cargando &&
+        !error &&
+        medicamentos.length > 0 &&
+        medicamentosFiltrados.length === 0
+      "
+      class="empty-state"
+    >
+
+      <span aria-hidden="true">
+        🔎
+      </span>
+
+      <h3>
+        No se encontraron medicamentos
+      </h3>
+
+      <p>
+        Prueba con otro nombre o modifica
+        los filtros de búsqueda.
+      </p>
+
+    </div>
+
+
+    <!-- ====================================================
+         9. TARJETAS DEL CATÁLOGO
+    ==================================================== -->
+
+    <div
+      class="medicine-grid"
+      *ngIf="
+        !cargando &&
+        !error &&
+        medicamentosFiltrados.length > 0
+      "
+    >
+
+      <article
+        class="medicine-card"
+        *ngFor="
+          let medicamento of medicamentosFiltrados;
+          trackBy: identificarMedicamento
+        "
+      >
+
+
+        <!-- CABECERA DE TARJETA -->
+
+        <div class="medicine-card__top">
+
+          <div
+            class="medicine-icon"
+            aria-hidden="true"
+          >
+            💊
+          </div>
+
+          <span
+            class="status-badge"
+            [ngClass]="claseEstado(medicamento)"
+          >
+
+            {{ estadoTexto(medicamento) }}
+
+          </span>
+
+        </div>
+
+
+        <!-- =================================================
+             10. INFORMACIÓN PRINCIPAL
+        ================================================= -->
+
+        <div class="medicine-main">
+
+          <small class="medicine-code">
+
+            MEDICAMENTO #{{ medicamento.id }}
+
+          </small>
+
+          <h3>
+
+            {{ medicamento.nombre }}
+
+          </h3>
+
+          <p *ngIf="medicamento.descripcion">
+
+            {{ medicamento.descripcion }}
+
+          </p>
+
+        </div>
+
+
+        <!-- =================================================
+             11. DATOS DEL MEDICAMENTO
+        ================================================= -->
+
+        <div class="medicine-details">
+
+
+          <!-- CONCENTRACIÓN -->
+
+          <div class="detail-row">
+
+            <span>
+              Concentración
+            </span>
+
+            <strong>
+
+              {{
+                medicamento.concentracion ||
+                'No informada'
+              }}
+
+            </strong>
+
+          </div>
+
+
+          <!-- PRESENTACIÓN -->
+
+          <div class="detail-row">
+
+            <span>
+              Presentación
+            </span>
+
+            <strong>
+
+              {{
+                medicamento.presentacion ||
+                'No informada'
+              }}
+
+            </strong>
+
+          </div>
+
+
+          <!-- STOCK -->
+
+          <div class="detail-row">
+
+            <span>
+              Existencias
+            </span>
+
+            <strong>
+
+              {{ stockTexto(medicamento) }}
+
+            </strong>
+
+          </div>
+
+
+          <!-- PRECIO -->
+
+          <div class="detail-row">
+
+            <span>
+              Precio unitario
+            </span>
+
+            <strong
+              *ngIf="
+                medicamento.precioUnitario !== null &&
+                medicamento.precioUnitario !== undefined;
+                else precioNoInformado
+              "
+            >
+
+              {{
+                numero(medicamento.precioUnitario)
+                  | currency:'USD':'symbol':'1.2-2'
+              }}
+
+            </strong>
+
+
+            <ng-template #precioNoInformado>
+
+              <strong>
+                No informado
+              </strong>
+
+            </ng-template>
+
+          </div>
+
+        </div>
+
+      </article>
+
+    </div>
+
+  </section>
+
+</div>

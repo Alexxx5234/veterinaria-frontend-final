@@ -1,0 +1,789 @@
+
+/* ==========================================================
+   VETERINARIA ARÉVALO
+   MÓDULO DE MEDICAMENTOS Y FACTURACIÓN
+   Diseño sencillo, accesible y adaptable.
+   ========================================================== */
+
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+:host,
+:host * {
+  box-sizing: border-box;
+}
+
+.medicamentos-page {
+  --verde: #08745c;
+  --verde-oscuro: #075642;
+  --verde-claro: #eaf8ef;
+  --texto: #173c31;
+  --secundario: #64786f;
+  --borde: #dce9e1;
+  --fondo: #ffffff;
+  --rojo: #a72c3c;
+
+  width: 100%;
+  max-width: 1250px;
+  min-width: 0;
+  margin: 0 auto;
+  padding: 4px 0 35px;
+  color: var(--texto);
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+/* ==========================================================
+   1. ENCABEZADO
+   ========================================================== */
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.eyebrow {
+  margin: 0 0 7px;
+  color: var(--verde);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.page-header h1 {
+  margin: 0;
+  color: var(--texto);
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 750;
+  line-height: 1.25;
+}
+
+.intro {
+  max-width: 680px;
+  margin: 9px 0 0;
+  color: var(--secundario);
+  font-size: 14px;
+}
+
+/* ==========================================================
+   2. PANELES
+   ========================================================== */
+
+.panel {
+  min-width: 0;
+  margin-bottom: 20px;
+  padding: 23px;
+  border: 1px solid var(--borde);
+  border-radius: 16px;
+  background: var(--fondo);
+  box-shadow: 0 4px 15px rgba(15, 65, 44, 0.045);
+}
+
+.panel h2 {
+  margin: 0 0 17px;
+  color: var(--texto);
+  font-size: 19px;
+  font-weight: 750;
+  line-height: 1.4;
+}
+
+.panel h3 {
+  margin: 0;
+  color: var(--texto);
+  font-size: 15px;
+}
+
+.section-description {
+  margin: -8px 0 20px;
+  color: var(--secundario);
+  font-size: 13px;
+}
+
+/* ==========================================================
+   3. BOTONES
+   ========================================================== */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 11px 17px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 750;
+  line-height: 1.35;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color .18s ease, border-color .18s ease;
+}
+
+.button--primary {
+  border-color: var(--verde);
+  background: var(--verde);
+  color: #ffffff;
+}
+
+.button--primary:hover:not(:disabled) {
+  border-color: var(--verde-oscuro);
+  background: var(--verde-oscuro);
+}
+
+.button--secondary {
+  border-color: #c9e1d4;
+  background: #ffffff;
+  color: var(--verde);
+}
+
+.button--secondary:hover:not(:disabled) {
+  background: var(--verde-claro);
+}
+
+.button--remove {
+  min-height: 35px;
+  padding: 7px 12px;
+  border-color: #f0d2d5;
+  background: #fff7f7;
+  color: var(--rojo);
+}
+
+.button--remove:hover:not(:disabled) {
+  background: #ffebed;
+}
+
+.button:disabled,
+.medicamentos-page button:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+.text-button {
+  display: inline;
+  margin-left: 5px;
+  padding: 3px 5px;
+  border: 0;
+  background: transparent;
+  color: var(--verde);
+  font: inherit;
+  font-weight: 750;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* ==========================================================
+   4. MENSAJES
+   ========================================================== */
+
+.notice {
+  margin: 0 0 17px;
+  padding: 13px 16px;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.notice--error {
+  border-color: #efc3c8;
+  background: #fff1f2;
+  color: #902b39;
+}
+
+.notice--success {
+  border-color: #bce5cd;
+  background: #eaf8ef;
+  color: #096044;
+}
+
+/* ==========================================================
+   5. FORMULARIOS
+   ========================================================== */
+
+.medicamentos-page label {
+  color: var(--texto);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.medicamentos-page select,
+.medicamentos-page input:not([type="radio"]),
+.medicamentos-page textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 45px;
+  margin-top: 7px;
+  padding: 10px 13px;
+  border: 1px solid #cbded3;
+  border-radius: 10px;
+  background: #fbfefc;
+  color: var(--texto);
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.medicamentos-page select {
+  cursor: pointer;
+}
+
+.medicamentos-page textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.medicamentos-page select:disabled,
+.medicamentos-page input:disabled,
+.medicamentos-page textarea:disabled {
+  background: #f1f4f2;
+  color: #7c8982;
+  cursor: not-allowed;
+}
+
+.help {
+  display: block;
+  margin-top: 7px;
+  color: var(--secundario);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.help--error {
+  color: var(--rojo);
+}
+
+.empty-state {
+  margin: 14px 0 0;
+  padding: 16px;
+  border: 1px solid var(--borde);
+  border-radius: 11px;
+  background: #f8fcf9;
+  color: var(--secundario);
+  font-size: 13px;
+  text-align: center;
+}
+
+/* ==========================================================
+   6. ATENCIÓN SELECCIONADA
+   ========================================================== */
+
+.selected-attention {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px 22px;
+  margin-top: 17px;
+  padding: 15px;
+  border: 1px solid #c6e5d3;
+  border-radius: 12px;
+  background: #effaf3;
+}
+
+.selected-attention strong {
+  color: var(--verde-oscuro);
+  font-size: 14px;
+}
+
+.selected-attention span {
+  color: #456b59;
+  font-size: 13px;
+}
+
+/* ==========================================================
+   7. OPCIONES SÍ / NO
+   ========================================================== */
+
+.choice-group {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 13px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.choice-group legend {
+  margin-bottom: 12px;
+  color: var(--secundario);
+  font-size: 12px;
+}
+
+.choice-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+  padding: 17px;
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  background: #ffffff;
+  cursor: pointer;
+  transition: background-color .18s ease, border-color .18s ease;
+}
+
+.choice-option:hover {
+  border-color: #9acbb0;
+  background: #f6fcf8;
+}
+
+.choice-option input[type="radio"] {
+  width: 19px;
+  height: 19px;
+  min-width: 19px;
+  margin: 2px 0 0;
+  accent-color: var(--verde);
+  cursor: pointer;
+}
+
+.choice-option span {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.choice-option strong {
+  color: var(--verde-oscuro);
+  font-size: 15px;
+}
+
+.choice-option small {
+  color: var(--secundario);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.55;
+}
+
+/* ==========================================================
+   8. FORMULARIO DE MEDICAMENTOS
+   ========================================================== */
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.field {
+  min-width: 0;
+}
+
+.field--wide {
+  grid-column: 1 / -1;
+}
+
+.field label {
+  display: block;
+}
+
+.medicine-info {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px 20px;
+  margin: 16px 0;
+  padding: 14px 16px;
+  border: 1px solid #c9e6d5;
+  border-radius: 11px;
+  background: #f0faf4;
+  font-size: 12px;
+}
+
+.medicine-info strong {
+  color: var(--verde-oscuro);
+  font-size: 14px;
+}
+
+.medicine-info span {
+  color: var(--secundario);
+}
+
+/* ==========================================================
+   9. MEDICAMENTOS PENDIENTES
+   ========================================================== */
+
+.pending-list {
+  margin-top: 23px;
+  padding-top: 20px;
+  border-top: 1px solid var(--borde);
+}
+
+.list-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 13px;
+}
+
+.list-heading h3 {
+  font-size: 16px;
+}
+
+.list-heading > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 29px;
+  height: 29px;
+  padding: 0 8px;
+  border-radius: 50px;
+  background: var(--verde-claro);
+  color: var(--verde);
+  font-weight: 800;
+}
+
+.pending-list ul,
+.history-list {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 18px;
+  padding: 0;
+  list-style: none;
+}
+
+.pending-list li,
+.history-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--borde);
+  border-radius: 11px;
+  background: #fcfefc;
+}
+
+.pending-list li > div,
+.history-list li > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.pending-list li strong,
+.history-list li strong {
+  color: var(--texto);
+  font-size: 13px;
+}
+
+.pending-list li span,
+.history-list li span,
+.pending-list li small,
+.history-list li small {
+  color: var(--secundario);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.pending-list > .button {
+  width: 100%;
+}
+
+/* ==========================================================
+   10. HISTORIAL
+   ========================================================== */
+
+.history-list {
+  margin-bottom: 0;
+}
+
+.history-list li > strong {
+  color: var(--verde-oscuro);
+  white-space: nowrap;
+}
+
+/* ==========================================================
+   11. CONTINUAR A FACTURACIÓN
+   ========================================================== */
+
+.next-step {
+  border-color: #c5e4d0;
+  background: #fbfefc;
+}
+
+.next-step p {
+  margin: 0 0 17px;
+  color: var(--secundario);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.next-step .button {
+  min-width: 190px;
+}
+
+/* ==========================================================
+   12. VISTA PREVIA Y FACTURA
+   ========================================================== */
+
+.invoice-panel {
+  border-color: #c3e2ce;
+}
+
+.invoice-data {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 13px;
+  margin: 0 0 21px;
+  padding: 17px;
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  background: #f9fcfa;
+}
+
+.invoice-data > div {
+  min-width: 0;
+}
+
+.invoice-data dt {
+  margin-bottom: 4px;
+  color: var(--secundario);
+  font-size: 11px;
+}
+
+.invoice-data dd {
+  margin: 0;
+  color: var(--texto);
+  font-size: 13px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.invoice-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 15px;
+  padding: 13px 2px;
+  border-bottom: 1px solid #e8eee9;
+  font-size: 13px;
+}
+
+.invoice-line span {
+  min-width: 0;
+  color: var(--secundario);
+  overflow-wrap: anywhere;
+}
+
+.invoice-line strong {
+  flex-shrink: 0;
+  color: var(--texto);
+  white-space: nowrap;
+}
+
+.totals {
+  display: grid;
+  gap: 10px;
+  max-width: 430px;
+  margin: 20px 0 0 auto;
+}
+
+.totals > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.totals dt {
+  color: var(--secundario);
+  font-size: 13px;
+}
+
+.totals dd {
+  margin: 0;
+  color: var(--texto);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.totals .grand-total {
+  margin-top: 5px;
+  padding-top: 14px;
+  border-top: 2px solid var(--borde);
+}
+
+.grand-total dt,
+.grand-total dd {
+  color: var(--verde-oscuro);
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.invoice-number {
+  display: inline-block;
+  margin: -5px 0 17px;
+  padding: 7px 13px;
+  border-radius: 8px;
+  background: var(--verde-claro);
+  color: var(--verde-oscuro);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+/* ==========================================================
+   13. BOTONES DE ACCIÓN
+   ========================================================== */
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 11px;
+  margin-top: 22px;
+}
+
+.actions--wrap {
+  justify-content: flex-start;
+}
+
+.actions .button {
+  min-width: 155px;
+}
+
+/* ==========================================================
+   14. ACCESIBILIDAD
+   ========================================================== */
+
+.medicamentos-page :is(
+  button,
+  select,
+  input,
+  textarea
+):focus-visible {
+  outline: 3px solid #08745c;
+  outline-offset: 3px;
+}
+
+.medicamentos-page input[type="radio"]:focus-visible {
+  outline-offset: 4px;
+}
+
+.medicamentos-page :is(
+  button,
+  input,
+  select,
+  textarea
+):disabled {
+  opacity: .6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .medicamentos-page *,
+  .medicamentos-page *::before,
+  .medicamentos-page *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ==========================================================
+   15. TABLETS
+   ========================================================== */
+
+@media (max-width: 850px) {
+  .medicamentos-page {
+    padding-right: 5px;
+    padding-left: 5px;
+  }
+
+  .panel {
+    padding: 19px;
+  }
+
+  .choice-group {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================
+   16. CELULARES
+   ========================================================== */
+
+@media (max-width: 580px) {
+  .medicamentos-page {
+    padding: 0 0 25px;
+  }
+
+  .page-header {
+    align-items: flex-start;
+  }
+
+  .page-header h1 {
+    font-size: 24px;
+  }
+
+  .page-header > button {
+    width: 100%;
+  }
+
+  .panel {
+    padding: 16px;
+    margin-bottom: 15px;
+    border-radius: 13px;
+  }
+
+  .panel h2 {
+    font-size: 17px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .field--wide {
+    grid-column: auto;
+  }
+
+  .invoice-data {
+    grid-template-columns: 1fr;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .actions .button,
+  .next-step .button {
+    width: 100%;
+  }
+
+  .pending-list li,
+  .history-list li {
+    align-items: flex-start;
+  }
+
+  .selected-attention {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .medicine-info {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .totals {
+    max-width: 100%;
+  }
+}

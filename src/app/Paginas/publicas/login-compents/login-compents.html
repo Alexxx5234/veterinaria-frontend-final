@@ -1,295 +1,65 @@
-
-<!-- ==========================================================
-     LOGIN - VETERINARIA AREVALO
-
-     MEJORAS:
-     - Panel informativo a la izquierda.
-     - Formulario a la derecha.
-     - Mensajes de error accesibles.
-     - Conserva las funciones del login original.
-     ========================================================== -->
-
-<div class="login-page">
-
-  <!-- CONTENEDOR DE DOS COLUMNAS -->
-  <main class="login-container">
-
-    <!-- ====================================================
-         SECCIÓN IZQUIERDA: INFORMACIÓN
-         ==================================================== -->
-
-    <section class="login-info">
-
-      <!-- Nombre de la veterinaria -->
-      <div class="marca">
-
-        <div class="marca-icono" aria-hidden="true">
-          🐾
-        </div>
-
-        <span>
-          Veterinaria Arevalo
-        </span>
-
+<!-- LOGIN · VETERINARIA ARÉVALO · mantiene el formulario reactivo -->
+<div class="vet-auth vet-auth--login">
+  <main class="vet-auth__shell">
+    <section class="vet-auth__hero" aria-labelledby="mensaje-login">
+      <div class="vet-auth__brand">
+        <span class="vet-auth__marca-icono" aria-hidden="true">🐾</span>
+        <span><span class="vet-auth__marca-nombre">Veterinaria Arévalo</span><span class="vet-auth__marca-sub">Sistema Veterinario</span></span>
       </div>
-
-      <!-- Frase principal -->
-      <div class="informacion">
-
-        <div class="etiqueta">
-          CUIDAMOS A QUIENES MÁS QUIERES
+      <div class="vet-auth__relato">
+        <span class="vet-auth__eyebrow">CUIDAMOS A QUIENES MÁS AMAS</span>
+        <h1 id="mensaje-login">Su bienestar es <span>nuestra prioridad.</span></h1>
+        <p>Gestiona a tus mascotas, organiza sus citas y acompaña su salud desde un solo lugar.</p>
+        <div class="vet-auth__beneficios">
+          <div class="vet-auth__beneficio"><span class="vet-auth__beneficio-icono" aria-hidden="true">♡</span> Atención veterinaria cercana</div>
+          <div class="vet-auth__beneficio"><span class="vet-auth__beneficio-icono" aria-hidden="true">✚</span> Historial de cuidados organizado</div>
+          <div class="vet-auth__beneficio"><span class="vet-auth__beneficio-icono" aria-hidden="true">✓</span> Gestión sencilla de tus citas</div>
         </div>
-
-        <h1>
-          Su bienestar es
-          <span>nuestra prioridad.</span>
-        </h1>
-
-        <p>
-          Gestiona tus mascotas, organiza tus citas
-          veterinarias y consulta nuestros servicios
-          desde un solo lugar.
-        </p>
-
-        <!-- Características del sistema -->
-        <div class="beneficios">
-
-          <div class="beneficio">
-            <span aria-hidden="true">✓</span>
-            Gestión sencilla de mascotas
-          </div>
-
-          <div class="beneficio">
-            <span aria-hidden="true">✓</span>
-            Organización de citas veterinarias
-          </div>
-
-          <div class="beneficio">
-            <span aria-hidden="true">✓</span>
-            Información disponible en un solo lugar
-          </div>
-
-        </div>
-
       </div>
-
-      <!-- Mensaje inferior -->
-      <div class="info-footer">
-        🐶 🐱 Cuidando juntos de nuestros compañeros.
-      </div>
-
+      <img class="vet-auth__foto" src="/imagenes/mascotas-hero.webp" alt="Un perro golden retriever y un gato juntos" />
+      <span class="vet-auth__lema">🐾 Más que mascotas, son familia</span>
     </section>
 
-
-    <!-- ====================================================
-         SECCIÓN DERECHA: FORMULARIO LOGIN
-         ==================================================== -->
-
-    <section class="login-formulario">
-
-      <div class="login-card">
-
-        <!-- ENCABEZADO -->
-        <div class="logo-area">
-
-          <div class="logo-icon" aria-hidden="true">
-            🐾
-          </div>
-
-          <h2>
-            Bienvenido de nuevo
-          </h2>
-
-          <p>
-            Ingresa tus datos para acceder a tu cuenta.
-          </p>
-
-        </div>
-
-
-        <!-- ================================================
-             FORMULARIO REACTIVO ANGULAR
-             ================================================ -->
-
-        <form
-          [formGroup]="loginForm"
-          (ngSubmit)="iniciarSesion()"
-          class="login-form"
-          novalidate
-          [attr.aria-busy]="cargando"
-        >
-
-
-          <!-- ==============================================
-               CORREO ELECTRÓNICO
-               ============================================== -->
-
-          <div class="form-group">
-
-            <label for="correo">
-              Correo electrónico
-            </label>
-
-            <input
-              id="correo"
-              type="email"
-              formControlName="correo"
-              placeholder="ejemplo@correo.com"
-              autocomplete="username"
-              required
-              [class.input-error]="
-                loginForm.get('correo')?.touched &&
-                loginForm.get('correo')?.invalid
-              "
-              [attr.aria-invalid]="
-                loginForm.get('correo')?.touched &&
-                loginForm.get('correo')?.invalid
-              "
-            >
-
-            <!-- Correo obligatorio -->
-            <small
-              class="error"
-              *ngIf="
-                loginForm.get('correo')?.touched &&
-                loginForm.get('correo')?.hasError('required')
-              "
-            >
-              El correo electrónico es obligatorio.
+    <section class="vet-auth__derecha" aria-labelledby="titulo-login">
+      <div class="vet-auth__form-card">
+        <header class="vet-auth__cabecera">
+          <span class="vet-auth__logo-form" aria-hidden="true">🐾</span>
+          <h2 id="titulo-login">Bienvenido de nuevo</h2>
+          <p>Inicia sesión para continuar cuidando a quienes más quieres.</p>
+        </header>
+        <form class="vet-auth__form" [formGroup]="loginForm" (ngSubmit)="iniciarSesion()" novalidate [attr.aria-busy]="cargando">
+          <div class="vet-auth__campo">
+            <label for="correo">Correo electrónico</label>
+            <input id="correo" type="email" formControlName="correo" placeholder="tucorreo@ejemplo.com" autocomplete="username" required
+              [class.input-error]="loginForm.get('correo')?.touched && loginForm.get('correo')?.invalid"
+              [attr.aria-invalid]="loginForm.get('correo')?.touched && loginForm.get('correo')?.invalid"
+              [attr.aria-describedby]="loginForm.get('correo')?.touched && loginForm.get('correo')?.invalid ? 'correo-error-login' : null" />
+            <small id="correo-error-login" class="vet-auth__error-campo" *ngIf="loginForm.get('correo')?.touched && loginForm.get('correo')?.invalid">
+              <ng-container *ngIf="loginForm.get('correo')?.hasError('required')">El correo electrónico es obligatorio.</ng-container>
+              <ng-container *ngIf="loginForm.get('correo')?.hasError('email')">Ingresa un correo válido.</ng-container>
             </small>
-
-            <!-- Formato incorrecto -->
-            <small
-              class="error"
-              *ngIf="
-                loginForm.get('correo')?.touched &&
-                loginForm.get('correo')?.hasError('email')
-              "
-            >
-              Ingresa un correo electrónico válido.
-            </small>
-
           </div>
-
-
-          <!-- ==============================================
-               CONTRASEÑA
-               ============================================== -->
-
-          <div class="form-group">
-
-            <label for="password">
-              Contraseña
-            </label>
-
-            <div class="password-container">
-
-              <input
-                id="password"
-                [type]="
-                  mostrarPassword ? 'text' : 'password'
-                "
-                formControlName="password"
-                placeholder="Ingresa tu contraseña"
-                autocomplete="current-password"
-                required
-                [class.input-error]="
-                  loginForm.get('password')?.touched &&
-                  loginForm.get('password')?.invalid
-                "
-                [attr.aria-invalid]="
-                  loginForm.get('password')?.touched &&
-                  loginForm.get('password')?.invalid
-                "
-              >
-
-              <!-- Mostrar u ocultar contraseña -->
-              <button
-                type="button"
-                class="btn-ver-password"
-                (click)="cambiarVisibilidadPassword()"
-                [attr.aria-label]="
-                  mostrarPassword
-                    ? 'Ocultar contraseña'
-                    : 'Mostrar contraseña'
-                "
-                [attr.aria-pressed]="mostrarPassword"
-              >
-                {{ mostrarPassword ? '🙈' : '👁️' }}
+          <div class="vet-auth__campo">
+            <label for="password">Contraseña</label>
+            <div class="vet-auth__password">
+              <input id="password" [type]="mostrarPassword ? 'text' : 'password'" formControlName="password" placeholder="Ingresa tu contraseña" autocomplete="current-password" required
+                [class.input-error]="loginForm.get('password')?.touched && loginForm.get('password')?.invalid"
+                [attr.aria-invalid]="loginForm.get('password')?.touched && loginForm.get('password')?.invalid"
+                [attr.aria-describedby]="loginForm.get('password')?.touched && loginForm.get('password')?.invalid ? 'password-error-login' : null" />
+              <button class="vet-auth__ojo" type="button" (click)="cambiarVisibilidadPassword()" [attr.aria-label]="mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'" [attr.aria-pressed]="mostrarPassword">
+                <span aria-hidden="true">{{ mostrarPassword ? '🙈' : '👁️' }}</span>
               </button>
-
             </div>
-
-            <!-- Contraseña obligatoria -->
-            <small
-              class="error"
-              *ngIf="
-                loginForm.get('password')?.touched &&
-                loginForm.get('password')?.hasError('required')
-              "
-            >
-              La contraseña es obligatoria.
-            </small>
-
+            <small id="password-error-login" class="vet-auth__error-campo" *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.hasError('required')">La contraseña es obligatoria.</small>
           </div>
-
-
-          <!-- ==============================================
-               MENSAJE DE ERROR DEL BACKEND
-               ============================================== -->
-
-          <div
-            class="mensaje-error"
-            *ngIf="mensajeError"
-            role="alert"
-          >
-            {{ mensajeError }}
-          </div>
-
-
-          <!-- ==============================================
-               BOTÓN DE INICIO DE SESIÓN
-               ============================================== -->
-
-          <button
-            type="submit"
-            class="btn-login"
-            [disabled]="cargando"
-          >
-
-            <span *ngIf="!cargando">
-              Iniciar sesión
-            </span>
-
-            <span *ngIf="cargando">
-              Ingresando...
-            </span>
-
+          <div class="vet-auth__mensaje vet-auth__mensaje--error" *ngIf="mensajeError" role="alert">{{ mensajeError }}</div>
+          <button class="vet-auth__enviar" type="submit" [disabled]="cargando">
+            <span aria-hidden="true">➜</span> {{ cargando ? 'Ingresando...' : 'Iniciar sesión' }}
           </button>
-
-
-          <!-- ==============================================
-               ENLACE DE REGISTRO
-               ============================================== -->
-
-          <div class="registro">
-
-            <span>
-              ¿No tienes una cuenta?
-            </span>
-
-            <a href="/registro">
-              Regístrate aquí
-            </a>
-
-          </div>
-
         </form>
-
+        <div class="vet-auth__separador">O</div>
+        <div class="vet-auth__enlace-fila">¿No tienes una cuenta? <a routerLink="/registro">Regístrate aquí</a></div>
       </div>
-
     </section>
-
   </main>
-
 </div>

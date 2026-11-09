@@ -1,0 +1,712 @@
+
+/* ==========================================================
+   VETERINARIA ARÉVALO
+   ESTILOS - ATENCIONES MÉDICAS
+
+   - Diseño verde y blanco.
+   - Tarjetas responsivas.
+   - Formularios accesibles.
+   - Historial médico organizado.
+   - Compatible con el menú lateral existente.
+   ========================================================== */
+
+
+/* ==========================================================
+   1. CONFIGURACIÓN GENERAL
+   ========================================================== */
+
+:host {
+  display: block;
+  min-width: 0;
+}
+
+:host *,
+:host *::before,
+:host *::after {
+  box-sizing: border-box;
+}
+
+.vet-atenciones {
+
+  --verde: #08745c;
+  --verde-oscuro: #075744;
+  --texto: #193b31;
+  --secundario: #60796c;
+  --borde: #d9ebe1;
+
+  width: 100%;
+  max-width: 1450px;
+  min-width: 0;
+
+  margin: 0 auto;
+
+  color: var(--texto);
+
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+
+/* ==========================================================
+   2. ENCABEZADO
+   ========================================================== */
+
+.vet-atenciones__header {
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  flex-wrap: wrap;
+  gap: 16px;
+
+  margin-bottom: 24px;
+}
+
+.vet-atenciones__etiqueta {
+
+  color: var(--verde);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.7px;
+}
+
+.vet-atenciones__header h1 {
+
+  margin: 9px 0;
+
+  color: var(--texto);
+  font-size: clamp(25px, 3vw, 35px);
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.vet-atenciones__header p {
+
+  margin: 0;
+
+  color: var(--secundario);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+
+/* ==========================================================
+   3. BOTÓN ACTUALIZAR
+   ========================================================== */
+
+.vet-atenciones__actualizar {
+
+  min-height: 44px;
+
+  padding: 11px 16px;
+
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+
+  background: #ffffff;
+  color: var(--verde);
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.vet-atenciones__actualizar:hover:not(:disabled) {
+  background: #e6f7ed;
+}
+
+
+/* ==========================================================
+   4. TARJETAS DE ESTADÍSTICAS
+   ========================================================== */
+
+.vet-atenciones__estadisticas {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 15px;
+
+  margin-bottom: 24px;
+}
+
+.vet-atenciones__estadistica {
+
+  display: flex;
+  align-items: center;
+
+  gap: 14px;
+
+  min-width: 0;
+  padding: 19px;
+
+  border: 1px solid var(--borde);
+  border-radius: 17px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 5px 18px rgba(16, 88, 61, 0.04);
+}
+
+.vet-atenciones__icono {
+
+  display: grid;
+  place-items: center;
+
+  flex-shrink: 0;
+
+  width: 48px;
+  height: 48px;
+
+  border-radius: 14px;
+
+  background: #def6e9;
+
+  font-size: 23px;
+}
+
+.vet-atenciones__estadistica small {
+
+  display: block;
+
+  color: var(--secundario);
+  font-size: 12px;
+}
+
+.vet-atenciones__estadistica strong {
+
+  display: block;
+
+  margin-top: 6px;
+
+  color: var(--texto);
+  font-size: 30px;
+  font-weight: 800;
+}
+
+
+/* ==========================================================
+   5. MENSAJES DE ERROR Y ÉXITO
+   ========================================================== */
+
+.vet-atenciones__mensaje {
+
+  margin-bottom: 18px;
+  padding: 13px 16px;
+
+  border-radius: 12px;
+
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.vet-atenciones__mensaje--error {
+
+  border: 1px solid #edb2ba;
+
+  background: #fff0f2;
+  color: #932a3a;
+}
+
+.vet-atenciones__mensaje--exito {
+
+  border: 1px solid #b9e4cd;
+
+  background: #e8f9ef;
+  color: #096044;
+}
+
+
+/* ==========================================================
+   6. PANELES PRINCIPALES
+   ========================================================== */
+
+.vet-atenciones__panel {
+
+  min-width: 0;
+
+  margin-bottom: 22px;
+  padding: 24px;
+
+  border: 1px solid var(--borde);
+  border-radius: 20px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 5px 20px rgba(16, 88, 61, 0.04);
+}
+
+.vet-atenciones__panel-header {
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 14px;
+
+  margin-bottom: 20px;
+}
+
+.vet-atenciones__panel-header h2 {
+
+  margin: 0 0 7px;
+
+  color: var(--texto);
+  font-size: 21px;
+  font-weight: 800;
+}
+
+.vet-atenciones__panel-header p {
+
+  margin: 0;
+
+  color: var(--secundario);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+
+/* ==========================================================
+   7. AVISO SOBRE EL REGISTRO CLÍNICO
+   ========================================================== */
+
+.vet-atenciones__informacion {
+
+  margin-bottom: 23px;
+  padding: 16px;
+
+  border: 1px solid #c5e8d5;
+  border-radius: 13px;
+
+  background: #eefaf2;
+}
+
+.vet-atenciones__informacion strong {
+
+  color: #086147;
+  font-size: 13px;
+}
+
+.vet-atenciones__informacion p {
+
+  margin: 6px 0 0;
+
+  color: #426b58;
+
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+
+/* ==========================================================
+   8. FORMULARIO CLÍNICO
+   ========================================================== */
+
+.vet-atenciones__formulario {
+
+  display: grid;
+  gap: 20px;
+
+  max-width: 950px;
+}
+
+.vet-atenciones__campo {
+  min-width: 0;
+}
+
+.vet-atenciones__campo label {
+
+  display: block;
+
+  margin-bottom: 9px;
+
+  color: var(--texto);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.vet-atenciones__opcional {
+
+  color: var(--secundario);
+
+  font-size: 12px;
+  font-weight: 400;
+}
+
+
+/* ==========================================================
+   9. SELECT Y CAMPOS DE TEXTO
+   ========================================================== */
+
+.vet-atenciones__campo select,
+.vet-atenciones__campo textarea {
+
+  display: block;
+
+  width: 100%;
+  min-width: 0;
+
+  padding: 13px 15px;
+
+  border: 1px solid #cbded3;
+  border-radius: 11px;
+
+  outline: none;
+
+  background: #fbfefc;
+  color: var(--texto);
+
+  font-family: inherit;
+  font-size: 14px;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.vet-atenciones__campo select {
+  min-height: 50px;
+}
+
+.vet-atenciones__campo textarea {
+
+  min-height: 105px;
+  resize: vertical;
+
+  line-height: 1.65;
+}
+
+.vet-atenciones__campo :is(
+  select,
+  textarea
+):focus {
+
+  border-color: var(--verde);
+
+  background: #ffffff;
+
+  box-shadow:
+    0 0 0 3px rgba(8, 116, 92, 0.13);
+}
+
+.vet-atenciones__campo textarea::placeholder {
+  color: #71887b;
+}
+
+
+/* ==========================================================
+   10. AYUDAS Y VALIDACIONES
+   ========================================================== */
+
+.vet-atenciones__ayuda {
+
+  display: flex;
+  justify-content: space-between;
+
+  flex-wrap: wrap;
+  gap: 8px;
+
+  margin-top: 7px;
+
+  color: var(--secundario);
+
+  font-size: 11px;
+}
+
+.vet-atenciones__error-campo {
+
+  display: block;
+
+  margin-top: 8px;
+
+  color: #b12d3e;
+  font-size: 12px;
+}
+
+.vet-atenciones__campo [aria-invalid="true"] {
+  border-color: #ba3444;
+}
+
+
+/* ==========================================================
+   11. BOTÓN GUARDAR
+   ========================================================== */
+
+.vet-atenciones__acciones {
+
+  display: flex;
+  justify-content: flex-end;
+}
+
+.vet-atenciones__guardar {
+
+  min-height: 48px;
+
+  padding: 13px 21px;
+
+  border: none;
+  border-radius: 11px;
+
+  background: var(--verde);
+  color: #ffffff;
+
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+.vet-atenciones__guardar:hover:not(:disabled) {
+  background: var(--verde-oscuro);
+}
+
+.vet-atenciones button:disabled {
+
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+
+/* ==========================================================
+   12. HISTORIAL DE ATENCIONES
+   ========================================================== */
+
+.vet-atenciones__contador {
+
+  display: grid;
+  place-items: center;
+
+  min-width: 38px;
+  height: 38px;
+
+  padding: 5px 10px;
+
+  border-radius: 12px;
+
+  background: #e0f6e9;
+  color: var(--verde);
+
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.vet-atenciones__lista {
+
+  display: grid;
+  gap: 15px;
+}
+
+.vet-atenciones__item {
+
+  min-width: 0;
+
+  padding: 19px;
+
+  border: 1px solid #dcece3;
+  border-radius: 15px;
+
+  background: #fcfffd;
+}
+
+.vet-atenciones__item-header {
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  flex-wrap: wrap;
+  gap: 12px;
+
+  margin-bottom: 18px;
+}
+
+.vet-atenciones__paciente {
+
+  display: flex;
+  align-items: center;
+
+  gap: 11px;
+}
+
+.vet-atenciones__avatar {
+
+  display: grid;
+  place-items: center;
+
+  width: 45px;
+  height: 45px;
+
+  border-radius: 13px;
+
+  background: #ddf5e8;
+
+  font-size: 22px;
+}
+
+.vet-atenciones__paciente h3 {
+
+  margin: 0 0 5px;
+
+  color: var(--texto);
+
+  font-size: 16px;
+}
+
+.vet-atenciones__paciente small,
+.vet-atenciones__fecha {
+
+  color: var(--secundario);
+
+  font-size: 12px;
+}
+
+.vet-atenciones__detalle {
+
+  display: grid;
+  gap: 15px;
+}
+
+.vet-atenciones__detalle strong {
+
+  display: block;
+
+  margin-bottom: 6px;
+
+  color: #14674e;
+  font-size: 13px;
+}
+
+.vet-atenciones__detalle p {
+
+  margin: 0;
+
+  color: #426052;
+
+  font-size: 13px;
+  line-height: 1.65;
+
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+
+/* ==========================================================
+   13. MENSAJES SIN REGISTROS
+   ========================================================== */
+
+.vet-atenciones__vacio {
+
+  padding: 24px 16px;
+
+  border-radius: 12px;
+
+  background: #f0faf3;
+  color: var(--secundario);
+
+  font-size: 13px;
+  line-height: 1.6;
+
+  text-align: center;
+}
+
+
+/* ==========================================================
+   14. ACCESIBILIDAD
+   ========================================================== */
+
+.vet-atenciones :is(
+  button,
+  select,
+  textarea
+):focus-visible {
+
+  outline: 3px solid #08745c;
+  outline-offset: 3px;
+}
+
+
+/* ==========================================================
+   15. TABLETS
+   ========================================================== */
+
+@media (max-width: 900px) {
+
+  .vet-atenciones__estadisticas {
+
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .vet-atenciones__panel {
+    padding: 20px;
+  }
+
+}
+
+
+/* ==========================================================
+   16. CELULARES
+   ========================================================== */
+
+@media (max-width: 600px) {
+
+  .vet-atenciones__header {
+    align-items: flex-start;
+  }
+
+  .vet-atenciones__estadisticas {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .vet-atenciones__estadistica {
+    padding: 14px;
+  }
+
+  .vet-atenciones__panel {
+    padding: 16px;
+    border-radius: 15px;
+  }
+
+  .vet-atenciones__panel-header h2 {
+    font-size: 19px;
+  }
+
+  .vet-atenciones__item {
+    padding: 14px;
+  }
+
+  .vet-atenciones__acciones,
+  .vet-atenciones__guardar {
+    width: 100%;
+  }
+
+  .vet-atenciones__guardar {
+    justify-content: center;
+  }
+
+}
+
+
+/* ==========================================================
+   17. REDUCIR ANIMACIONES
+   ========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .vet-atenciones *,
+  .vet-atenciones *::before,
+  .vet-atenciones *::after {
+
+    animation: none !important;
+    transition: none !important;
+  }
+
+}

@@ -1,399 +1,56 @@
-
-<!-- ==========================================================
-     VETERINARIA AREVALO
-     VERIFICACIÓN DE CORREO
-
-     MEJORAS:
-     1. Panel informativo del proceso.
-     2. Correo de verificación visible.
-     3. Campo numérico de cuatro dígitos.
-     4. Mensajes de validación accesibles.
-     5. Diseño responsivo.
-     ========================================================== -->
-
-<div class="verificar-container">
-
-  <!-- ========================================================
-       CONTENEDOR DE DOS COLUMNAS
-       ======================================================== -->
-
-  <main class="verificar-layout">
-
-
-    <!-- ======================================================
-         PANEL IZQUIERDO
-         ====================================================== -->
-
-    <section class="verificar-info">
-
-      <!-- MARCA -->
-      <div class="marca">
-
-        <div class="marca-icono" aria-hidden="true">
-          🐾
+<!-- VERIFICAR CÓDIGO · VETERINARIA ARÉVALO · conserva verificarCodigo() -->
+<div class="vet-auth vet-auth--verificacion">
+  <main class="vet-auth__shell">
+    <section class="vet-auth__hero" aria-labelledby="mensaje-verificar">
+      <div class="vet-auth__brand">
+        <span class="vet-auth__marca-icono" aria-hidden="true">🐾</span>
+        <span><span class="vet-auth__marca-nombre">Veterinaria Arévalo</span><span class="vet-auth__marca-sub">Sistema Veterinario</span></span>
+      </div>
+      <div class="vet-auth__relato">
+        <span class="vet-auth__eyebrow">UN PASO MÁS PARA COMENZAR</span>
+        <h1 id="mensaje-verificar">Tu familia merece <span>el mejor cuidado.</span></h1>
+        <p>Verifica tu dirección de correo electrónico para completar el registro en nuestra veterinaria.</p>
+        <div class="vet-auth__pasos">
+          <div class="vet-auth__paso"><span class="vet-auth__paso-numero">1</span><span><strong>Revisa tu correo</strong><small>Busca el mensaje con tu código.</small></span></div>
+          <div class="vet-auth__paso"><span class="vet-auth__paso-numero">2</span><span><strong>Ingresa los cuatro números</strong><small>Escribe exactamente el código recibido.</small></span></div>
+          <div class="vet-auth__paso"><span class="vet-auth__paso-numero">3</span><span><strong>Espera la aprobación</strong><small>El administrador revisará tu cuenta.</small></span></div>
         </div>
-
-        <span>
-          Veterinaria Arevalo
-        </span>
-
       </div>
-
-
-      <!-- INFORMACIÓN PRINCIPAL -->
-      <div class="informacion">
-
-        <span class="etiqueta">
-          UN PASO MÁS PARA COMENZAR
-        </span>
-
-        <h1>
-          Estamos a un paso de
-          <span>cuidar a tus mejores amigos.</span>
-        </h1>
-
-        <p>
-          Verifica tu dirección de correo electrónico
-          para continuar con la creación de tu cuenta
-          en nuestra veterinaria.
-        </p>
-
-
-        <!-- PASOS DE VERIFICACIÓN -->
-        <div class="pasos">
-
-          <div class="paso">
-
-            <div class="paso-icono" aria-hidden="true">
-              📧
-            </div>
-
-            <div>
-              <strong>Revisa tu correo</strong>
-
-              <small>
-                Busca el mensaje con tu código de verificación.
-              </small>
-            </div>
-
-          </div>
-
-
-          <div class="paso">
-
-            <div class="paso-icono" aria-hidden="true">
-              🔢
-            </div>
-
-            <div>
-              <strong>Ingresa los cuatro números</strong>
-
-              <small>
-                Escribe el código recibido para verificar tu cuenta.
-              </small>
-            </div>
-
-          </div>
-
-
-          <div class="paso">
-
-            <div class="paso-icono" aria-hidden="true">
-              ✅
-            </div>
-
-            <div>
-              <strong>Espera la aprobación</strong>
-
-              <small>
-                El administrador revisará tu cuenta antes de habilitarla.
-              </small>
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <!-- FRASE INFERIOR -->
-      <div class="info-footer">
-        🐶 🐱 Su bienestar es nuestra prioridad.
-      </div>
-
+      <img class="vet-auth__foto" src="/imagenes/mascotas-hero.webp" alt="Un perro y un gato juntos" />
+      <span class="vet-auth__lema">💚 Historias de cuidado, juntos</span>
     </section>
 
-
-    <!-- ======================================================
-         PANEL DERECHO: VERIFICACIÓN
-         ====================================================== -->
-
-    <section class="verificar-formulario">
-
-      <div class="verificar-card">
-
-
-        <!-- ==================================================
-             ENCABEZADO
-             ================================================== -->
-
-        <div class="verificar-header">
-
-          <div class="logo" aria-hidden="true">
-            📧
-          </div>
-
-          <h2>
-            Verifica tu correo
-          </h2>
-
-          <p>
-            Ingresa el código de 4 dígitos que enviamos
-            a tu dirección de correo electrónico.
-          </p>
-
-        </div>
-
-
-        <!-- ==================================================
-             CORREO ASOCIADO AL REGISTRO
-             ================================================== -->
-
-        <div
-          class="correo-info"
-          *ngIf="correo"
-        >
-
-          <span class="correo-etiqueta">
-            Código enviado a:
-          </span>
-
-          <strong class="correo-valor">
-            {{ correo }}
-          </strong>
-
-        </div>
-
-
-        <!-- ==================================================
-             MENSAJE DE ÉXITO
-             ================================================== -->
-
-        <div
-          class="mensaje-exito"
-          *ngIf="mensajeExito"
-          role="status"
-        >
-          {{ mensajeExito }}
-        </div>
-
-
-        <!-- ==================================================
-             MENSAJE DE ERROR
-             ================================================== -->
-
-        <div
-          class="mensaje-error"
-          *ngIf="mensajeError"
-          role="alert"
-        >
-          {{ mensajeError }}
-        </div>
-
-
-        <!-- ==================================================
-             FORMULARIO REACTIVO
-             ================================================== -->
-
-        <form
-          [formGroup]="verificarForm"
-          (ngSubmit)="verificarCodigo()"
-          class="form-verificar"
-          novalidate
-          [attr.aria-busy]="cargando"
-        >
-
-
-          <!-- ================================================
-               CÓDIGO DE VERIFICACIÓN
-               ================================================ -->
-
-          <div class="form-group">
-
-            <label for="codigo">
-              Código de verificación
-            </label>
-
-            <p
-              class="codigo-ayuda"
-              id="codigo-ayuda"
-            >
-              Escribe los cuatro números recibidos.
-            </p>
-
-
-            <!-- INPUT NUMÉRICO -->
-            <input
-              id="codigo"
-              type="text"
-
-              formControlName="codigo"
-
-              placeholder="0000"
-
-              maxlength="4"
-
-              minlength="4"
-
-              inputmode="numeric"
-
-              autocomplete="one-time-code"
-
-              pattern="[0-9]{4}"
-
-              required
-
-              (input)="limpiarCodigo()"
-
-              [class.input-error]="
-                verificarForm.get('codigo')?.touched &&
-                verificarForm.get('codigo')?.invalid
-              "
-
-              [attr.aria-invalid]="
-                verificarForm.get('codigo')?.touched &&
-                verificarForm.get('codigo')?.invalid
-              "
-
-              [attr.aria-describedby]="
-                verificarForm.get('codigo')?.touched &&
-                verificarForm.get('codigo')?.invalid
-                  ? 'codigo-ayuda codigo-error'
-                  : 'codigo-ayuda'
-              "
-            >
-
-
-            <!-- VALIDACIONES -->
-            <small
-              id="codigo-error"
-              class="error-validacion"
-              *ngIf="
-                verificarForm.get('codigo')?.touched &&
-                verificarForm.get('codigo')?.invalid
-              "
-            >
-
-              <span
-                *ngIf="
-                  verificarForm.get('codigo')?.hasError('required')
-                "
-              >
-                El código es obligatorio.
-              </span>
-
-              <span
-                *ngIf="
-                  verificarForm.get('codigo')?.hasError('pattern')
-                "
-              >
-                El código debe contener exactamente 4 números.
-              </span>
-
+    <section class="vet-auth__derecha" aria-labelledby="titulo-verificar">
+      <div class="vet-auth__form-card">
+        <header class="vet-auth__cabecera">
+          <span class="vet-auth__logo-form" aria-hidden="true">✉️</span>
+          <h2 id="titulo-verificar">Verifica tu correo</h2>
+          <p>Introduce el código de 4 dígitos enviado a tu correo electrónico.</p>
+        </header>
+        <div class="vet-auth__correo" *ngIf="correo"><small>Código enviado a:</small><strong>{{ correo }}</strong></div>
+        <div class="vet-auth__mensaje vet-auth__mensaje--exito" *ngIf="mensajeExito" role="status">{{ mensajeExito }}</div>
+        <div class="vet-auth__mensaje vet-auth__mensaje--error" *ngIf="mensajeError" role="alert">{{ mensajeError }}</div>
+        <form class="vet-auth__form" [formGroup]="verificarForm" (ngSubmit)="verificarCodigo()" novalidate [attr.aria-busy]="cargando">
+          <div class="vet-auth__campo">
+            <label for="codigo">Código de verificación</label>
+            <small id="codigo-ayuda" class="vet-auth__ayuda">Escribe los cuatro números recibidos.</small>
+            <input id="codigo" class="vet-auth__codigo" type="text" formControlName="codigo" placeholder="0000" maxlength="4" minlength="4" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{4}" required (input)="limpiarCodigo()"
+              [class.input-error]="verificarForm.get('codigo')?.touched && verificarForm.get('codigo')?.invalid"
+              [attr.aria-invalid]="verificarForm.get('codigo')?.touched && verificarForm.get('codigo')?.invalid"
+              [attr.aria-describedby]="verificarForm.get('codigo')?.touched && verificarForm.get('codigo')?.invalid ? 'codigo-ayuda codigo-error' : 'codigo-ayuda'" />
+            <small id="codigo-error" class="vet-auth__error-campo" *ngIf="verificarForm.get('codigo')?.touched && verificarForm.get('codigo')?.invalid">
+              <span *ngIf="verificarForm.get('codigo')?.hasError('required')">El código es obligatorio.</span>
+              <span *ngIf="verificarForm.get('codigo')?.hasError('pattern')">El código debe contener exactamente 4 números.</span>
             </small>
-
           </div>
-
-
-          <!-- ================================================
-               BOTÓN VERIFICAR
-               ================================================ -->
-
-          <button
-            type="submit"
-            class="btn-verificar"
-            [disabled]="cargando || !correo"
-          >
-
-            <span *ngIf="!cargando">
-              Verificar mi cuenta
-            </span>
-
-            <span *ngIf="cargando">
-              Verificando...
-            </span>
-
-          </button>
-
+          <button class="vet-auth__enviar" type="submit" [disabled]="cargando || !correo">{{ cargando ? 'Verificando...' : 'Verificar mi cuenta' }}</button>
         </form>
-
-
-        <!-- ==================================================
-             INFORMACIÓN ADICIONAL
-             ================================================== -->
-
-        <div class="info-verificacion">
-
-          <div class="info-fila">
-
-            <span aria-hidden="true">
-              🔐
-            </span>
-
-            <p>
-              Tu código permite confirmar que tienes
-              acceso al correo registrado.
-            </p>
-
-          </div>
-
-
-          <div class="info-fila">
-
-            <span aria-hidden="true">
-              ⏳
-            </span>
-
-            <p>
-              Después de verificar tu cuenta,
-              deberás esperar la aprobación del administrador.
-            </p>
-
-          </div>
-
+        <div class="vet-auth__bloque-info" style="margin-top: 23px;"><p>🔐 El código confirma que tienes acceso al correo registrado.</p><p>⏳ Tras verificarlo, deberás esperar la aprobación del administrador.</p></div>
+        <div class="vet-auth__acciones">
+          <button type="button" (click)="volverRegistro()">← Volver al registro</button>
+          <button type="button" (click)="irLogin()">Ir al login →</button>
         </div>
-
-
-        <!-- ==================================================
-             NAVEGACIÓN SECUNDARIA
-             ================================================== -->
-
-        <div class="acciones-secundarias">
-
-          <button
-            type="button"
-            class="btn-secundario"
-            (click)="volverRegistro()"
-          >
-            ← Volver al registro
-          </button>
-
-
-          <button
-            type="button"
-            class="btn-secundario"
-            (click)="irLogin()"
-          >
-            Ir al login
-          </button>
-
-        </div>
-
       </div>
-
     </section>
-
   </main>
-
 </div>

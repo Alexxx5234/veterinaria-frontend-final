@@ -1,0 +1,933 @@
+
+<!-- ==========================================================
+     VETERINARIA ARÉVALO
+     ADMINISTRACIÓN DE MEDICAMENTOS
+     DISEÑO VERDE INSTITUCIONAL
+========================================================== -->
+
+<div class="admin-medicamentos">
+
+  <!-- ========================================================
+       1. CABECERA
+  ======================================================== -->
+
+  <header class="med-header">
+
+    <div class="med-header__texto">
+
+      <span class="med-etiqueta">
+        PANEL ADMINISTRATIVO
+      </span>
+
+      <h1>
+        Administración de Medicamentos 💊
+      </h1>
+
+      <p>
+        Gestiona el catálogo, los precios y las existencias
+        de medicamentos de la veterinaria.
+      </p>
+
+    </div>
+
+    <div class="med-header__acciones">
+
+      <button
+        type="button"
+        class="btn-nuevo"
+        (click)="nuevoMedicamento()"
+        [disabled]="cargando || hayOperacionEnCurso"
+      >
+        + Nuevo medicamento
+      </button>
+
+      <button
+        type="button"
+        class="btn-actualizar"
+        (click)="cargarMedicamentos(true)"
+        [disabled]="cargando || hayOperacionEnCurso"
+      >
+        {{ cargando ? 'Actualizando...' : '↻ Actualizar' }}
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <!-- ========================================================
+       2. MENSAJES
+  ======================================================== -->
+
+  <div
+    class="med-mensaje med-mensaje--exito"
+    *ngIf="mensajeExito"
+    role="status"
+    aria-live="polite"
+  >
+
+    <span>✓</span>
+
+    {{ mensajeExito }}
+
+  </div>
+
+
+  <div
+    class="med-mensaje med-mensaje--error"
+    *ngIf="mensajeError"
+    role="alert"
+  >
+
+    <span>⚠</span>
+
+    {{ mensajeError }}
+
+    <button
+      *ngIf="errorCarga"
+      type="button"
+      (click)="cargarMedicamentos()"
+    >
+      Reintentar
+    </button>
+
+  </div>
+
+
+  <!-- ========================================================
+       3. ESTADÍSTICAS
+  ======================================================== -->
+
+  <section
+    class="med-resumen"
+    *ngIf="!cargando && !errorCarga"
+    aria-label="Resumen del inventario"
+  >
+
+    <article class="med-resumen__card">
+
+      <div class="med-resumen__icono icono-total">
+        💊
+      </div>
+
+      <div class="med-resumen__datos">
+
+        <span>Total de medicamentos</span>
+
+        <strong>{{ totalMedicamentos }}</strong>
+
+      </div>
+
+    </article>
+
+
+    <article class="med-resumen__card">
+
+      <div class="med-resumen__icono icono-activo">
+        ✓
+      </div>
+
+      <div class="med-resumen__datos">
+
+        <span>Medicamentos activos</span>
+
+        <strong>{{ totalActivos }}</strong>
+
+      </div>
+
+    </article>
+
+
+    <article class="med-resumen__card">
+
+      <div class="med-resumen__icono icono-inactivo">
+        ⏸
+      </div>
+
+      <div class="med-resumen__datos">
+
+        <span>Medicamentos inactivos</span>
+
+        <strong>{{ totalInactivos }}</strong>
+
+      </div>
+
+    </article>
+
+
+    <article class="med-resumen__card">
+
+      <div class="med-resumen__icono icono-stock">
+        !
+      </div>
+
+      <div class="med-resumen__datos">
+
+        <span>Sin existencias</span>
+
+        <strong>{{ totalSinStock }}</strong>
+
+      </div>
+
+    </article>
+
+  </section>
+
+
+  <!-- ========================================================
+       4. FORMULARIO DE REGISTRO Y EDICIÓN
+  ======================================================== -->
+
+  <section
+    class="med-formulario"
+    *ngIf="mostrarFormulario"
+  >
+
+    <div class="med-formulario__cabecera">
+
+      <div>
+
+        <span class="med-formulario__etiqueta">
+
+          {{ medicamentoEditandoId ? 'MODIFICACIÓN' : 'NUEVO REGISTRO' }}
+
+        </span>
+
+        <h2>
+
+          {{
+            medicamentoEditandoId
+              ? 'Editar medicamento'
+              : 'Registrar medicamento'
+          }}
+
+        </h2>
+
+        <p>
+          Completa la información del medicamento.
+        </p>
+
+      </div>
+
+      <button
+        type="button"
+        class="btn-cerrar"
+        (click)="cerrarFormulario()"
+        [disabled]="guardando"
+        aria-label="Cerrar formulario"
+      >
+        ✕
+      </button>
+
+    </div>
+
+
+    <form
+      [formGroup]="medicamentoForm"
+      (ngSubmit)="guardarMedicamento()"
+      novalidate
+    >
+
+      <div class="med-form-grid">
+
+        <!-- NOMBRE -->
+
+        <div class="med-campo">
+
+          <label for="nombre">
+            Nombre del medicamento *
+          </label>
+
+          <input
+            id="nombre"
+            type="text"
+            formControlName="nombre"
+            placeholder="Ej. Amoxicilina"
+            maxlength="150"
+            [class.campo-invalido]="campoInvalido('nombre')"
+          >
+
+          <small
+            class="med-error-campo"
+            *ngIf="campoInvalido('nombre')"
+          >
+            El nombre es obligatorio.
+          </small>
+
+        </div>
+
+
+        <!-- PRESENTACIÓN -->
+
+        <div class="med-campo">
+
+          <label for="presentacion">
+            Presentación *
+          </label>
+
+          <input
+            id="presentacion"
+            type="text"
+            formControlName="presentacion"
+            placeholder="Ej. Frasco de 100 ml"
+            maxlength="100"
+            [class.campo-invalido]="campoInvalido('presentacion')"
+          >
+
+          <small
+            class="med-error-campo"
+            *ngIf="campoInvalido('presentacion')"
+          >
+            La presentación es obligatoria.
+          </small>
+
+        </div>
+
+
+        <!-- DESCRIPCIÓN -->
+
+        <div class="med-campo med-campo--completo">
+
+          <label for="descripcion">
+            Descripción
+          </label>
+
+          <textarea
+            id="descripcion"
+            formControlName="descripcion"
+            rows="3"
+            maxlength="1000"
+            placeholder="Información general del medicamento..."
+          ></textarea>
+
+        </div>
+
+
+        <!-- CONCENTRACIÓN -->
+
+        <div class="med-campo">
+
+          <label for="concentracion">
+            Concentración
+          </label>
+
+          <input
+            id="concentracion"
+            type="text"
+            formControlName="concentracion"
+            placeholder="Ej. 250 mg"
+            maxlength="100"
+          >
+
+        </div>
+
+
+        <!-- UNIDAD DE MEDIDA -->
+
+        <div class="med-campo">
+
+          <label for="unidadMedida">
+            Unidad de medida *
+          </label>
+
+          <select
+            id="unidadMedida"
+            formControlName="unidadMedida"
+            [class.campo-invalido]="campoInvalido('unidadMedida')"
+          >
+
+            <option value="">
+              Selecciona una unidad
+            </option>
+
+            <option value="UNIDAD">UNIDAD</option>
+
+            <option value="TABLETA">TABLETA</option>
+
+            <option value="CAPSULA">CÁPSULA</option>
+
+            <option value="ML">ML</option>
+
+            <option value="MG">MG</option>
+
+            <option value="DOSIS">DOSIS</option>
+
+            <option value="FRASCO">FRASCO</option>
+
+            <option value="AMPOLLA">AMPOLLA</option>
+
+            <option value="SOBRE">SOBRE</option>
+
+            <option value="GRAMO">GRAMO</option>
+
+          </select>
+
+          <small
+            class="med-error-campo"
+            *ngIf="campoInvalido('unidadMedida')"
+          >
+            Selecciona una unidad de medida.
+          </small>
+
+        </div>
+
+
+        <!-- PRECIO -->
+
+        <div class="med-campo">
+
+          <label for="precioUnitario">
+            Precio unitario ($) *
+          </label>
+
+          <input
+            id="precioUnitario"
+            type="number"
+            formControlName="precioUnitario"
+            min="0"
+            step="0.01"
+            placeholder="0.00"
+            [class.campo-invalido]="campoInvalido('precioUnitario')"
+          >
+
+          <small
+            class="med-error-campo"
+            *ngIf="campoInvalido('precioUnitario')"
+          >
+            Ingresa un precio válido.
+          </small>
+
+        </div>
+
+
+        <!-- STOCK -->
+
+        <div class="med-campo">
+
+          <label for="stockDisponible">
+            Stock disponible *
+          </label>
+
+          <input
+            id="stockDisponible"
+            type="number"
+            formControlName="stockDisponible"
+            min="0"
+            step="0.01"
+            placeholder="0"
+            [class.campo-invalido]="campoInvalido('stockDisponible')"
+          >
+
+          <small
+            class="med-error-campo"
+            *ngIf="campoInvalido('stockDisponible')"
+          >
+            Ingresa una cantidad válida.
+          </small>
+
+        </div>
+
+      </div>
+
+
+      <!-- INFORMACIÓN -->
+
+      <div class="med-ayuda-formulario">
+
+        <span>ℹ</span>
+
+        <p>
+          El precio unitario se utilizará para calcular
+          los importes de medicamentos incluidos en las
+          facturas de las atenciones médicas.
+        </p>
+
+      </div>
+
+
+      <!-- BOTONES -->
+
+      <div class="med-formulario__acciones">
+
+        <button
+          type="button"
+          class="btn-cancelar"
+          (click)="cerrarFormulario()"
+          [disabled]="guardando"
+        >
+          Cancelar
+        </button>
+
+        <button
+          type="submit"
+          class="btn-guardar"
+          [disabled]="guardando"
+        >
+
+          {{
+            guardando
+              ? 'Guardando...'
+              : medicamentoEditandoId
+                ? 'Guardar cambios'
+                : 'Registrar medicamento'
+          }}
+
+        </button>
+
+      </div>
+
+    </form>
+
+  </section>
+
+
+  <!-- ========================================================
+       5. BUSCADOR Y FILTROS
+  ======================================================== -->
+
+  <section
+    class="med-filtros"
+    *ngIf="!cargando && !errorCarga"
+  >
+
+    <div class="med-filtro med-filtro--busqueda">
+
+      <label for="buscarMedicamento">
+        Buscar medicamento
+      </label>
+
+      <div class="med-buscador">
+
+        <span>⌕</span>
+
+        <input
+          id="buscarMedicamento"
+          type="search"
+          [(ngModel)]="busqueda"
+          [ngModelOptions]="{standalone: true}"
+          placeholder="Nombre, presentación o concentración..."
+        >
+
+      </div>
+
+    </div>
+
+
+    <div class="med-filtro">
+
+      <label for="filtroEstado">
+        Estado
+      </label>
+
+      <select
+        id="filtroEstado"
+        [(ngModel)]="filtroEstado"
+        [ngModelOptions]="{standalone: true}"
+      >
+
+        <option value="TODOS">
+          Todos
+        </option>
+
+        <option value="ACTIVOS">
+          Activos
+        </option>
+
+        <option value="INACTIVOS">
+          Inactivos
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <div class="med-filtro">
+
+      <label for="ordenarPor">
+        Ordenar por
+      </label>
+
+      <select
+        id="ordenarPor"
+        [(ngModel)]="ordenarPor"
+        [ngModelOptions]="{standalone: true}"
+      >
+
+        <option value="nombreAsc">
+          Nombre A - Z
+        </option>
+
+        <option value="nombreDesc">
+          Nombre Z - A
+        </option>
+
+        <option value="precioAsc">
+          Menor precio
+        </option>
+
+        <option value="precioDesc">
+          Mayor precio
+        </option>
+
+        <option value="stockAsc">
+          Menor stock
+        </option>
+
+        <option value="stockDesc">
+          Mayor stock
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <button
+      type="button"
+      class="btn-limpiar"
+      (click)="limpiarFiltros()"
+    >
+      Limpiar filtros
+    </button>
+
+  </section>
+
+
+  <!-- ========================================================
+       6. CATÁLOGO DE MEDICAMENTOS
+  ======================================================== -->
+
+  <section
+    class="med-listado"
+    *ngIf="!cargando && !errorCarga"
+  >
+
+    <div class="med-listado__cabecera">
+
+      <div>
+
+        <h2>
+          Catálogo de medicamentos
+        </h2>
+
+        <p>
+          Consulta y administra los productos registrados.
+        </p>
+
+      </div>
+
+      <span class="med-contador">
+
+        {{ medicamentosFiltrados.length }}
+
+        {{
+          medicamentosFiltrados.length === 1
+            ? 'resultado'
+            : 'resultados'
+        }}
+
+      </span>
+
+    </div>
+
+
+    <!-- TABLA -->
+
+    <div class="med-tabla-contenedor">
+
+      <table class="med-tabla">
+
+        <thead>
+
+          <tr>
+
+            <th>Medicamento</th>
+
+            <th>Presentación</th>
+
+            <th>Unidad</th>
+
+            <th>Precio</th>
+
+            <th>Stock</th>
+
+            <th>Estado</th>
+
+            <th>Acciones</th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          <!-- REGISTROS VÁLIDOS -->
+
+          <tr
+            *ngFor="
+              let medicamento of medicamentosFiltrados;
+              trackBy: identificarMedicamento
+            "
+          >
+
+            <!-- NOMBRE -->
+
+            <td>
+
+              <div class="med-nombre">
+
+                <span class="med-nombre__icono">
+                  💊
+                </span>
+
+                <div>
+
+                  <strong>
+                    {{ medicamento.nombre }}
+                  </strong>
+
+                  <small>
+                    ID: {{ medicamento.id }}
+                  </small>
+
+                </div>
+
+              </div>
+
+            </td>
+
+
+            <!-- PRESENTACIÓN -->
+
+            <td>
+
+              <div class="med-presentacion">
+
+                {{ medicamento.presentacion }}
+
+                <small *ngIf="medicamento.concentracion">
+                  {{ medicamento.concentracion }}
+                </small>
+
+              </div>
+
+            </td>
+
+
+            <!-- UNIDAD -->
+
+            <td>
+
+              <span class="med-unidad">
+                {{ medicamento.unidadMedida }}
+              </span>
+
+            </td>
+
+
+            <!-- PRECIO -->
+
+            <td>
+
+              <strong class="med-precio">
+
+                {{
+                  numero(medicamento.precioUnitario)
+                    | currency:'USD':'symbol':'1.2-2':'es-EC'
+                }}
+
+              </strong>
+
+            </td>
+
+
+            <!-- STOCK -->
+
+            <td>
+
+              <span
+                class="med-stock"
+                [class.med-stock--agotado]="numero(medicamento.stockDisponible) <= 0"
+              >
+
+                {{
+                  numero(medicamento.stockDisponible)
+                    | number:'1.0-2'
+                }}
+
+              </span>
+
+            </td>
+
+
+            <!-- ESTADO -->
+
+            <td>
+
+              <span
+                class="med-estado"
+                [class.med-estado--activo]="medicamento.activo"
+                [class.med-estado--inactivo]="!medicamento.activo"
+              >
+
+                {{ medicamento.activo ? 'Activo' : 'Inactivo' }}
+
+              </span>
+
+            </td>
+
+
+            <!-- ACCIONES -->
+
+            <td>
+
+              <div class="med-acciones">
+
+                <button
+                  type="button"
+                  class="btn-editar"
+                  (click)="editarMedicamento(medicamento)"
+                  [disabled]="hayOperacionEnCurso"
+                  title="Editar medicamento"
+                >
+                  ✎ Editar
+                </button>
+
+
+                <button
+                  type="button"
+                  class="btn-estado"
+                  [class.btn-estado--activar]="!medicamento.activo"
+                  [class.btn-estado--desactivar]="medicamento.activo"
+                  (click)="cambiarEstado(medicamento)"
+                  [disabled]="
+                    hayOperacionEnCurso ||
+                    actualizandoEstadoId === medicamento.id
+                  "
+                >
+
+                  {{
+                    actualizandoEstadoId === medicamento.id
+                      ? 'Procesando...'
+                      : medicamento.activo
+                        ? 'Desactivar'
+                        : 'Activar'
+                  }}
+
+                </button>
+
+              </div>
+
+            </td>
+
+          </tr>
+
+
+          <!-- SIN RESULTADOS -->
+
+          <tr *ngIf="medicamentosFiltrados.length === 0">
+
+            <td
+              colspan="7"
+              class="med-sin-resultados"
+            >
+
+              <span>🔎</span>
+
+              <strong>
+                No se encontraron medicamentos
+              </strong>
+
+              <p>
+                Prueba con otro nombre o modifica los filtros.
+              </p>
+
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </section>
+
+
+  <!-- ========================================================
+       7. CARGANDO
+  ======================================================== -->
+
+  <section
+    class="med-estado-pagina"
+    *ngIf="cargando"
+  >
+
+    <div class="med-spinner"></div>
+
+    <strong>
+      Consultando medicamentos...
+    </strong>
+
+    <p>
+      Estamos obteniendo la información del servidor.
+    </p>
+
+  </section>
+
+
+  <!-- ========================================================
+       8. ERROR DE CONEXIÓN
+  ======================================================== -->
+
+  <section
+    class="med-estado-pagina med-estado-pagina--error"
+    *ngIf="errorCarga && !cargando"
+  >
+
+    <span>⚠️</span>
+
+    <strong>
+      No se pudo cargar el catálogo
+    </strong>
+
+    <p>
+      Comprueba que Spring Boot esté funcionando
+      y que tu conexión con el servidor esté disponible.
+    </p>
+
+    <button
+      type="button"
+      class="btn-guardar"
+      (click)="cargarMedicamentos()"
+    >
+      Intentar nuevamente
+    </button>
+
+  </section>
+
+
+  <!-- ========================================================
+       9. PIE INFORMATIVO
+  ======================================================== -->
+
+  <footer
+    class="med-pie"
+    *ngIf="!cargando && !errorCarga"
+  >
+
+    <span>🔐</span>
+
+    <p>
+      La administración del catálogo, los precios y las
+      existencias corresponde exclusivamente al ADMIN.
+      Los medicamentos inactivos se conservan para
+      mantener el historial de la veterinaria.
+    </p>
+
+  </footer>
+
+</div>

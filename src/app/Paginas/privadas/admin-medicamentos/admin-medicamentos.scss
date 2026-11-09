@@ -1,0 +1,1049 @@
+
+/* ==========================================================
+   VETERINARIA ARÉVALO
+   ADMINISTRACIÓN DE MEDICAMENTOS
+   DISEÑO VERDE INSTITUCIONAL
+
+   PALETA:
+   Verde principal: #08745A
+   Verde oscuro:    #075E47
+   Verde claro:     #D4F1E3
+   Fondo:           #F3FAF6
+
+   Compatible con LayoutPrivado.
+   ========================================================== */
+
+.admin-medicamentos {
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 25px;
+  box-sizing: border-box;
+  color: #183d33;
+  font-family: inherit;
+}
+
+.admin-medicamentos *,
+.admin-medicamentos *::before,
+.admin-medicamentos *::after {
+  box-sizing: border-box;
+}
+
+/* ==========================================================
+   1. CABECERA
+   ========================================================== */
+
+.med-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 25px;
+  padding: 30px;
+  margin-bottom: 25px;
+  border-radius: 18px;
+  background: linear-gradient(
+    120deg,
+    #ffffff,
+    #eef9f3
+  );
+  border: 1px solid #dceee3;
+  box-shadow: 0 5px 20px rgba(22, 88, 61, 0.05);
+}
+
+.med-header__texto {
+  flex: 1;
+  min-width: 0;
+}
+
+.med-etiqueta {
+  display: inline-block;
+  margin-bottom: 10px;
+  color: #08745a;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.med-header h1 {
+  margin: 0;
+  color: #194538;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.med-header p {
+  margin: 10px 0 0;
+  color: #71877c;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.med-header__acciones {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ==========================================================
+   2. BOTONES GENERALES
+   ========================================================== */
+
+.admin-medicamentos button {
+  font-family: inherit;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.admin-medicamentos button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn-nuevo {
+  padding: 12px 18px;
+  border: 1px solid #08745a;
+  border-radius: 10px;
+  background: #08745a;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.btn-nuevo:hover:not(:disabled) {
+  background: #075e47;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 14px rgba(8, 116, 90, 0.18);
+}
+
+.btn-actualizar {
+  padding: 12px 17px;
+  border: 1px solid #cfe6d9;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #0d7053;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.btn-actualizar:hover:not(:disabled) {
+  background: #eaf8f0;
+}
+
+/* ==========================================================
+   3. MENSAJES
+   ========================================================== */
+
+.med-mensaje {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  border-radius: 11px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.med-mensaje--exito {
+  background: #eaf8f0;
+  border: 1px solid #c5ead3;
+  color: #187344;
+}
+
+.med-mensaje--error {
+  background: #fff0ef;
+  border: 1px solid #ffd3cf;
+  color: #b52d2d;
+}
+
+.med-mensaje button {
+  margin-left: auto;
+  padding: 7px 12px;
+  border: none;
+  border-radius: 7px;
+  background: #b52d2d;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* ==========================================================
+   4. TARJETAS DE ESTADÍSTICAS
+   ========================================================== */
+
+.med-resumen {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 25px;
+}
+
+.med-resumen__card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  min-width: 0;
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid #dfede4;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(22, 88, 61, 0.04);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.med-resumen__card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(22, 88, 61, 0.08);
+}
+
+.med-resumen__icono {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: 13px;
+  font-size: 21px;
+  font-weight: 800;
+}
+
+.icono-total {
+  background: #dff4e8;
+  color: #08745a;
+}
+
+.icono-activo {
+  background: #e1f5e9;
+  color: #16804e;
+}
+
+.icono-inactivo {
+  background: #fff2df;
+  color: #c17a21;
+}
+
+.icono-stock {
+  background: #ffe9e8;
+  color: #d34a43;
+}
+
+.med-resumen__datos {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.med-resumen__datos span {
+  color: #748b7f;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.med-resumen__datos strong {
+  color: #194538;
+  font-size: 25px;
+  font-weight: 800;
+}
+
+/* ==========================================================
+   5. FORMULARIO
+   ========================================================== */
+
+.med-formulario {
+  padding: 27px;
+  margin-bottom: 25px;
+  background: #ffffff;
+  border: 1px solid #dcece2;
+  border-radius: 17px;
+  box-shadow: 0 5px 20px rgba(22, 88, 61, 0.05);
+}
+
+.med-formulario__cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 15px;
+  padding-bottom: 20px;
+  margin-bottom: 23px;
+  border-bottom: 1px solid #e8f1eb;
+}
+
+.med-formulario__etiqueta {
+  color: #08745a;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.3px;
+}
+
+.med-formulario__cabecera h2 {
+  margin: 7px 0;
+  color: #194538;
+  font-size: 21px;
+  font-weight: 800;
+}
+
+.med-formulario__cabecera p {
+  margin: 0;
+  color: #82968b;
+  font-size: 13px;
+}
+
+.btn-cerrar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 35px;
+  height: 35px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 9px;
+  background: #eaf7ef;
+  color: #08745a;
+  font-size: 16px;
+}
+
+.btn-cerrar:hover:not(:disabled) {
+  background: #d4f1e3;
+  color: #075e47;
+}
+
+.med-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.med-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.med-campo--completo {
+  grid-column: 1 / -1;
+}
+
+.med-campo label {
+  color: #315c4a;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.med-campo input,
+.med-campo select,
+.med-campo textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: 11px 13px;
+  border: 1px solid #d9e9df;
+  border-radius: 9px;
+  outline: none;
+  background: #ffffff;
+  color: #264a3a;
+  font-family: inherit;
+  font-size: 13px;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.med-campo textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+
+.med-campo input:focus,
+.med-campo select:focus,
+.med-campo textarea:focus {
+  border-color: #08745a;
+  box-shadow: 0 0 0 3px rgba(8, 116, 90, 0.10);
+}
+
+.med-campo input::placeholder,
+.med-campo textarea::placeholder {
+  color: #a0b3a7;
+}
+
+.med-campo .campo-invalido {
+  border-color: #df4d4d;
+  background: #fffafa;
+}
+
+.med-error-campo {
+  color: #d14343;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* ==========================================================
+   6. AYUDA DEL FORMULARIO
+   ========================================================== */
+
+.med-ayuda-formulario {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  margin-top: 22px;
+  border: 1px solid #d8ede0;
+  border-radius: 10px;
+  background: #f0faf4;
+  color: #386c53;
+}
+
+.med-ayuda-formulario span {
+  color: #08745a;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.med-ayuda-formulario p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* ==========================================================
+   7. BOTONES DEL FORMULARIO
+   ========================================================== */
+
+.med-formulario__acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 23px;
+}
+
+.btn-cancelar,
+.btn-guardar {
+  min-width: 140px;
+  padding: 12px 18px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.btn-cancelar {
+  border: 1px solid #d4e7db;
+  background: #ffffff;
+  color: #547565;
+}
+
+.btn-cancelar:hover:not(:disabled) {
+  background: #eff8f2;
+}
+
+.btn-guardar {
+  border: 1px solid #08745a;
+  background: #08745a;
+  color: #ffffff;
+}
+
+.btn-guardar:hover:not(:disabled) {
+  background: #075e47;
+  transform: translateY(-1px);
+}
+
+/* ==========================================================
+   8. BUSCADOR Y FILTROS
+   ========================================================== */
+
+.med-filtros {
+  display: grid;
+  grid-template-columns:
+    minmax(220px, 2fr)
+    minmax(140px, 1fr)
+    minmax(160px, 1fr)
+    auto;
+  align-items: end;
+  gap: 15px;
+  padding: 20px;
+  margin-bottom: 22px;
+  background: #ffffff;
+  border: 1px solid #dfece4;
+  border-radius: 14px;
+}
+
+.med-filtro {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.med-filtro label {
+  color: #315c4a;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.med-filtro input,
+.med-filtro select {
+  width: 100%;
+  height: 43px;
+  padding: 0 12px;
+  border: 1px solid #d9e9df;
+  border-radius: 9px;
+  outline: none;
+  background: #ffffff;
+  color: #3e6551;
+  font-family: inherit;
+  font-size: 12px;
+}
+
+.med-filtro input:focus,
+.med-filtro select:focus {
+  border-color: #08745a;
+  box-shadow: 0 0 0 3px rgba(8, 116, 90, 0.08);
+}
+
+.med-buscador {
+  position: relative;
+}
+
+.med-buscador span {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #829b8b;
+  font-size: 22px;
+}
+
+.med-buscador input {
+  padding-left: 38px;
+}
+
+.btn-limpiar {
+  height: 43px;
+  padding: 0 15px;
+  border: 1px solid #cfe5d7;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #0b7052;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.btn-limpiar:hover {
+  background: #eaf7ef;
+}
+
+/* ==========================================================
+   9. LISTADO
+   ========================================================== */
+
+.med-listado {
+  padding: 23px;
+  background: #ffffff;
+  border: 1px solid #dfece4;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(22, 88, 61, 0.035);
+}
+
+.med-listado__cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.med-listado__cabecera h2 {
+  margin: 0;
+  color: #194538;
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.med-listado__cabecera p {
+  margin: 7px 0 0;
+  color: #82968b;
+  font-size: 12px;
+}
+
+.med-contador {
+  padding: 8px 12px;
+  border-radius: 20px;
+  background: #e0f4e8;
+  color: #08745a;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+/* ==========================================================
+   10. TABLA
+   ========================================================== */
+
+.med-tabla-contenedor {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #e3eee7;
+  border-radius: 11px;
+}
+
+.med-tabla {
+  width: 100%;
+  min-width: 950px;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.med-tabla thead {
+  background: #f0f9f4;
+}
+
+.med-tabla th {
+  padding: 15px 13px;
+  color: #557566;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+  border-bottom: 1px solid #dcece2;
+}
+
+.med-tabla td {
+  padding: 15px 13px;
+  color: #456353;
+  font-size: 12px;
+  border-bottom: 1px solid #eaf1ec;
+  vertical-align: middle;
+}
+
+.med-tabla tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.med-tabla tbody tr:not(:has(.med-sin-resultados)):hover {
+  background: #f7fcf9;
+}
+
+/* ==========================================================
+   11. INFORMACIÓN DEL MEDICAMENTO
+   ========================================================== */
+
+.med-nombre {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 170px;
+}
+
+.med-nombre__icono {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 37px;
+  height: 37px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: #e1f5e9;
+  font-size: 17px;
+}
+
+.med-nombre div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.med-nombre strong {
+  color: #194538;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.med-nombre small {
+  color: #82998c;
+  font-size: 10px;
+}
+
+.med-presentacion {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 120px;
+  color: #456353;
+  font-size: 12px;
+}
+
+.med-presentacion small {
+  color: #82998c;
+  font-size: 10px;
+}
+
+.med-unidad {
+  display: inline-block;
+  padding: 6px 9px;
+  border-radius: 6px;
+  background: #edf6f0;
+  color: #416a53;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.med-precio {
+  color: #194538;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.med-stock {
+  color: #08745a;
+  font-weight: 800;
+}
+
+.med-stock--agotado {
+  color: #d34242;
+}
+
+/* ==========================================================
+   12. ESTADOS
+   ========================================================== */
+
+.med-estado {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.med-estado--activo {
+  background: #e1f5e9;
+  color: #08734f;
+}
+
+.med-estado--inactivo {
+  background: #fff0e5;
+  color: #bd6a27;
+}
+
+/* ==========================================================
+   13. ACCIONES
+   ========================================================== */
+
+.med-acciones {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.med-acciones button {
+  padding: 8px 10px;
+  border-radius: 7px;
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.btn-editar {
+  border: 1px solid #cce7d6;
+  background: #eaf7ef;
+  color: #08745a;
+}
+
+.btn-editar:hover:not(:disabled) {
+  background: #d4f1e3;
+}
+
+.btn-estado {
+  border: 1px solid transparent;
+}
+
+.btn-estado--desactivar {
+  background: #fff0e9;
+  border-color: #ffddd0 !important;
+  color: #c15b37;
+}
+
+.btn-estado--activar {
+  background: #e8f7ee;
+  border-color: #ccebd7 !important;
+  color: #25804e;
+}
+
+.btn-estado--activar:hover:not(:disabled) {
+  background: #d7f1e1;
+}
+
+.btn-estado--desactivar:hover:not(:disabled) {
+  background: #ffe2d8;
+}
+
+/* ==========================================================
+   14. SIN RESULTADOS
+   ========================================================== */
+
+.med-sin-resultados {
+  padding: 50px 20px !important;
+  text-align: center;
+}
+
+.med-sin-resultados span {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 30px;
+}
+
+.med-sin-resultados strong {
+  display: block;
+  color: #315c4a;
+  font-size: 14px;
+}
+
+.med-sin-resultados p {
+  margin: 8px 0 0;
+  color: #82968b;
+  font-size: 12px;
+}
+
+/* ==========================================================
+   15. CARGA Y ERROR
+   ========================================================== */
+
+.med-estado-pagina {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  min-height: 280px;
+  padding: 30px;
+  margin-bottom: 20px;
+  border: 1px solid #dfece4;
+  border-radius: 15px;
+  background: #ffffff;
+  text-align: center;
+}
+
+.med-estado-pagina strong {
+  color: #315c4a;
+  font-size: 15px;
+}
+
+.med-estado-pagina p {
+  max-width: 450px;
+  margin: 0;
+  color: #82968b;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.med-estado-pagina--error > span {
+  font-size: 35px;
+}
+
+.med-spinner {
+  width: 37px;
+  height: 37px;
+  border: 4px solid #dcefe3;
+  border-top-color: #08745a;
+  border-radius: 50%;
+  animation: med-girar 0.8s linear infinite;
+}
+
+@keyframes med-girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================================
+   16. PIE INFORMATIVO
+   ========================================================== */
+
+.med-pie {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 17px;
+  margin-top: 20px;
+  border: 1px solid #dcece2;
+  border-radius: 11px;
+  background: #f0f9f4;
+}
+
+.med-pie span {
+  font-size: 17px;
+}
+
+.med-pie p {
+  margin: 0;
+  color: #587967;
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+/* ==========================================================
+   17. ACCESIBILIDAD
+   ========================================================== */
+
+.admin-medicamentos button:focus-visible,
+.admin-medicamentos input:focus-visible,
+.admin-medicamentos select:focus-visible,
+.admin-medicamentos textarea:focus-visible {
+  outline: 3px solid #08745a;
+  outline-offset: 3px;
+}
+
+/* ==========================================================
+   18. TABLET
+   ========================================================== */
+
+@media (max-width: 1050px) {
+
+  .med-resumen {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .med-filtros {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+}
+
+/* ==========================================================
+   19. MÓVILES
+   ========================================================== */
+
+@media (max-width: 650px) {
+
+  .admin-medicamentos {
+    padding: 14px;
+  }
+
+  .med-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 22px 18px;
+  }
+
+  .med-header h1 {
+    font-size: 22px;
+  }
+
+  .med-header__acciones {
+    width: 100%;
+  }
+
+  .med-header__acciones button {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .med-resumen {
+    grid-template-columns: 1fr;
+    gap: 11px;
+  }
+
+  .med-resumen__card {
+    padding: 16px;
+  }
+
+  .med-formulario {
+    padding: 19px 15px;
+  }
+
+  .med-formulario__cabecera h2 {
+    font-size: 18px;
+  }
+
+  .med-form-grid {
+    grid-template-columns: 1fr;
+    gap: 17px;
+  }
+
+  .med-campo--completo {
+    grid-column: auto;
+  }
+
+  .med-formulario__acciones {
+    flex-direction: column-reverse;
+  }
+
+  .med-formulario__acciones button {
+    width: 100%;
+  }
+
+  .med-filtros {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+
+  .med-listado {
+    padding: 17px 12px;
+  }
+
+  .med-listado__cabecera {
+    align-items: flex-start;
+  }
+
+  .med-listado__cabecera h2 {
+    font-size: 16px;
+  }
+
+  .med-contador {
+    font-size: 10px;
+  }
+
+  .med-mensaje {
+    align-items: flex-start;
+    font-size: 12px;
+  }
+
+}
+
+/* ==========================================================
+   20. MÓVILES PEQUEÑOS
+   ========================================================== */
+
+@media (max-width: 380px) {
+
+  .med-header h1 {
+    font-size: 19px;
+  }
+
+  .med-header__acciones {
+    flex-direction: column;
+  }
+
+  .med-header__acciones button {
+    width: 100%;
+  }
+
+  .med-listado__cabecera {
+    flex-direction: column;
+  }
+
+}
+
+/* ==========================================================
+   21. REDUCIR ANIMACIONES
+   ========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .admin-medicamentos *,
+  .admin-medicamentos *::before,
+  .admin-medicamentos *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+
+}

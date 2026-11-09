@@ -1,612 +1,120 @@
-
 <!-- ==========================================================
-     VETERINARIA AREVALO
-     DASHBOARD USER - MENÚ Y RESUMEN PERSONAL
-     ========================================================== -->
+  VETERINARIA ARÉVALO · DASHBOARD USER
+  Menú, notificaciones y accesibilidad viven en LayoutPrivado.
+  Aquí solo mostramos datos del usuario desde Spring Boot.
+========================================================== -->
+<div class="dash-final dash-final--user">
 
-<div class="dashboard-usuario-page">
-
-  <!-- ========================================================
-       FONDO DEL MENÚ EN CELULARES
-       ======================================================== -->
-
-  <button
-    type="button"
-    class="menu-overlay"
-    [class.visible]="menuAbierto"
-    (click)="cerrarMenu()"
-    aria-label="Cerrar menú lateral"
-    [attr.tabindex]="menuAbierto ? 0 : -1"
-  ></button>
-
-
-  <!-- ========================================================
-       MENÚ LATERAL
-       ======================================================== -->
-
-  <aside
-    id="menu-usuario"
-    class="sidebar"
-    [class.abierto]="menuAbierto"
-    aria-label="Menú del usuario"
-  >
-
-    <!-- LOGO -->
-    <div class="sidebar-header">
-
-      <div class="sidebar-brand">
-
-        <div class="sidebar-logo" aria-hidden="true">
-          🐾
-        </div>
-
-        <div class="sidebar-brand-text">
-          <h2>Veterinaria</h2>
-          <span>Arevalo</span>
-        </div>
-
-      </div>
-
-      <button
-        type="button"
-        class="sidebar-cerrar"
-        (click)="cerrarMenu()"
-        aria-label="Cerrar menú"
-      >
-        ✕
-      </button>
-
+  <!-- Saludo + actualización -->
+  <header class="dash-final__encabezado">
+    <div>
+      <span class="dash-final__eyebrow">🐾 MI ESPACIO PERSONAL</span>
+      <h1>¡Bienvenido a Veterinaria Arévalo!</h1>
+      <p>Cuida a tus mejores amigos y consulta su información desde un solo lugar.</p>
     </div>
+    <button type="button" class="dash-final__actualizar"
+            (click)="cargarResumen()" [disabled]="cargando">
+      {{ cargando ? 'Actualizando…' : '↻ Actualizar datos' }}
+    </button>
+  </header>
 
-
-    <!-- IDENTIFICACIÓN DEL USUARIO -->
-    <div class="sidebar-perfil">
-
-      <div class="perfil-icono" aria-hidden="true">
-        👤
-      </div>
-
-      <div>
-        <strong>Mi cuenta</strong>
-        <span>Panel de usuario</span>
-      </div>
-
+  <!-- Banner: imagen separada del texto; no se superpone al ampliar la vista -->
+  <section class="dash-final__hero" aria-label="Bienvenida">
+    <div class="dash-final__hero-texto">
+      <span>♥ ELLOS TAMBIÉN SON FAMILIA</span>
+      <h2>Su bienestar es nuestra prioridad.</h2>
+      <p>Registra a tus mascotas, organiza las citas y mantén sus cuidados al día.</p>
+      <button type="button" (click)="irCitas()">📅 Ver mis citas</button>
     </div>
+    <img src="/imagenes/mascotas-hero.webp" alt="" aria-hidden="true" loading="lazy">
+  </section>
 
+  <p class="dash-final__alerta" role="alert" *ngIf="errorCarga">
+    ⚠️ No se pudo cargar parte del resumen. Verifica que la API esté disponible.
+  </p>
 
-    <!-- OPCIONES DE NAVEGACIÓN -->
-    <nav
-      class="sidebar-nav"
-      aria-label="Navegación principal"
-    >
+  <!-- Cada valor viene de las consultas existentes del componente TS -->
+  <section class="dash-final__indicadores" aria-label="Mi resumen">
+    <article class="dash-final__indicador">
+      <span class="dash-final__indicador-icono" aria-hidden="true">🐾</span>
+      <div><span>Mascotas registradas</span>
+      <strong>{{ totalMascotas === null ? '—' : totalMascotas }}</strong>
+      <small>Mis compañeros de vida</small></div>
+    </article>
+    <article class="dash-final__indicador">
+      <span class="dash-final__indicador-icono" aria-hidden="true">📅</span>
+      <div><span>Mis citas</span>
+      <strong>{{ totalCitas === null ? '—' : totalCitas }}</strong>
+      <small>Registradas en el sistema</small></div>
+    </article>
+    <article class="dash-final__indicador">
+      <span class="dash-final__indicador-icono" aria-hidden="true">⏳</span>
+      <div><span>Citas pendientes</span>
+      <strong>{{ citasPendientes === null ? '—' : citasPendientes }}</strong>
+      <small>En espera de confirmación</small></div>
+    </article>
+    <article class="dash-final__indicador">
+      <span class="dash-final__indicador-icono" aria-hidden="true">🩺</span>
+      <div><span>Servicios disponibles</span>
+      <strong>{{ totalServicios === null ? '—' : totalServicios }}</strong>
+      <small>Atención para tu mascota</small></div>
+    </article>
+  </section>
 
-      <p class="menu-titulo">
-        MENÚ PRINCIPAL
-      </p>
-
-      <button
-        type="button"
-        class="nav-item activo"
-        (click)="irInicio()"
-        aria-current="page"
-      >
-        <span class="nav-icon" aria-hidden="true">🏠</span>
-        <span>Inicio</span>
-      </button>
-
-      <button
-        type="button"
-        class="nav-item"
-        (click)="irMascotas()"
-      >
-        <span class="nav-icon" aria-hidden="true">🐾</span>
-        <span>Mis Mascotas</span>
-      </button>
-
-      <button
-        type="button"
-        class="nav-item"
-        (click)="irCitas()"
-      >
-        <span class="nav-icon" aria-hidden="true">📅</span>
-        <span>Mis Citas</span>
-      </button>
-
-      <button
-        type="button"
-        class="nav-item"
-        (click)="irServicios()"
-      >
-        <span class="nav-icon" aria-hidden="true">🩺</span>
-        <span>Servicios</span>
-      </button>
-
-      <button
-        type="button"
-        class="nav-item"
-        (click)="irVeterinarios()"
-      >
-        <span class="nav-icon" aria-hidden="true">👨‍⚕️</span>
-        <span>Veterinarios</span>
-      </button>
-
-    </nav>
-
-
-    <!-- CERRAR SESIÓN AL FINAL DEL MENÚ -->
-    <div class="sidebar-footer">
-
-      <button
-        type="button"
-        class="btn-cerrar-sesion"
-        (click)="cerrarSesion()"
-      >
-        <span aria-hidden="true">🚪</span>
-        <span>Cerrar sesión</span>
-      </button>
-
-      <p class="sidebar-copy">
-        Veterinaria Arevalo
-      </p>
-
-    </div>
-
-  </aside>
-
-
-  <!-- ========================================================
-       CONTENIDO PRINCIPAL
-       ======================================================== -->
-
-  <main class="dashboard-main">
-
-    <!-- ======================================================
-         ENCABEZADO
-         ====================================================== -->
-
-    <header class="dashboard-header">
-
-      <div class="header-superior">
-
-        <button
-          type="button"
-          class="btn-menu"
-          (click)="cambiarMenu()"
-          aria-controls="menu-usuario"
-          [attr.aria-expanded]="menuAbierto"
-        >
-          <span aria-hidden="true">☰</span>
-          Menú
-        </button>
-
-        <span class="rol-badge">
-          ● Usuario
-        </span>
-
+  <div class="dash-final__columnas">
+    <!-- Próximas citas -->
+    <section class="dash-final__panel" aria-labelledby="titulo-citas-user">
+      <div class="dash-final__panel-head">
+        <div><h2 id="titulo-citas-user">📅 Próximas citas</h2>
+        <p>Las citas programadas para tus mascotas</p></div>
+        <button type="button" (click)="irCitas()">Ver todas →</button>
       </div>
-
-      <div class="header-texto">
-
-        <h1>Panel de Usuario</h1>
-
-        <p>
-          Consulta tus mascotas y organiza tus
-          citas veterinarias desde un solo lugar.
-        </p>
-
+      <p class="dash-final__vacio" *ngIf="cargando">Cargando citas…</p>
+      <p class="dash-final__vacio" *ngIf="!cargando && totalCitas === null">No se pudo consultar las citas.</p>
+      <p class="dash-final__vacio" *ngIf="!cargando && totalCitas !== null && proximasCitas.length === 0">No tienes próximas citas.</p>
+      <div class="dash-final__lista" *ngIf="!cargando && proximasCitas.length > 0">
+        <article class="dash-final__fila" *ngFor="let cita of proximasCitas">
+          <span class="dash-final__avatar" aria-hidden="true">📅</span>
+          <div class="dash-final__fila-texto">
+            <strong>{{ cita.mascota?.nombre || 'Mi mascota' }}</strong>
+            <span>{{ cita.servicio?.nombre || cita.motivo || 'Cita veterinaria' }}</span>
+            <small>{{ cita.fechaHora | date:'dd/MM/yyyy HH:mm' }}</small>
+          </div>
+          <span class="dash-final__estado" [class.dash-final__estado--pendiente]="cita.estado?.toUpperCase() === 'PENDIENTE'">
+            {{ cita.estado || 'Registrada' }}
+          </span>
+        </article>
       </div>
-
-    </header>
-
-
-    <!-- ======================================================
-         BIENVENIDA
-         ====================================================== -->
-
-    <section class="bienvenida">
-
-      <div class="bienvenida-contenido">
-
-        <span class="bienvenida-etiqueta">
-          MI ESPACIO PERSONAL
-        </span>
-
-        <h2>
-          ¡Bienvenido a Veterinaria Arevalo! 🐾
-        </h2>
-
-        <p>
-          Aquí puedes consultar la información de tus
-          mascotas, revisar tus próximas citas
-          y conocer nuestros servicios.
-        </p>
-
-      </div>
-
-      <div
-        class="bienvenida-icono"
-        aria-hidden="true"
-      >
-        🐶
-      </div>
-
     </section>
 
-
-    <!-- ======================================================
-         MI RESUMEN
-         ====================================================== -->
-
-    <section
-      class="resumen-section"
-      aria-labelledby="titulo-resumen"
-    >
-
-      <div class="resumen-encabezado">
-
-        <div>
-
-          <h2 id="titulo-resumen">
-            Mi resumen
-          </h2>
-
-          <p>
-            Información de tu cuenta y nuestros servicios.
-          </p>
-
-        </div>
-
-        <!-- ACTUALIZAR INFORMACIÓN -->
-        <button
-          type="button"
-          class="btn-actualizar"
-          (click)="cargarResumen()"
-          [disabled]="cargando"
-        >
-          {{ cargando ? 'Actualizando...' : '↻ Actualizar' }}
-        </button>
-
+    <!-- Mascotas reales del usuario -->
+    <section class="dash-final__panel" aria-labelledby="titulo-mascotas-user">
+      <div class="dash-final__panel-head">
+        <div><h2 id="titulo-mascotas-user">🐾 Mis mascotas</h2>
+        <p>Tu familia de cuatro patas</p></div>
+        <button type="button" (click)="irMascotas()">Ver todas →</button>
       </div>
-
-
-      <!-- MENSAJE SI FALLA ALGUNA CONSULTA -->
-      <div
-        class="resumen-alerta"
-        *ngIf="errorCarga"
-        role="alert"
-      >
-        Algunas estadísticas no pudieron cargarse.
-        Comprueba la conexión con el servidor.
+      <p class="dash-final__vacio" *ngIf="cargando">Cargando mascotas…</p>
+      <p class="dash-final__vacio" *ngIf="!cargando && totalMascotas === null">No se pudo consultar las mascotas.</p>
+      <p class="dash-final__vacio" *ngIf="!cargando && totalMascotas !== null && misMascotas.length === 0">Todavía no tienes mascotas registradas.</p>
+      <div class="dash-final__lista" *ngIf="!cargando && misMascotas.length > 0">
+        <article class="dash-final__fila" *ngFor="let mascota of misMascotas">
+          <span class="dash-final__avatar" aria-hidden="true">🐾</span>
+          <div class="dash-final__fila-texto">
+            <strong>{{ mascota.nombre || 'Mascota' }}</strong>
+            <span>{{ mascota.especie || 'Especie no especificada' }}</span>
+            <small>{{ mascota.raza || 'Raza no especificada' }}</small>
+          </div>
+          <span class="dash-final__etiqueta">Mi mascota</span>
+        </article>
       </div>
-
-
-      <!-- ====================================================
-           ESTADÍSTICAS
-           ==================================================== -->
-
-      <div class="resumen-grid" aria-live="polite">
-
-        <!-- MIS MASCOTAS -->
-        <article class="resumen-card">
-
-          <div class="resumen-icono" aria-hidden="true">
-            🐾
-          </div>
-
-          <span class="resumen-label">
-            Mis mascotas
-          </span>
-
-          <strong class="resumen-numero">
-            {{ totalMascotas === null ? '—' : totalMascotas }}
-          </strong>
-
-          <small>
-            Mascotas registradas en mi cuenta
-          </small>
-
-        </article>
-
-
-        <!-- MIS CITAS -->
-        <article class="resumen-card">
-
-          <div class="resumen-icono" aria-hidden="true">
-            📅
-          </div>
-
-          <span class="resumen-label">
-            Mis citas
-          </span>
-
-          <strong class="resumen-numero">
-            {{ totalCitas === null ? '—' : totalCitas }}
-          </strong>
-
-          <small>
-            Citas veterinarias de mi cuenta
-          </small>
-
-        </article>
-
-
-        <!-- CITAS PENDIENTES -->
-        <article class="resumen-card resumen-destacado">
-
-          <div class="resumen-icono" aria-hidden="true">
-            ⏳
-          </div>
-
-          <span class="resumen-label">
-            Citas pendientes
-          </span>
-
-          <strong class="resumen-numero">
-            {{ citasPendientes === null ? '—' : citasPendientes }}
-          </strong>
-
-          <small>
-            Citas que tienen estado pendiente
-          </small>
-
-        </article>
-
-
-        <!-- SERVICIOS -->
-        <article class="resumen-card">
-
-          <div class="resumen-icono" aria-hidden="true">
-            🩺
-          </div>
-
-          <span class="resumen-label">
-            Servicios veterinarios
-          </span>
-
-          <strong class="resumen-numero">
-            {{ totalServicios === null ? '—' : totalServicios }}
-          </strong>
-
-          <small>
-            Servicios registrados en la veterinaria
-          </small>
-
-        </article>
-
-
-        <!-- VETERINARIOS -->
-        <article class="resumen-card">
-
-          <div class="resumen-icono" aria-hidden="true">
-            👨‍⚕️
-          </div>
-
-          <span class="resumen-label">
-            Veterinarios
-          </span>
-
-          <strong class="resumen-numero">
-            {{ totalVeterinarios === null ? '—' : totalVeterinarios }}
-          </strong>
-
-          <small>
-            Profesionales registrados
-          </small>
-
-        </article>
-
-      </div>
-
     </section>
+  </div>
 
-
-    <!-- ======================================================
-         INFORMACIÓN PERSONAL
-         ====================================================== -->
-
-    <section class="detalle-grid">
-
-      <!-- ====================================================
-           MIS PRÓXIMAS CITAS
-           ==================================================== -->
-
-      <article class="detalle-panel">
-
-        <div class="detalle-encabezado">
-
-          <div>
-            <h2>📅 Mis próximas citas</h2>
-            <p>
-              Las próximas citas de tus mascotas.
-            </p>
-          </div>
-
-          <button
-            type="button"
-            class="detalle-enlace"
-            (click)="irCitas()"
-          >
-            Ver mis citas →
-          </button>
-
-        </div>
-
-
-        <!-- CARGANDO -->
-        <p
-          class="detalle-vacio"
-          *ngIf="cargando"
-        >
-          Consultando tus próximas citas...
-        </p>
-
-
-        <!-- ERROR -->
-        <p
-          class="detalle-vacio"
-          *ngIf="!cargando && totalCitas === null"
-        >
-          No se pudo consultar tus citas.
-        </p>
-
-
-        <!-- SIN CITAS -->
-        <p
-          class="detalle-vacio"
-          *ngIf="
-            !cargando &&
-            totalCitas !== null &&
-            proximasCitas.length === 0
-          "
-        >
-          No tienes próximas citas registradas.
-        </p>
-
-
-        <!-- LISTADO -->
-        <div
-          class="lista-elementos"
-          *ngIf="
-            !cargando &&
-            proximasCitas.length > 0
-          "
-        >
-
-          <div
-            class="lista-item"
-            *ngFor="let cita of proximasCitas"
-          >
-
-            <div class="item-icono" aria-hidden="true">
-              📅
-            </div>
-
-            <div class="item-contenido">
-
-              <strong>
-                {{ cita.mascota?.nombre || 'Mi mascota' }}
-              </strong>
-
-              <span>
-                {{ cita.servicio?.nombre || cita.motivo || 'Cita veterinaria' }}
-              </span>
-
-              <small>
-                {{ cita.fechaHora | date:'dd/MM/yyyy HH:mm' }}
-              </small>
-
-            </div>
-
-            <span class="item-estado">
-              {{ cita.estado || 'Registrada' }}
-            </span>
-
-          </div>
-
-        </div>
-
-      </article>
-
-
-      <!-- ====================================================
-           MIS MASCOTAS
-           ==================================================== -->
-
-      <article class="detalle-panel">
-
-        <div class="detalle-encabezado">
-
-          <div>
-            <h2>🐾 Mis mascotas</h2>
-            <p>
-              Mascotas registradas en tu cuenta.
-            </p>
-          </div>
-
-          <button
-            type="button"
-            class="detalle-enlace"
-            (click)="irMascotas()"
-          >
-            Ver todas →
-          </button>
-
-        </div>
-
-
-        <!-- CARGANDO -->
-        <p
-          class="detalle-vacio"
-          *ngIf="cargando"
-        >
-          Cargando tus mascotas...
-        </p>
-
-
-        <!-- ERROR -->
-        <p
-          class="detalle-vacio"
-          *ngIf="!cargando && totalMascotas === null"
-        >
-          No se pudo consultar tus mascotas.
-        </p>
-
-
-        <!-- SIN MASCOTAS -->
-        <p
-          class="detalle-vacio"
-          *ngIf="
-            !cargando &&
-            totalMascotas !== null &&
-            misMascotas.length === 0
-          "
-        >
-          Todavía no tienes mascotas registradas.
-        </p>
-
-
-        <!-- LISTADO DE MASCOTAS -->
-        <div
-          class="lista-elementos"
-          *ngIf="
-            !cargando &&
-            misMascotas.length > 0
-          "
-        >
-
-          <div
-            class="lista-item"
-            *ngFor="let mascota of misMascotas"
-          >
-
-            <div class="item-icono" aria-hidden="true">
-              🐶
-            </div>
-
-            <div class="item-contenido">
-
-              <strong>
-                {{ mascota.nombre || 'Mascota' }}
-              </strong>
-
-              <span>
-                {{ mascota.especie || 'Especie no especificada' }}
-              </span>
-
-              <small>
-                {{ mascota.raza || 'Raza no especificada' }}
-              </small>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </article>
-
-    </section>
-
-  </main>
-
+  <section class="dash-final__pie" aria-label="Información adicional">
+    <span>💚</span>
+    <div><strong>Pequeñas acciones, grandes historias.</strong>
+    <p>Consulta los profesionales disponibles y agenda una cita cuando la necesites.</p></div>
+    <button type="button" (click)="irVeterinarios()">Conocer veterinarios →</button>
+  </section>
 </div>

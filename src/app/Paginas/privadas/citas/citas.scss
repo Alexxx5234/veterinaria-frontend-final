@@ -1,23 +1,15 @@
 
 /* ==========================================================
-   VETERINARIA AREVALO - MIS CITAS (USER)
+ VETERINARIA ARÉVALO · MIS CITAS · USER
 
-   DISEÑO:
-   - Morado y blanco.
-   - Resumen de citas.
-   - Buscador y filtros.
-   - Formulario organizado.
-   - Tarjetas de citas.
-   - Estados diferenciados visualmente.
-   - Accesibilidad y diseño responsivo.
-
-   La página funciona dentro de LayoutPrivado.
-   ========================================================== */
-
-
-/* ==========================================================
-   1. CONFIGURACIÓN DEL COMPONENTE
-   ========================================================== */
+ Estilos completos:
+ - Verde institucional.
+ - Resumen de citas y estados.
+ - Formulario y validaciones.
+ - Filtros, tarjetas y botones.
+ - Accesos rápidos.
+ - Responsive y accesibilidad.
+========================================================== */
 
 :host {
   display: block;
@@ -31,56 +23,40 @@
   box-sizing: border-box;
 }
 
-
-/* ==========================================================
-   2. CONTENEDOR PRINCIPAL
-   ========================================================== */
-
-/*
-   El menú compartido ya define el espacio
-   y el fondo de la aplicación.
-
-   Evitamos agregar márgenes excesivos o
-   crear una segunda distribución.
-*/
+/* 1. COLORES DEL COMPONENTE */
 
 .citas-container {
+  --verde: #08765a;
+  --verde-oscuro: #075642;
+  --verde-claro: #e6f6ed;
+  --texto: #183e32;
+  --secundario: #637d70;
+  --borde: #dcebe2;
+  --blanco: #ffffff;
+
   width: 100%;
   min-width: 0;
-  min-height: auto;
-
   padding: 0;
-
   background: transparent;
-
-  color: #302d4f;
-
+  color: var(--texto);
   font-family: 'Segoe UI', Arial, sans-serif;
+  line-height: 1.55;
 }
 
-
-/* ==========================================================
-   3. CABECERA
-   ========================================================== */
+/* 2. ENCABEZADO */
 
 .citas-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   flex-wrap: wrap;
   gap: 20px;
-
-  margin-bottom: 25px;
-  padding: 28px 30px;
-
-  border: 1px solid #ece8fa;
+  margin-bottom: 20px;
+  padding: 27px 30px;
+  border: 1px solid var(--borde);
   border-radius: 18px;
-
-  background: #ffffff;
-
-  box-shadow:
-    0 8px 25px rgba(53, 42, 105, 0.06);
+  background: linear-gradient(115deg, #ffffff, #f0faf4);
+  box-shadow: 0 8px 25px #0f54370b;
 }
 
 .header-texto {
@@ -90,301 +66,231 @@
 
 .etiqueta-pagina {
   display: inline-block;
-
   margin-bottom: 10px;
-
-  color: #6251d5;
-
+  color: var(--verde);
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 1px;
+  font-weight: 800;
+  letter-spacing: 1.1px;
 }
 
 .citas-header h1 {
   margin: 0;
-
-  color: #292742;
-
+  color: var(--verde-oscuro);
   font-size: 29px;
-  font-weight: 700;
+  font-weight: 800;
   line-height: 1.3;
 }
 
 .citas-header p {
   margin: 9px 0 0;
-
-  color: #68647d;
-
+  color: var(--secundario);
   font-size: 14px;
-  line-height: 1.6;
+  line-height: 1.65;
 }
 
+/* 3. ACCESOS RÁPIDOS */
 
-/* ==========================================================
-   4. BOTONES GENERALES
-   ========================================================== */
+.user-accesos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 25px;
+}
 
-.acciones-header {
+.user-accesos a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 15px;
+  border: 1px solid #cce5d7;
+  border-radius: 11px;
+  background: #ffffff;
+  color: var(--verde-oscuro);
+  font-size: 13px;
+  font-weight: 750;
+  text-decoration: none;
+  transition: background-color .2s, border-color .2s;
+}
+
+.user-accesos a:hover {
+  background: var(--verde-claro);
+  border-color: #abd7bc;
+}
+
+/* 4. BOTONES GENERALES */
+
+.acciones-header,
+.form-acciones,
+.listado-acciones {
   display: flex;
   align-items: center;
-
   flex-wrap: wrap;
   gap: 11px;
 }
 
-.btn-nueva,
-.btn-volver,
-.btn-guardar,
-.btn-cancelar-form,
-.btn-actualizar,
-.btn-ir-mascotas {
+:is(
+  .btn-nueva,
+  .btn-volver,
+  .btn-guardar,
+  .btn-cancelar-form,
+  .btn-actualizar,
+  .btn-ir-mascotas,
+  .btn-limpiar-filtros,
+  .btn-editar,
+  .btn-cancelar-cita
+) {
   min-height: 44px;
-
-  padding: 11px 17px;
-
+  padding: 11px 16px;
   border-radius: 10px;
-
   font-family: inherit;
   font-size: 13px;
-  font-weight: 700;
-
+  font-weight: 750;
   cursor: pointer;
-
-  transition:
-    background-color 0.2s ease,
-    box-shadow 0.2s ease,
-    transform 0.2s ease;
+  transition: background-color .2s, box-shadow .2s;
 }
 
-
-/* BOTONES PRINCIPALES */
-
-.btn-nueva,
-.btn-guardar,
-.btn-ir-mascotas {
-  border: none;
-
-  background: linear-gradient(
-    135deg,
-    #6254e8,
-    #7c5ce7
-  );
-
+:is(.btn-nueva, .btn-guardar, .btn-ir-mascotas) {
+  border: 1px solid var(--verde);
+  background: var(--verde);
   color: #ffffff;
 }
 
-.btn-nueva:hover:not(:disabled),
-.btn-guardar:hover:not(:disabled),
-.btn-ir-mascotas:hover:not(:disabled) {
-  transform: translateY(-2px);
-
-  box-shadow:
-    0 7px 18px rgba(98, 84, 232, 0.25);
+:is(.btn-nueva, .btn-guardar, .btn-ir-mascotas):hover:not(:disabled) {
+  background: var(--verde-oscuro);
+  box-shadow: 0 6px 15px #08765a25;
 }
 
-
-/* BOTONES SECUNDARIOS */
-
-.btn-volver,
-.btn-cancelar-form {
-  border: 1px solid #e0dcf0;
-
-  background: #f3f1fc;
-
-  color: #514c68;
+:is(.btn-volver, .btn-cancelar-form, .btn-actualizar, .btn-limpiar-filtros) {
+  border: 1px solid #cce5d7;
+  background: #ffffff;
+  color: var(--verde-oscuro);
 }
 
-.btn-volver:hover,
-.btn-cancelar-form:hover:not(:disabled) {
-  background: #e9e5f9;
+:is(.btn-volver, .btn-cancelar-form, .btn-actualizar, .btn-limpiar-filtros):hover:not(:disabled) {
+  background: var(--verde-claro);
 }
-
-
-/* BOTONES DESHABILITADOS */
 
 .citas-container button:disabled {
-  opacity: 0.6;
-
+  opacity: .58;
   cursor: not-allowed;
 }
 
-
-/* ==========================================================
-   5. RESUMEN DE CITAS
-   ========================================================== */
+/* 5. ESTADÍSTICAS */
 
 .resumen-grid {
   display: grid;
-
-  grid-template-columns:
-    repeat(3, minmax(0, 1fr));
-
-  gap: 18px;
-
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 17px;
   margin-bottom: 25px;
 }
 
 .resumen-card {
   display: flex;
   align-items: center;
-
-  gap: 17px;
-
+  gap: 16px;
   min-width: 0;
-  padding: 23px;
-
-  border: 1px solid #ece8fa;
-  border-radius: 17px;
-
+  padding: 22px;
+  border: 1px solid var(--borde);
+  border-radius: 16px;
   background: #ffffff;
-
-  box-shadow:
-    0 7px 22px rgba(53, 42, 105, 0.05);
+  box-shadow: 0 6px 20px #0f54370a;
 }
 
 .resumen-icono {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 52px;
-  height: 52px;
-
+  display: grid;
+  place-items: center;
   flex-shrink: 0;
-
-  border-radius: 15px;
-
+  width: 53px;
+  height: 53px;
+  border-radius: 14px;
   font-size: 25px;
 }
 
-.icono-total {
-  background: #eee9ff;
-}
+.icono-total { background: #e2f5ea; }
+.icono-pendientes { background: #fff1d7; }
+.icono-canceladas { background: #ffe8e9; }
 
-.icono-pendientes {
-  background: #fff4d9;
-}
-
-.icono-canceladas {
-  background: #ffeced;
-}
-
-.resumen-card span {
+.resumen-card span:not(.resumen-icono) {
   display: block;
-
-  color: #68647d;
-
+  color: var(--secundario);
   font-size: 12px;
-  line-height: 1.5;
 }
 
 .resumen-card strong {
   display: block;
-
   margin-top: 5px;
-
-  color: #302d4f;
-
-  font-size: 27px;
-  font-weight: 700;
+  color: var(--verde-oscuro);
+  font-size: 28px;
+  font-weight: 800;
 }
 
-
-/* ==========================================================
-   6. MENSAJES GENERALES
-   ========================================================== */
+/* 6. MENSAJES */
 
 .mensaje-error,
 .mensaje-exito,
 .mensaje-info {
+  margin-bottom: 22px;
   padding: 15px 18px;
-
-  margin-bottom: 23px;
-
   border-radius: 12px;
-
   font-size: 13px;
-  line-height: 1.6;
+  line-height: 1.65;
 }
 
 .mensaje-error {
-  border: 1px solid #f3b4b4;
-
-  background: #fff1f0;
-  color: #a32020;
+  border: 1px solid #f0bfc4;
+  background: #fff1f2;
+  color: #a32034;
 }
 
 .mensaje-exito {
   border: 1px solid #b7ebc9;
-
   background: #ecfdf3;
   color: #176b3a;
 }
 
 .mensaje-info {
-  border: 1px solid #ded6ff;
-
-  background: #ffffff;
-  color: #5946d5;
-
+  border: 1px solid var(--borde);
+  background: #f0faf4;
+  color: var(--verde-oscuro);
   text-align: center;
 }
 
 .btn-reintentar {
-  min-height: 35px;
-
   margin-left: 12px;
-  padding: 7px 13px;
-
-  border: 1px solid #a32020;
+  padding: 8px 12px;
+  border: 1px solid #b42332;
   border-radius: 8px;
-
   background: #ffffff;
-
-  color: #a32020;
-
-  font-family: inherit;
-  font-size: 12px;
+  color: #a32034;
+  font: inherit;
   font-weight: 700;
-
   cursor: pointer;
 }
 
-
-/* ==========================================================
-   7. AVISO CUANDO NO HAY MASCOTAS
-   ========================================================== */
+/* 7. AVISO DE MASCOTAS */
 
 .aviso-requisito {
   display: flex;
   align-items: center;
-
   flex-wrap: wrap;
   gap: 18px;
-
   margin-bottom: 26px;
   padding: 21px;
-
-  border: 1px solid #ded6ff;
+  border: 1px solid #cce5d7;
   border-radius: 16px;
-
-  background: #f8f6ff;
+  background: #eaf8ef;
 }
 
 .aviso-icono {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
   width: 54px;
   height: 54px;
-
-  flex-shrink: 0;
-
   border-radius: 14px;
-
-  background: #ece7ff;
-
+  background: #d5f0df;
   font-size: 26px;
 }
 
@@ -395,967 +301,484 @@
 
 .aviso-requisito h2 {
   margin: 0 0 6px;
-
-  color: #302d4f;
-
+  color: var(--verde-oscuro);
   font-size: 17px;
 }
 
 .aviso-requisito p {
   margin: 0;
-
-  color: #68647d;
-
+  color: var(--secundario);
   font-size: 13px;
-  line-height: 1.6;
 }
 
-
-/* ==========================================================
-   8. TARJETA DEL FORMULARIO
-   ========================================================== */
+/* 8. FORMULARIO */
 
 .formulario-card {
   max-width: 920px;
-
-  margin: 0 auto 28px;
+  margin: 0 auto 29px;
   padding: 30px;
-
-  border: 1px solid #ece8fa;
+  border: 1px solid var(--borde);
   border-radius: 18px;
-
   background: #ffffff;
-
-  box-shadow:
-    0 10px 30px rgba(53, 42, 105, 0.07);
+  box-shadow: 0 10px 30px #0f54370b;
 }
 
 .formulario-header {
   display: flex;
   align-items: center;
-
   gap: 15px;
-
-  margin-bottom: 27px;
+  margin-bottom: 26px;
 }
 
 .formulario-logo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
   width: 56px;
   height: 56px;
-
-  flex-shrink: 0;
-
   border-radius: 15px;
-
-  background: #eee9ff;
-
+  background: #e2f5ea;
   font-size: 27px;
 }
 
 .formulario-header h2 {
   margin: 0;
-
-  color: #302d4f;
-
+  color: var(--verde-oscuro);
   font-size: 22px;
-  font-weight: 700;
 }
 
 .formulario-header p {
   margin: 7px 0 0;
-
-  color: #68647d;
-
+  color: var(--secundario);
   font-size: 13px;
-  line-height: 1.6;
 }
 
-
-/* ==========================================================
-   9. ORGANIZACIÓN DEL FORMULARIO
-   ========================================================== */
-
 .campos-formulario {
+  min-width: 0;
   margin: 0;
   padding: 0;
-
-  border: none;
-
-  min-width: 0;
+  border: 0;
 }
 
 .form-grid {
   display: grid;
-
-  grid-template-columns:
-    repeat(2, minmax(0, 1fr));
-
-  gap: 21px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
 }
 
-.form-group {
-  min-width: 0;
-}
+.form-group { min-width: 0; }
+.campo-ancho { grid-column: 1 / -1; }
 
-.campo-ancho {
-  grid-column: 1 / -1;
-}
-
-.form-group label {
+.form-group label,
+.filtro-grupo label {
   display: block;
-
   margin-bottom: 8px;
-
-  color: #39364d;
-
-  font-size: 14px;
-  font-weight: 600;
+  color: var(--texto);
+  font-size: 13px;
+  font-weight: 700;
 }
 
-.obligatorio {
+.obligatorio,
+.error-validacion {
   color: #b42332;
 }
 
-
-/* ==========================================================
-   10. CAMPOS DE ENTRADA
-   ========================================================== */
-
-.form-group input,
-.form-group select,
-.form-group textarea {
+.form-group :is(input, select, textarea),
+.filtro-grupo :is(input, select) {
   display: block;
-
   width: 100%;
-  min-height: 48px;
-
-  padding: 12px 14px;
-
-  border: 1px solid #d8d8e5;
+  min-width: 0;
+  min-height: 47px;
+  padding: 11px 13px;
+  border: 1px solid #cadfd3;
   border-radius: 10px;
-
-  outline: none;
-
-  background: #fafafe;
-  color: #302d4f;
-
+  background: #fcfffd;
+  color: var(--texto);
   font-family: inherit;
   font-size: 14px;
-
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    background-color 0.2s ease;
 }
 
 .form-group textarea {
   min-height: 110px;
-
   resize: vertical;
-
   line-height: 1.6;
 }
 
-.form-group input::placeholder,
-.form-group textarea::placeholder {
-  color: #77738a;
+.form-group :is(input, select, textarea):focus,
+.filtro-grupo :is(input, select):focus {
+  outline: none;
+  border-color: var(--verde);
+  box-shadow: 0 0 0 3px #08765a23;
 }
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-  border-color: #6254e8;
-
-  background: #ffffff;
-
-  box-shadow:
-    0 0 0 3px rgba(98, 84, 232, 0.15);
-}
-
-
-/* ==========================================================
-   11. VALIDACIONES
-   ========================================================== */
 
 .form-group .input-error {
   border-color: #c52c37;
-
   background: #fffafa;
 }
 
 .form-group .input-error:focus {
-  box-shadow:
-    0 0 0 3px rgba(197, 44, 55, 0.15);
+  box-shadow: 0 0 0 3px #c52c3725;
 }
 
-.error-validacion {
-  display: block;
-
-  margin-top: 7px;
-
-  color: #b42332;
-
-  font-size: 12px;
-  line-height: 1.5;
-}
-
+.error-validacion,
 .texto-ayuda {
   display: block;
-
   margin-top: 7px;
-
-  color: #68647d;
-
   font-size: 12px;
   line-height: 1.5;
 }
 
+.texto-ayuda { color: var(--secundario); }
 
-/* ==========================================================
-   12. BOTONES DEL FORMULARIO
-   ========================================================== */
+.form-acciones { margin-top: 26px; }
 
-.form-acciones {
-  display: flex;
-  align-items: center;
+/* 9. LISTADO Y FILTROS */
 
-  flex-wrap: wrap;
-  gap: 12px;
-
-  margin-top: 27px;
-}
-
-
-/* ==========================================================
-   13. ENCABEZADO DEL LISTADO
-   ========================================================== */
-
-.listado-section {
-  min-width: 0;
-}
+.listado-section { min-width: 0; }
 
 .listado-header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-
+  align-items: center;
   flex-wrap: wrap;
   gap: 16px;
-
   margin-bottom: 21px;
 }
 
 .listado-header h2 {
   margin: 0;
-
-  color: #302d4f;
-
+  color: var(--verde-oscuro);
   font-size: 22px;
-  font-weight: 700;
 }
 
 .listado-header p {
   margin: 7px 0 0;
-
-  color: #68647d;
-
+  color: var(--secundario);
   font-size: 13px;
-  line-height: 1.6;
-}
-
-.listado-acciones {
-  display: flex;
-  align-items: center;
-
-  flex-wrap: wrap;
-  gap: 12px;
 }
 
 .total-citas {
   display: inline-flex;
   align-items: center;
-
   min-height: 35px;
-
   padding: 8px 12px;
-
   border-radius: 20px;
-
-  background: #eee9ff;
-  color: #5946c9;
-
+  background: #e2f5ea;
+  color: var(--verde-oscuro);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 750;
 }
-
-.btn-actualizar {
-  border: 1px solid #ded6ff;
-
-  background: #ffffff;
-  color: #5946d5;
-}
-
-.btn-actualizar:hover:not(:disabled) {
-  background: #f3f0ff;
-}
-
-
-/* ==========================================================
-   14. FILTROS Y BUSCADOR
-   ========================================================== */
 
 .filtros-card {
   display: grid;
-
-  grid-template-columns:
-    minmax(0, 2fr) minmax(170px, 1fr);
-
+  grid-template-columns: minmax(0, 2fr) minmax(170px, 1fr);
   gap: 18px;
-
   margin-bottom: 25px;
   padding: 20px;
-
-  border: 1px solid #ece8fa;
+  border: 1px solid var(--borde);
   border-radius: 15px;
-
   background: #ffffff;
 }
 
-.filtro-grupo {
-  min-width: 0;
-}
+.filtro-grupo { min-width: 0; }
 
-.filtro-grupo label {
-  display: block;
-
-  margin-bottom: 8px;
-
-  color: #39364d;
-
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.filtro-grupo input,
-.filtro-grupo select {
-  display: block;
-
-  width: 100%;
-  min-height: 46px;
-
-  padding: 11px 13px;
-
-  border: 1px solid #d8d8e5;
-  border-radius: 9px;
-
-  outline: none;
-
-  background: #fafafe;
-  color: #302d4f;
-
-  font-family: inherit;
-  font-size: 14px;
-}
-
-.filtro-grupo input:focus,
-.filtro-grupo select:focus {
-  border-color: #6254e8;
-
-  background: #ffffff;
-
-  box-shadow:
-    0 0 0 3px rgba(98, 84, 232, 0.15);
-}
-
-
-/* ==========================================================
-   15. ESTADOS SIN DATOS
-   ========================================================== */
+/* 10. SIN DATOS */
 
 .sin-citas,
 .sin-resultados {
   padding: 35px 25px;
-
-  border: 1px solid #ece8fa;
+  border: 1px solid var(--borde);
   border-radius: 17px;
-
   background: #ffffff;
-
   text-align: center;
-
-  box-shadow:
-    0 8px 25px rgba(53, 42, 105, 0.05);
+  box-shadow: 0 8px 25px #0f54370b;
 }
 
 .sin-icono,
 .sin-resultados > span {
   display: block;
-
   margin-bottom: 12px;
-
-  font-size: 48px;
+  font-size: 46px;
 }
 
 .sin-citas h3,
 .sin-resultados h3 {
   margin: 0 0 10px;
-
-  color: #302d4f;
-
+  color: var(--verde-oscuro);
   font-size: 20px;
 }
 
 .sin-citas p,
 .sin-resultados p {
-  margin: 0 auto;
-
   max-width: 480px;
-
-  color: #68647d;
-
+  margin: 0 auto;
+  color: var(--secundario);
   font-size: 13px;
-  line-height: 1.7;
 }
 
-.sin-citas .btn-nueva {
+.sin-citas .btn-nueva,
+.sin-resultados .btn-limpiar-filtros {
   margin-top: 20px;
 }
 
-.btn-limpiar-filtros {
-  min-height: 42px;
-
-  margin-top: 20px;
-  padding: 10px 16px;
-
-  border: 1px solid #6254e8;
-  border-radius: 9px;
-
-  background: #ffffff;
-  color: #5946d5;
-
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 700;
-
-  cursor: pointer;
-}
-
-.btn-limpiar-filtros:hover {
-  background: #f3f0ff;
-}
-
-
-/* ==========================================================
-   16. CUADRÍCULA DE CITAS
-   ========================================================== */
+/* 11. TARJETAS DE CITAS */
 
 .citas-grid {
   display: grid;
-
-  grid-template-columns:
-    repeat(auto-fit, minmax(280px, 1fr));
-
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
   gap: 22px;
 }
-
-
-/* ==========================================================
-   17. TARJETAS DE CITA
-   ========================================================== */
 
 .cita-card {
   display: flex;
   flex-direction: column;
-
   min-width: 0;
-
   padding: 24px;
-
-  border: 1px solid #ece8fa;
-  border-radius: 18px;
-
+  border: 1px solid var(--borde);
+  border-radius: 17px;
   background: #ffffff;
-
-  box-shadow:
-    0 8px 25px rgba(53, 42, 105, 0.06);
-
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+  box-shadow: 0 7px 23px #0f54370a;
+  transition: box-shadow .2s;
 }
 
 .cita-card:hover {
-  transform: translateY(-3px);
-
-  box-shadow:
-    0 13px 30px rgba(74, 56, 139, 0.12);
+  box-shadow: 0 10px 27px #0f543719;
 }
 
 .tarjeta-superior {
   display: flex;
-  align-items: flex-start;
   justify-content: space-between;
-
+  align-items: flex-start;
   gap: 10px;
-
   margin-bottom: 15px;
 }
 
 .cita-icono {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
   width: 55px;
   height: 55px;
-
-  flex-shrink: 0;
-
   border-radius: 15px;
-
-  background: #eee9ff;
-
+  background: #e2f5ea;
   font-size: 26px;
 }
 
 .nombre-mascota {
   margin: 0 0 18px;
-
-  color: #302d4f;
-
+  color: var(--verde-oscuro);
   font-size: 22px;
-  font-weight: 700;
-
   overflow-wrap: anywhere;
 }
 
-
-/* ==========================================================
-   18. ESTADOS DE LAS CITAS
-   ========================================================== */
+/* 12. ESTADOS DIFERENCIADOS */
 
 .estado-cita {
   display: inline-flex;
   align-items: center;
-
   max-width: 100%;
-
   padding: 7px 11px;
-
-  border: 1px solid #ded6ff;
+  border: 1px solid #c5e4d4;
   border-radius: 20px;
-
-  background: #f3f0ff;
-  color: #5641c5;
-
+  background: #e5f6ed;
+  color: #075642;
   font-size: 11px;
-  font-weight: 700;
-
+  font-weight: 750;
   overflow-wrap: anywhere;
-  text-align: center;
 }
 
 .estado-cita.pendiente {
-  border-color: #f0d79a;
-
   background: #fff4d9;
+  border-color: #eed392;
   color: #765100;
 }
 
-.estado-cita.confirmada {
-  border-color: #b6e7ca;
-
-  background: #e8faef;
+.estado-cita.confirmada,
+.estado-cita.completada {
+  background: #e5f7ec;
+  border-color: #b3e3c5;
   color: #176b3a;
 }
 
 .estado-cita.cancelada {
-  border-color: #f3c0c7;
-
-  background: #ffedf0;
+  background: #fff0f2;
+  border-color: #f0bfc7;
   color: #a32034;
 }
 
-.estado-cita.completada {
-  border-color: #bed8ef;
+/* 13. DATOS DE LAS CITAS */
 
-  background: #e9f3ff;
-  color: #215580;
-}
-
-
-/* ==========================================================
-   19. DATOS DE LA CITA
-   ========================================================== */
-
-.cita-info {
-  margin-bottom: 16px;
-}
+.cita-info { margin-bottom: 17px; }
 
 .info-fila {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-
   flex-wrap: wrap;
   gap: 8px;
-
   padding: 11px 0;
-
-  border-bottom: 1px solid #f0edfa;
-
-  color: #625e78;
-
+  border-bottom: 1px solid #e9f1eb;
+  color: var(--secundario);
   font-size: 13px;
-  line-height: 1.6;
 }
 
 .info-fila strong {
-  color: #38364c;
-  font-weight: 600;
+  color: var(--texto);
+  font-weight: 700;
 }
 
 .info-fila span {
-  max-width: 100%;
-
   text-align: right;
   overflow-wrap: anywhere;
 }
 
-
-/* ==========================================================
-   20. MOTIVO DE LA CITA
-   ========================================================== */
-
 .motivo-cita {
   margin-bottom: 21px;
   padding: 14px;
-
-  border: 1px solid #eee9fc;
+  border: 1px solid #dfede4;
   border-radius: 10px;
-
-  background: #f9f7ff;
+  background: #f3faf6;
 }
 
 .motivo-cita strong {
   display: block;
-
   margin-bottom: 7px;
-
-  color: #39364d;
-
+  color: var(--texto);
   font-size: 12px;
 }
 
 .motivo-cita p {
   margin: 0;
-
-  color: #625e78;
-
+  color: var(--secundario);
   font-size: 13px;
-  line-height: 1.6;
-
   overflow-wrap: anywhere;
 }
 
-
-/* ==========================================================
-   21. BOTONES DE LAS CITAS
-   ========================================================== */
+/* 14. ACCIONES DE CADA CITA */
 
 .acciones-cita {
   display: flex;
-
   gap: 10px;
-
   margin-top: auto;
 }
 
 .btn-editar,
 .btn-cancelar-cita {
   flex: 1;
-
-  min-height: 44px;
-
-  padding: 10px 13px;
-
-  border-radius: 9px;
-
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 700;
-
-  cursor: pointer;
-
-  transition:
-    background-color 0.2s ease,
-    color 0.2s ease;
 }
 
 .btn-editar {
-  border: 1px solid #6254e8;
-
+  border: 1px solid var(--verde);
   background: #ffffff;
-  color: #5843d5;
+  color: var(--verde-oscuro);
 }
 
 .btn-editar:hover:not(:disabled) {
-  background: #6254e8;
+  background: var(--verde);
   color: #ffffff;
 }
 
 .btn-cancelar-cita {
-  border: 1px solid #bc3045;
-
+  border: 1px solid #bb3045;
   background: #ffffff;
-  color: #bc3045;
+  color: #bb3045;
 }
 
 .btn-cancelar-cita:hover:not(:disabled) {
-  background: #bc3045;
+  background: #bb3045;
   color: #ffffff;
 }
 
 .aviso-cancelada {
   margin-top: auto;
   padding: 12px;
-
   border-radius: 9px;
-
   background: #fff3f4;
-
   color: #9b2536;
-
   font-size: 12px;
-  line-height: 1.6;
 }
 
+/* 15. ACCESIBILIDAD */
 
-/* ==========================================================
-   22. ACCESIBILIDAD POR TECLADO
-   ========================================================== */
-
-.citas-container button:focus-visible,
-.citas-container input:focus-visible,
-.citas-container select:focus-visible,
-.citas-container textarea:focus-visible {
-  outline: 3px solid #6952e6;
+.citas-container :is(button, a, input, select, textarea):focus-visible {
+  outline: 3px solid var(--verde);
   outline-offset: 3px;
 }
 
-
-/* Elemento oculto visualmente pero legible
-   para tecnologías de asistencia. */
-
 .solo-lectores {
   position: absolute;
-
   width: 1px;
   height: 1px;
-
-  padding: 0;
   margin: -1px;
-
+  padding: 0;
   overflow: hidden;
-
   clip: rect(0, 0, 0, 0);
-
   white-space: nowrap;
-
   border: 0;
 }
 
-
-/* ==========================================================
-   23. PANTALLAS MEDIANAS
-   ========================================================== */
+/* 16. RESPONSIVE */
 
 @media (max-width: 1050px) {
-
-  .citas-header {
-    padding: 24px;
-  }
-
-  .resumen-grid {
-    gap: 12px;
-  }
-
-  .resumen-card {
-    padding: 18px;
-  }
-
+  .resumen-grid { gap: 12px; }
+  .resumen-card { padding: 17px; }
 }
 
-
-/* ==========================================================
-   24. TABLETS
-   ========================================================== */
-
 @media (max-width: 800px) {
-
   .citas-header {
     flex-direction: column;
     align-items: flex-start;
+    padding: 23px;
   }
 
-  .acciones-header {
-    width: 100%;
-  }
-
-  .resumen-grid {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
-  }
-
-  .formulario-card {
-    padding: 24px;
-  }
-
+  .acciones-header { width: 100%; }
+  .resumen-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .formulario-card { padding: 23px; }
 }
 
-
-/* ==========================================================
-   25. CELULARES
-   ========================================================== */
-
 @media (max-width: 600px) {
+  .citas-header { padding: 19px; }
+  .citas-header h1 { font-size: 25px; }
 
-  .citas-header {
-    padding: 20px;
-  }
-
-  .citas-header h1 {
-    font-size: 25px;
-  }
-
-  .acciones-header {
+  .acciones-header,
+  .form-acciones,
+  .acciones-cita {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .btn-nueva,
-  .btn-volver {
-    width: 100%;
-  }
+  .user-accesos a { flex: 1 1 145px; }
 
-  .resumen-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .resumen-card {
-    padding: 17px;
-  }
-
-  .formulario-card {
-    padding: 20px;
-  }
-
-  .formulario-header {
-    align-items: flex-start;
-  }
-
-  .formulario-header h2 {
-    font-size: 20px;
-  }
-
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .campo-ancho {
-    grid-column: auto;
-  }
-
-  .form-group input,
-  .form-group select,
-  .form-group textarea {
-    font-size: 16px;
-  }
-
-  .form-acciones {
-    flex-direction: column;
-  }
-
-  .btn-guardar,
-  .btn-cancelar-form {
-    width: 100%;
-  }
-
-  .filtros-card {
-    grid-template-columns: 1fr;
-
-    padding: 16px;
-  }
-
-  .listado-acciones {
-    width: 100%;
-  }
-
+  .resumen-grid,
+  .form-grid,
+  .filtros-card,
   .citas-grid {
     grid-template-columns: 1fr;
   }
 
-  .acciones-cita {
-    flex-direction: column;
+  .formulario-card { padding: 18px; }
+  .campo-ancho { grid-column: auto; }
+
+  .form-group :is(input, select, textarea),
+  .filtro-grupo :is(input, select) {
+    font-size: 16px;
   }
 
-  .aviso-requisito {
-    align-items: flex-start;
-  }
-
-  .btn-ir-mascotas {
-    width: 100%;
-  }
-
+  .listado-acciones { width: 100%; }
+  .btn-ir-mascotas { width: 100%; }
 }
-
-
-/* ==========================================================
-   26. CELULARES PEQUEÑOS
-   ========================================================== */
 
 @media (max-width: 370px) {
-
   .citas-header,
   .formulario-card,
-  .cita-card {
-    padding: 16px;
-  }
-
-  .citas-header h1 {
-    font-size: 23px;
-  }
-
-  .tarjeta-superior {
-    flex-wrap: wrap;
-  }
-
+  .cita-card { padding: 16px; }
+  .tarjeta-superior { flex-wrap: wrap; }
 }
 
-
-/* ==========================================================
-   27. REDUCIR MOVIMIENTO
-   ========================================================== */
-
-/* Respeta la configuración del dispositivo. */
-
 @media (prefers-reduced-motion: reduce) {
-
   .citas-container *,
   .citas-container *::before,
   .citas-container *::after {
     transition: none !important;
     animation: none !important;
   }
-
-  .cita-card:hover,
-  .btn-nueva:hover,
-  .btn-guardar:hover {
-    transform: none;
-  }
-
 }

@@ -1,433 +1,563 @@
 
 <!-- ==========================================================
-     VETERINARIA AREVALO
-     DASHBOARD ADMIN - RESUMEN GENERAL
-     ========================================================== -->
+  VETERINARIA ARÉVALO
+  DASHBOARD DEL ADMINISTRADOR
 
-<div class="dashboard-admin-page">
+  CONTENIDO:
+  1. Encabezado administrativo.
+  2. Banner de bienvenida.
+  3. Estadísticas generales.
+  4. Estadísticas de facturación.
+  5. Próximas citas.
+  6. Estado de usuarios.
+  7. Últimas facturas emitidas.
+  8. Información institucional.
 
-  <!-- ========================================================
-       FONDO DEL MENÚ EN CELULARES
-       ======================================================== -->
-
-  <button
-    type="button"
-    class="menu-overlay"
-    [class.visible]="menuAbierto"
-    (click)="cerrarMenu()"
-    aria-label="Cerrar menú lateral"
-    [attr.tabindex]="menuAbierto ? 0 : -1"
-  ></button>
+  IMPORTANTE:
+  - El menú lateral pertenece a LayoutPrivado.
+  - La campana pertenece a LayoutPrivado.
+  - El panel de accesibilidad pertenece a LayoutPrivado.
+  - Los datos se consultan desde Spring Boot.
+========================================================== -->
 
 
-  <!-- ========================================================
-       MENÚ LATERAL
-       ======================================================== -->
+<!-- ========================================================
+  1. CONTENEDOR PRINCIPAL
+========================================================= -->
 
-  <aside
-    id="menu-admin"
-    class="sidebar"
-    [class.abierto]="menuAbierto"
-    aria-label="Menú de administración"
-  >
+<div class="dash-final dash-final--admin">
 
-    <!-- LOGO -->
-    <div class="sidebar-header">
 
-      <div class="sidebar-brand">
+  <!-- ======================================================
+    2. ENCABEZADO
+  ======================================================= -->
 
-        <div class="sidebar-logo" aria-hidden="true">
-          🐾
-        </div>
+  <header class="dash-final__encabezado">
 
-        <div class="sidebar-brand-text">
-          <h2>Veterinaria</h2>
-          <span>Arevalo</span>
-        </div>
+    <div>
 
-      </div>
+      <span class="dash-final__eyebrow">
+        🩺 PANEL ADMINISTRATIVO
+      </span>
+
+      <h1>
+        ¡Hola, administrador!
+      </h1>
+
+      <p>
+        Este es el resumen de la actividad de Veterinaria Arévalo.
+      </p>
+
+    </div>
+
+
+    <!-- Actualizar todas las estadísticas -->
+
+    <button
+      type="button"
+      class="dash-final__actualizar"
+      (click)="cargarResumen()"
+      [disabled]="cargandoResumen"
+      [attr.aria-busy]="cargandoResumen">
+
+      {{
+        cargandoResumen
+          ? 'Actualizando…'
+          : '↻ Actualizar datos'
+      }}
+
+    </button>
+
+  </header>
+
+
+  <!-- ======================================================
+    3. BANNER DE BIENVENIDA
+  ======================================================= -->
+
+  <section
+    class="dash-final__hero"
+    aria-label="Bienvenida al administrador">
+
+    <div class="dash-final__hero-texto">
+
+      <span>
+        🐾 GESTIÓN Y BIENESTAR ANIMAL
+      </span>
+
+      <h2>
+        Cuidamos lo que más quieres.
+      </h2>
+
+      <p>
+        Organiza las citas, supervisa las atenciones
+        y controla la actividad de la clínica
+        desde un solo lugar.
+      </p>
 
       <button
         type="button"
-        class="sidebar-cerrar"
-        (click)="cerrarMenu()"
-        aria-label="Cerrar menú"
-      >
-        ✕
+        (click)="irCitas()">
+
+        📅 Revisar citas
+
       </button>
 
     </div>
 
 
-    <!-- PERFIL -->
-    <div class="sidebar-perfil">
+    <!-- Imagen decorativa -->
 
-      <div class="perfil-icono" aria-hidden="true">
-        👨‍💼
-      </div>
+    <img
+      src="/imagenes/mascotas-hero.webp"
+      alt=""
+      aria-hidden="true"
+      loading="lazy">
+
+  </section>
+
+
+  <!-- ======================================================
+    4. MENSAJE DE ERROR
+  ======================================================= -->
+
+  <p
+    class="dash-final__alerta"
+    role="alert"
+    *ngIf="errorResumen">
+
+    ⚠️ Algunas consultas no respondieron.
+    Comprueba la conexión con Spring Boot
+    y los permisos de acceso.
+
+  </p>
+
+
+  <!-- ======================================================
+    5. ESTADÍSTICAS GENERALES
+  ======================================================= -->
+
+  <section
+    class="dash-final__indicadores"
+    aria-label="Estadísticas generales de la veterinaria">
+
+
+    <!-- -----------------------------------------------
+      5.1. CITAS DE HOY
+    ------------------------------------------------ -->
+
+    <article class="dash-final__indicador">
+
+      <span
+        class="dash-final__indicador-icono"
+        aria-hidden="true">
+
+        📅
+
+      </span>
 
       <div>
-        <strong>Administrador</strong>
-        <span>Panel de control</span>
+
+        <span>Citas de hoy</span>
+
+        <strong>
+          {{ citasHoy === null ? '—' : citasHoy }}
+        </strong>
+
+        <small>
+          Programadas para hoy
+        </small>
+
       </div>
 
-    </div>
+    </article>
 
 
-    <!-- NAVEGACIÓN -->
-    <nav
-      class="sidebar-nav"
-      aria-label="Navegación principal"
-    >
+    <!-- -----------------------------------------------
+      5.2. MASCOTAS
+    ------------------------------------------------ -->
 
-      <p class="menu-titulo">
-        MENÚ PRINCIPAL
-      </p>
+    <article class="dash-final__indicador">
 
+      <span
+        class="dash-final__indicador-icono"
+        aria-hidden="true">
 
-      <button
-        type="button"
-        class="nav-item activo"
-        (click)="irInicio()"
-        aria-current="page"
-      >
-        <span class="nav-icon" aria-hidden="true">🏠</span>
-        <span>Inicio</span>
-      </button>
+        🐾
 
+      </span>
 
-      <button
-        type="button"
-        class="nav-item"
-        (click)="irUsuarios()"
-      >
-        <span class="nav-icon" aria-hidden="true">👥</span>
-        <span>Usuarios</span>
-      </button>
+      <div>
 
-
-      <button
-        type="button"
-        class="nav-item"
-        (click)="irMascotas()"
-      >
-        <span class="nav-icon" aria-hidden="true">🐾</span>
         <span>Mascotas</span>
-      </button>
+
+        <strong>
+          {{ totalMascotas === null ? '—' : totalMascotas }}
+        </strong>
+
+        <small>
+          Registradas en la clínica
+        </small>
+
+      </div>
+
+    </article>
 
 
-      <button
-        type="button"
-        class="nav-item"
-        (click)="irCitas()"
-      >
-        <span class="nav-icon" aria-hidden="true">📅</span>
-        <span>Citas</span>
-      </button>
+    <!-- -----------------------------------------------
+      5.3. VETERINARIOS
+    ------------------------------------------------ -->
 
+    <article class="dash-final__indicador">
 
-      <button
-        type="button"
-        class="nav-item"
-        (click)="irServicios()"
-      >
-        <span class="nav-icon" aria-hidden="true">🩺</span>
-        <span>Servicios</span>
-      </button>
+      <span
+        class="dash-final__indicador-icono"
+        aria-hidden="true">
 
+        👨‍⚕️
 
-      <button
-        type="button"
-        class="nav-item"
-        (click)="irVeterinarios()"
-      >
-        <span class="nav-icon" aria-hidden="true">👨‍⚕️</span>
+      </span>
+
+      <div>
+
         <span>Veterinarios</span>
-      </button>
 
-    </nav>
+        <strong>
+          {{ totalVeterinarios === null ? '—' : totalVeterinarios }}
+        </strong>
 
-
-    <!-- CERRAR SESIÓN -->
-    <div class="sidebar-footer">
-
-      <button
-        type="button"
-        class="btn-cerrar-sesion"
-        (click)="cerrarSesion()"
-      >
-        <span aria-hidden="true">🚪</span>
-        <span>Cerrar sesión</span>
-      </button>
-
-      <p class="sidebar-copy">
-        Veterinaria Arevalo
-      </p>
-
-    </div>
-
-  </aside>
-
-
-  <!-- ========================================================
-       CONTENIDO DEL DASHBOARD
-       ======================================================== -->
-
-  <main class="dashboard-main">
-
-    <!-- CABECERA -->
-    <header class="dashboard-header">
-
-      <div class="header-superior">
-
-        <button
-          type="button"
-          class="btn-menu"
-          (click)="cambiarMenu()"
-          aria-controls="menu-admin"
-          [attr.aria-expanded]="menuAbierto"
-        >
-          <span aria-hidden="true">☰</span>
-          Menú
-        </button>
-
-        <span class="rol-badge">
-          ● Administrador
-        </span>
+        <small>
+          Profesionales registrados
+        </small>
 
       </div>
 
-      <div class="header-texto">
-
-        <h1>Panel de Administración</h1>
-
-        <p>
-          Consulta la información general de tu veterinaria.
-        </p>
-
-      </div>
-
-    </header>
+    </article>
 
 
-    <!-- ======================================================
-         BIENVENIDA
-         ====================================================== -->
+    <!-- -----------------------------------------------
+      5.4. USUARIOS
+    ------------------------------------------------ -->
 
-    <section class="bienvenida">
+    <article class="dash-final__indicador">
 
-      <div class="bienvenida-contenido">
+      <span
+        class="dash-final__indicador-icono"
+        aria-hidden="true">
 
-        <span class="bienvenida-etiqueta">
-          PANEL ADMINISTRATIVO
-        </span>
+        👥
 
-        <h2>
-          ¡Bienvenido a Veterinaria Arevalo! 🐾
-        </h2>
+      </span>
 
-        <p>
-          Revisa las estadísticas y mantente informado
-          sobre la actividad de tu veterinaria.
-        </p>
+      <div>
+
+        <span>Usuarios registrados</span>
+
+        <strong>
+          {{ totalUsuarios === null ? '—' : totalUsuarios }}
+        </strong>
+
+        <small>
+          Todos los estados
+        </small>
 
       </div>
 
-      <div
-        class="bienvenida-icono"
-        aria-hidden="true"
-      >
-        🐶
+    </article>
+
+
+    <!-- -----------------------------------------------
+      5.5. USUARIOS PENDIENTES
+    ------------------------------------------------ -->
+
+    <article class="dash-final__indicador">
+
+      <span
+        class="dash-final__indicador-icono"
+        aria-hidden="true">
+
+        ⏳
+
+      </span>
+
+      <div>
+
+        <span>Por aprobar</span>
+
+        <strong>
+          {{ usuariosPendientes === null ? '—' : usuariosPendientes }}
+        </strong>
+
+        <small>
+          Cuentas pendientes
+        </small>
+
       </div>
 
-    </section>
+    </article>
 
 
-    <!-- ======================================================
-         RESUMEN GENERAL
-         ====================================================== -->
+    <!-- -----------------------------------------------
+      5.6. SERVICIOS
+    ------------------------------------------------ -->
+
+    <article class="dash-final__indicador">
+
+      <span
+        class="dash-final__indicador-icono"
+        aria-hidden="true">
+
+        🩺
+
+      </span>
+
+      <div>
+
+        <span>Servicios</span>
+
+        <strong>
+          {{ totalServicios === null ? '—' : totalServicios }}
+        </strong>
+
+        <small>
+          Catálogo de la clínica
+        </small>
+
+      </div>
+
+    </article>
+
+
+    <!-- ==================================================
+      6. ESTADÍSTICAS DE FACTURACIÓN
+    =================================================== -->
+
+
+    <!-- -----------------------------------------------
+      6.1. TOTAL DE FACTURAS
+    ------------------------------------------------ -->
+
+    <article class="dash-final__indicador dash-final__indicador--factura">
+
+      <span
+        class="dash-final__indicador-icono"
+        aria-hidden="true">
+
+        🧾
+
+      </span>
+
+      <div>
+
+        <span>Facturas emitidas</span>
+
+        <strong>
+          {{ totalFacturas === null ? '—' : totalFacturas }}
+        </strong>
+
+        <small>
+          Total de comprobantes
+        </small>
+
+      </div>
+
+    </article>
+
+
+    <!-- -----------------------------------------------
+      6.2. FACTURAS DEL DÍA
+    ------------------------------------------------ -->
+
+    <article class="dash-final__indicador dash-final__indicador--factura">
+
+      <span
+        class="dash-final__indicador-icono"
+        aria-hidden="true">
+
+        📄
+
+      </span>
+
+      <div>
+
+        <span>Facturas de hoy</span>
+
+        <strong>
+          {{ facturasHoy === null ? '—' : facturasHoy }}
+        </strong>
+
+        <small>
+          Emitidas durante el día
+        </small>
+
+      </div>
+
+    </article>
+
+
+    <!-- -----------------------------------------------
+      6.3. TOTAL FACTURADO DEL DÍA
+    ------------------------------------------------ -->
+
+    <article class="dash-final__indicador dash-final__indicador--factura">
+
+      <span
+        class="dash-final__indicador-icono"
+        aria-hidden="true">
+
+        💰
+
+      </span>
+
+      <div>
+
+        <span>Total facturado hoy</span>
+
+        <strong class="dash-final__importe-indicador">
+
+          {{
+            totalFacturadoHoy === null
+              ? '—'
+              : (totalFacturadoHoy | currency:'USD':'symbol':'1.2-2')
+          }}
+
+        </strong>
+
+        <small>
+          Suma de facturas del día
+        </small>
+
+      </div>
+
+    </article>
+
+  </section>
+
+
+  <!-- ======================================================
+    7. COLUMNAS PRINCIPALES
+  ======================================================= -->
+
+  <div class="dash-final__columnas">
+
+
+    <!-- ====================================================
+      7.1. PRÓXIMAS CITAS
+    ===================================================== -->
 
     <section
-      class="resumen-section"
-      aria-labelledby="titulo-resumen"
-    >
+      class="dash-final__panel"
+      aria-labelledby="titulo-citas-admin">
 
-      <div class="resumen-encabezado">
+      <div class="dash-final__panel-head">
 
         <div>
 
-          <h2 id="titulo-resumen">
-            Resumen general
+          <h2 id="titulo-citas-admin">
+            📅 Próximas citas
           </h2>
 
           <p>
-            Información actualizada desde el sistema.
+            Actividad programada de la clínica
           </p>
 
         </div>
 
-
-        <!-- ACTUALIZAR LOS DATOS -->
         <button
           type="button"
-          class="btn-actualizar"
-          (click)="cargarResumen()"
-          [disabled]="cargandoResumen"
-        >
-          {{ cargandoResumen ? 'Actualizando...' : '↻ Actualizar' }}
+          (click)="irCitas()">
+
+          Ver todas →
+
         </button>
 
       </div>
 
 
-      <!-- ERROR DE CONEXIÓN -->
+      <!-- Cargando -->
+
+      <p
+        class="dash-final__vacio"
+        *ngIf="cargandoResumen"
+        aria-live="polite">
+
+        Consultando próximas citas…
+
+      </p>
+
+
+      <!-- Error -->
+
+      <p
+        class="dash-final__vacio"
+        *ngIf="!cargandoResumen && totalCitas === null">
+
+        No se pudo consultar las citas.
+
+      </p>
+
+
+      <!-- Sin citas -->
+
+      <p
+        class="dash-final__vacio"
+        *ngIf="
+          !cargandoResumen &&
+          totalCitas !== null &&
+          proximasCitas.length === 0
+        ">
+
+        No hay próximas citas programadas.
+
+      </p>
+
+
+      <!-- Lista de citas -->
+
       <div
-        class="resumen-alerta"
-        *ngIf="errorResumen"
-        role="alert"
-      >
-        Algunas estadísticas no pudieron cargarse.
-        Comprueba la conexión con Spring Boot.
-      </div>
+        class="dash-final__lista"
+        *ngIf="
+          !cargandoResumen &&
+          proximasCitas.length > 0
+        ">
 
+        <article
+          class="dash-final__fila"
+          *ngFor="let cita of proximasCitas">
 
-      <!-- ====================================================
-           TARJETAS DE ESTADÍSTICAS
-           ==================================================== -->
+          <span
+            class="dash-final__avatar"
+            aria-hidden="true">
 
-      <div
-        class="resumen-grid"
-        aria-live="polite"
-      >
-
-        <!-- TOTAL USUARIOS -->
-        <article class="resumen-card">
-
-          <div class="resumen-icono">
-            👥
-          </div>
-
-          <span class="resumen-label">
-            Usuarios registrados
-          </span>
-
-          <strong class="resumen-numero">
-            {{ totalUsuarios === null ? '—' : totalUsuarios }}
-          </strong>
-
-          <small>
-            Total de cuentas del sistema
-          </small>
-
-        </article>
-
-
-        <!-- TOTAL MASCOTAS -->
-        <article class="resumen-card">
-
-          <div class="resumen-icono">
             🐾
-          </div>
 
-          <span class="resumen-label">
-            Mascotas registradas
           </span>
 
-          <strong class="resumen-numero">
-            {{ totalMascotas === null ? '—' : totalMascotas }}
-          </strong>
+          <div class="dash-final__fila-texto">
 
-          <small>
-            Mascotas ingresadas al sistema
-          </small>
+            <strong>
+              {{ cita.mascota?.nombre || 'Mascota' }}
+            </strong>
 
-        </article>
+            <span>
+              {{ cita.servicio?.nombre || 'Cita veterinaria' }}
+            </span>
 
+            <small>
+              {{ cita.fechaHora | date:'dd/MM/yyyy HH:mm' }}
+            </small>
 
-        <!-- TOTAL CITAS -->
-        <article class="resumen-card">
-
-          <div class="resumen-icono">
-            📅
           </div>
 
-          <span class="resumen-label">
-            Citas registradas
+          <span
+            class="dash-final__estado"
+            [class.dash-final__estado--pendiente]="
+              cita.estado?.toUpperCase() === 'PENDIENTE'
+            ">
+
+            {{ cita.estado || 'Registrada' }}
+
           </span>
-
-          <strong class="resumen-numero">
-            {{ totalCitas === null ? '—' : totalCitas }}
-          </strong>
-
-          <small>
-            Total de citas de la veterinaria
-          </small>
-
-        </article>
-
-
-        <!-- TOTAL SERVICIOS -->
-        <article class="resumen-card">
-
-          <div class="resumen-icono">
-            🩺
-          </div>
-
-          <span class="resumen-label">
-            Servicios disponibles
-          </span>
-
-          <strong class="resumen-numero">
-            {{ totalServicios === null ? '—' : totalServicios }}
-          </strong>
-
-          <small>
-            Servicios registrados
-          </small>
-
-        </article>
-
-
-        <!-- TOTAL VETERINARIOS -->
-        <article class="resumen-card">
-
-          <div class="resumen-icono">
-            👨‍⚕️
-          </div>
-
-          <span class="resumen-label">
-            Veterinarios
-          </span>
-
-          <strong class="resumen-numero">
-            {{ totalVeterinarios === null ? '—' : totalVeterinarios }}
-          </strong>
-
-          <small>
-            Profesionales registrados
-          </small>
-
-        </article>
-
-
-        <!-- USUARIOS PENDIENTES -->
-        <article class="resumen-card resumen-destacado">
-
-          <div class="resumen-icono">
-            ⏳
-          </div>
-
-          <span class="resumen-label">
-            Usuarios pendientes
-          </span>
-
-          <strong class="resumen-numero">
-            {{ usuariosPendientes === null ? '—' : usuariosPendientes }}
-          </strong>
-
-          <small>
-            Cuentas por revisar y aprobar
-          </small>
 
         </article>
 
@@ -436,225 +566,355 @@
     </section>
 
 
-    <!-- ======================================================
-         INFORMACIÓN ADICIONAL
-         ====================================================== -->
+    <!-- ====================================================
+      7.2. ESTADOS DE USUARIOS
+    ===================================================== -->
 
-    <section class="detalle-grid">
+    <section
+      class="dash-final__panel"
+      aria-labelledby="titulo-usuarios-admin">
 
-      <!-- ====================================================
-           PRÓXIMAS CITAS
-           ==================================================== -->
+      <div class="dash-final__panel-head">
 
-      <article class="detalle-panel">
+        <div>
 
-        <div class="detalle-encabezado">
+          <h2 id="titulo-usuarios-admin">
+            👥 Estado de usuarios
+          </h2>
 
-          <div>
-
-            <h2>
-              📅 Próximas citas
-            </h2>
-
-            <p>
-              Las próximas atenciones registradas.
-            </p>
-
-          </div>
-
-          <button
-            type="button"
-            class="detalle-enlace"
-            (click)="irCitas()"
-          >
-            Ver todas →
-          </button>
+          <p>
+            Distribución de cuentas registradas
+          </p>
 
         </div>
 
+        <button
+          type="button"
+          (click)="irUsuarios()">
 
-        <!-- MENSAJE DE CARGA -->
-        <p
-          class="detalle-vacio"
-          *ngIf="cargandoResumen"
-        >
-          Cargando próximas citas...
-        </p>
+          Gestionar →
 
+        </button>
 
-        <!-- SI NO SE PUDIERON CONSULTAR -->
-        <p
-          class="detalle-vacio"
-          *ngIf="
-            !cargandoResumen &&
-            totalCitas === null
-          "
-        >
-          No se pudo consultar la información de las citas.
-        </p>
+      </div>
 
 
-        <!-- SIN CITAS PRÓXIMAS -->
-        <p
-          class="detalle-vacio"
-          *ngIf="
-            !cargandoResumen &&
-            totalCitas !== null &&
-            proximasCitas.length === 0
-          "
-        >
-          No hay próximas citas registradas.
-        </p>
+      <!-- Distribución de usuarios -->
+
+      <div class="dash-final__lista-estados">
 
 
-        <!-- LISTADO DE CITAS -->
-        <div
-          class="lista-citas"
-          *ngIf="
-            !cargandoResumen &&
-            proximasCitas.length > 0
-          "
-        >
+        <!-- Aprobados -->
 
-          <div
-            class="cita-item"
-            *ngFor="let cita of proximasCitas"
-          >
-
-            <div class="cita-icono" aria-hidden="true">
-              🐾
-            </div>
-
-            <div class="cita-contenido">
-
-              <strong>
-                {{ cita.mascota?.nombre || 'Mascota' }}
-              </strong>
-
-              <span>
-                {{ cita.servicio?.nombre || 'Cita veterinaria' }}
-              </span>
-
-              <small>
-                {{ cita.fechaHora | date:'dd/MM/yyyy HH:mm' }}
-              </small>
-
-            </div>
-
-            <span class="cita-estado">
-              {{ cita.estado || 'Registrada' }}
-            </span>
-
-          </div>
-
-        </div>
-
-      </article>
-
-
-      <!-- ====================================================
-           ESTADO DE USUARIOS
-           ==================================================== -->
-
-      <article class="detalle-panel">
-
-        <div class="detalle-encabezado">
-
-          <div>
-
-            <h2>
-              👥 Estado de usuarios
-            </h2>
-
-            <p>
-              Distribución de las cuentas registradas.
-            </p>
-
-          </div>
-
-        </div>
-
-
-        <div class="estados-lista">
-
-          <!-- APROBADOS -->
-          <div class="estado-fila">
-
-            <span>
-              <span class="estado-punto aprobado"></span>
-              Aprobados
-            </span>
-
-            <strong>
-              {{ usuariosAprobados === null ? '—' : usuariosAprobados }}
-            </strong>
-
-          </div>
-
-
-          <!-- PENDIENTES -->
-          <div class="estado-fila">
-
-            <span>
-              <span class="estado-punto pendiente"></span>
-              Pendientes
-            </span>
-
-            <strong>
-              {{ usuariosPendientes === null ? '—' : usuariosPendientes }}
-            </strong>
-
-          </div>
-
-
-          <!-- RECHAZADOS -->
-          <div class="estado-fila">
-
-            <span>
-              <span class="estado-punto rechazado"></span>
-              Rechazados
-            </span>
-
-            <strong>
-              {{ usuariosRechazados === null ? '—' : usuariosRechazados }}
-            </strong>
-
-          </div>
-
-
-          <!-- BLOQUEADOS -->
-          <div class="estado-fila">
-
-            <span>
-              <span class="estado-punto bloqueado"></span>
-              Bloqueados
-            </span>
-
-            <strong>
-              {{ usuariosBloqueados === null ? '—' : usuariosBloqueados }}
-            </strong>
-
-          </div>
-
-        </div>
-
-
-        <div class="citas-hoy">
+        <div>
 
           <span>
-            📅 Citas de hoy
+
+            <i
+              class="dash-final__punto dash-final__punto--verde"
+              aria-hidden="true">
+            </i>
+
+            Aprobados
+
           </span>
 
           <strong>
-            {{ citasHoy === null ? '—' : citasHoy }}
+            {{ usuariosAprobados === null ? '—' : usuariosAprobados }}
           </strong>
+
+        </div>
+
+
+        <!-- Pendientes -->
+
+        <div>
+
+          <span>
+
+            <i
+              class="dash-final__punto dash-final__punto--amarillo"
+              aria-hidden="true">
+            </i>
+
+            Pendientes
+
+          </span>
+
+          <strong>
+            {{ usuariosPendientes === null ? '—' : usuariosPendientes }}
+          </strong>
+
+        </div>
+
+
+        <!-- Rechazados -->
+
+        <div>
+
+          <span>
+
+            <i
+              class="dash-final__punto dash-final__punto--rojo"
+              aria-hidden="true">
+            </i>
+
+            Rechazados
+
+          </span>
+
+          <strong>
+            {{ usuariosRechazados === null ? '—' : usuariosRechazados }}
+          </strong>
+
+        </div>
+
+
+        <!-- Bloqueados -->
+
+        <div>
+
+          <span>
+
+            <i
+              class="dash-final__punto dash-final__punto--gris"
+              aria-hidden="true">
+            </i>
+
+            Bloqueados
+
+          </span>
+
+          <strong>
+            {{ usuariosBloqueados === null ? '—' : usuariosBloqueados }}
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <!-- Total de citas -->
+
+      <div class="dash-final__nota">
+
+        <strong>
+          {{ totalCitas === null ? '—' : totalCitas }}
+        </strong>
+
+        <span>
+          Citas registradas en total
+        </span>
+
+      </div>
+
+    </section>
+
+  </div>
+
+
+  <!-- ======================================================
+    8. ÚLTIMAS FACTURAS EMITIDAS
+  ======================================================= -->
+
+  <section
+    class="dash-final__panel dash-final__panel--facturas"
+    aria-labelledby="titulo-facturas-admin">
+
+    <div class="dash-final__panel-head">
+
+      <div>
+
+        <h2 id="titulo-facturas-admin">
+          🧾 Últimas facturas emitidas
+        </h2>
+
+        <p>
+          Comprobantes más recientes de Veterinaria Arévalo
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <!-- -----------------------------------------------
+      8.1. CARGANDO FACTURAS
+    ------------------------------------------------ -->
+
+    <p
+      class="dash-final__vacio"
+      *ngIf="cargandoResumen"
+      aria-live="polite">
+
+      Consultando facturas…
+
+    </p>
+
+
+    <!-- -----------------------------------------------
+      8.2. ERROR DE CONSULTA
+    ------------------------------------------------ -->
+
+    <p
+      class="dash-final__vacio"
+      *ngIf="
+        !cargandoResumen &&
+        !consultaFacturasCorrecta
+      ">
+
+      No se pudieron consultar las facturas.
+      Comprueba los permisos y la conexión con el backend.
+
+    </p>
+
+
+    <!-- -----------------------------------------------
+      8.3. SIN FACTURAS
+    ------------------------------------------------ -->
+
+    <p
+      class="dash-final__vacio"
+      *ngIf="
+        !cargandoResumen &&
+        consultaFacturasCorrecta &&
+        ultimasFacturas.length === 0
+      ">
+
+      Todavía no existen facturas registradas.
+
+    </p>
+
+
+    <!-- -----------------------------------------------
+      8.4. LISTADO DE FACTURAS
+    ------------------------------------------------ -->
+
+    <div
+      class="dash-final__lista"
+      *ngIf="
+        !cargandoResumen &&
+        consultaFacturasCorrecta &&
+        ultimasFacturas.length > 0
+      ">
+
+      <article
+        class="dash-final__fila dash-final__fila--factura"
+        *ngFor="let factura of ultimasFacturas">
+
+        <!-- Icono -->
+
+        <span
+          class="dash-final__avatar dash-final__avatar--factura"
+          aria-hidden="true">
+
+          🧾
+
+        </span>
+
+
+        <!-- Información -->
+
+        <div class="dash-final__fila-texto">
+
+          <strong>
+            {{
+              factura.numeroFactura ||
+              ('Factura #' + factura.id)
+            }}
+          </strong>
+
+          <span>
+
+            {{ factura.nombreCliente || 'Propietario' }}
+
+            ·
+
+            {{ factura.nombreMascota || 'Mascota' }}
+
+          </span>
+
+          <small>
+
+            Emisión:
+
+            {{
+              (factura.fechaEmision || factura.fechaCreacion)
+                | date:'dd/MM/yyyy HH:mm'
+            }}
+
+          </small>
+
+          <small>
+
+            Correo:
+
+            {{ factura.correoEnviado ? 'Enviado' : 'Pendiente de envío' }}
+
+          </small>
+
+        </div>
+
+
+        <!-- Total y estado -->
+
+        <div class="dash-final__factura-resumen">
+
+          <strong class="dash-final__factura-total">
+
+            {{ factura.total | currency:'USD':'symbol':'1.2-2' }}
+
+          </strong>
+
+          <span class="dash-final__estado">
+
+            {{ factura.estado || 'Emitida' }}
+
+          </span>
 
         </div>
 
       </article>
 
-    </section>
+    </div>
 
-  </main>
+  </section>
+
+
+  <!-- ======================================================
+    9. PIE INFORMATIVO
+  ======================================================= -->
+
+  <section
+    class="dash-final__pie"
+    aria-label="Información administrativa">
+
+    <span aria-hidden="true">
+      💚
+    </span>
+
+    <div>
+
+      <strong>
+        Mascotas sanas, historias más felices.
+      </strong>
+
+      <p>
+        Supervisa usuarios, citas, servicios,
+        veterinarios y facturación.
+      </p>
+
+    </div>
+
+    <button
+      type="button"
+      (click)="irVeterinarios()">
+
+      Ver veterinarios →
+
+    </button>
+
+  </section>
+
 
 </div>

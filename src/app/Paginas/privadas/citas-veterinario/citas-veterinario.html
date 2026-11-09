@@ -1,0 +1,734 @@
+
+<!-- ==========================================================
+     VETERINARIA ARÉVALO
+     MÓDULO: MIS CITAS DEL VETERINARIO
+
+     CONTENIDO:
+     1. Encabezado.
+     2. Estadísticas.
+     3. Mensajes de confirmación y errores.
+     4. Buscador.
+     5. Filtro por estados.
+     6. Listado de citas.
+     7. Botones Aceptar y Rechazar.
+     8. Ventana de confirmación.
+
+     IMPORTANTE:
+     El menú lateral, las notificaciones y
+     la accesibilidad los proporciona LayoutPrivado.
+     No debemos duplicarlos aquí.
+     ========================================================== -->
+
+
+<!-- ========================================================
+     1. CONTENEDOR PRINCIPAL
+     ======================================================== -->
+
+<div class="vet-citas">
+
+
+  <!-- ======================================================
+       2. ENCABEZADO
+       ====================================================== -->
+
+  <header class="vet-citas__header">
+
+    <div>
+
+      <span class="vet-citas__eyebrow">
+        🩺 ESPACIO PROFESIONAL
+      </span>
+
+      <h1>
+        Mis citas asignadas
+      </h1>
+
+      <p>
+        Consulta tus pacientes y administra
+        las citas que te han asignado.
+      </p>
+
+    </div>
+
+
+    <!-- ====================================================
+         BOTÓN ACTUALIZAR
+         ==================================================== -->
+
+    <button
+      type="button"
+      class="vet-citas__actualizar"
+      (click)="cargarCitas()"
+      [disabled]="cargando || procesandoId !== null"
+    >
+
+      {{
+        cargando
+          ? 'Actualizando...'
+          : '↻ Actualizar datos'
+      }}
+
+    </button>
+
+  </header>
+
+
+  <!-- ======================================================
+       3. TARJETAS DE ESTADÍSTICAS
+       ====================================================== -->
+
+  <!--
+    Los valores se calculan en citas-veterinario.ts
+    utilizando las citas recibidas desde Spring Boot.
+  -->
+
+  <section
+    class="vet-citas__resumen"
+    aria-label="Resumen de mis citas"
+  >
+
+
+    <!-- TOTAL DE CITAS -->
+
+    <article>
+
+      <span
+        class="vet-citas__ico"
+        aria-hidden="true"
+      >
+        📅
+      </span>
+
+      <div>
+
+        <small>
+          Total asignadas
+        </small>
+
+        <strong>
+          {{ totalCitas }}
+        </strong>
+
+      </div>
+
+    </article>
+
+
+    <!-- CITAS PENDIENTES -->
+
+    <article>
+
+      <span
+        class="vet-citas__ico"
+        aria-hidden="true"
+      >
+        ⏳
+      </span>
+
+      <div>
+
+        <small>
+          Pendientes
+        </small>
+
+        <strong>
+          {{ totalPendientes }}
+        </strong>
+
+      </div>
+
+    </article>
+
+
+    <!-- CITAS CONFIRMADAS -->
+
+    <article>
+
+      <span
+        class="vet-citas__ico"
+        aria-hidden="true"
+      >
+        ✅
+      </span>
+
+      <div>
+
+        <small>
+          Confirmadas
+        </small>
+
+        <strong>
+          {{ totalConfirmadas }}
+        </strong>
+
+      </div>
+
+    </article>
+
+
+    <!-- CITAS COMPLETADAS -->
+
+    <article>
+
+      <span
+        class="vet-citas__ico"
+        aria-hidden="true"
+      >
+        🩺
+      </span>
+
+      <div>
+
+        <small>
+          Completadas
+        </small>
+
+        <strong>
+          {{ totalCompletadas }}
+        </strong>
+
+      </div>
+
+    </article>
+
+  </section>
+
+
+  <!-- ======================================================
+       4. MENSAJES DEL SISTEMA
+       ====================================================== -->
+
+  <!-- Error del backend -->
+
+  <div
+    *ngIf="mensajeError"
+    class="vet-citas__mensaje vet-citas__mensaje--error"
+    role="alert"
+  >
+    ⚠️ {{ mensajeError }}
+  </div>
+
+
+  <!-- Operación realizada correctamente -->
+
+  <div
+    *ngIf="mensajeExito"
+    class="vet-citas__mensaje vet-citas__mensaje--exito"
+    role="status"
+  >
+    ✅ {{ mensajeExito }}
+  </div>
+
+
+  <!-- ======================================================
+       5. PANEL PRINCIPAL DE CITAS
+       ====================================================== -->
+
+  <section
+    class="vet-citas__panel"
+    aria-labelledby="titulo-lista-citas"
+  >
+
+
+    <!-- ====================================================
+         ENCABEZADO DEL PANEL
+         ==================================================== -->
+
+    <div class="vet-citas__panel-titulo">
+
+      <h2 id="titulo-lista-citas">
+        🐾 Pacientes y citas
+      </h2>
+
+      <p>
+        Aquí se muestran únicamente las citas
+        asignadas a tu cuenta de veterinario.
+      </p>
+
+    </div>
+
+
+    <!-- ====================================================
+         6. BUSCADOR Y FILTROS
+         ==================================================== -->
+
+    <div class="vet-citas__filtros">
+
+
+      <!-- BUSCAR CITA -->
+
+      <div class="vet-citas__campo">
+
+        <label for="buscar-citas-vet">
+          Buscar cita
+        </label>
+
+        <input
+          id="buscar-citas-vet"
+          type="search"
+          name="busqueda"
+          [(ngModel)]="busqueda"
+          placeholder="Mascota, propietario, servicio..."
+          autocomplete="off"
+        >
+
+      </div>
+
+
+      <!-- FILTRAR POR ESTADO -->
+
+      <div
+        class="vet-citas__campo vet-citas__campo--estado"
+      >
+
+        <label for="estado-citas-vet">
+          Estado de la cita
+        </label>
+
+        <select
+          id="estado-citas-vet"
+          name="filtroEstado"
+          [(ngModel)]="filtroEstado"
+        >
+
+          <option value="TODAS">
+            Todas las citas
+          </option>
+
+          <option value="PENDIENTE">
+            Pendientes
+          </option>
+
+          <option value="CONFIRMADA">
+            Confirmadas
+          </option>
+
+          <option value="COMPLETADA">
+            Completadas
+          </option>
+
+          <option value="CANCELADA">
+            Canceladas
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+
+    <!-- ====================================================
+         7. ESTADO DE CARGA
+         ==================================================== -->
+
+    <div
+      *ngIf="cargando"
+      class="vet-citas__vacio"
+      role="status"
+    >
+
+      ⏳ Cargando tus citas asignadas...
+
+    </div>
+
+
+    <!-- ====================================================
+         8. CUANDO NO EXISTEN CITAS
+         ==================================================== -->
+
+    <div
+      *ngIf="
+        !cargando &&
+        citas.length === 0 &&
+        !mensajeError
+      "
+      class="vet-citas__vacio"
+    >
+
+      🐾 Todavía no tienes citas asignadas.
+
+    </div>
+
+
+    <!-- ====================================================
+         9. CUANDO NO EXISTEN COINCIDENCIAS
+         ==================================================== -->
+
+    <div
+      *ngIf="
+        !cargando &&
+        citas.length > 0 &&
+        citasFiltradas.length === 0
+      "
+      class="vet-citas__vacio"
+    >
+
+      🔎 No encontramos citas que coincidan
+      con los filtros seleccionados.
+
+    </div>
+
+
+    <!-- ====================================================
+         10. LISTADO DE CITAS
+         ==================================================== -->
+
+    <div
+      class="vet-citas__lista"
+      *ngIf="
+        !cargando &&
+        citasFiltradas.length > 0
+      "
+    >
+
+
+      <!-- ==================================================
+           TARJETA DE CADA CITA
+           ================================================== -->
+
+      <article
+        class="vet-citas__cita"
+        *ngFor="
+          let cita of citasFiltradas;
+          trackBy: identificarCita
+        "
+      >
+
+
+        <!-- ICONO DE MASCOTA -->
+
+        <div
+          class="vet-citas__avatar"
+          aria-hidden="true"
+        >
+          🐾
+        </div>
+
+
+        <!-- ================================================
+             INFORMACIÓN DE LA CITA
+             ================================================ -->
+
+        <div class="vet-citas__datos">
+
+
+          <!-- MASCOTA Y ESTADO -->
+
+          <div class="vet-citas__linea">
+
+            <h3>
+              {{
+                cita.mascota?.nombre ||
+                'Mascota sin nombre'
+              }}
+            </h3>
+
+
+            <!-- ESTADO CON COLOR -->
+
+            <span
+              class="vet-citas__estado"
+              [ngClass]="{
+
+                'vet-citas__estado--pendiente':
+                  estado(cita) === 'PENDIENTE',
+
+                'vet-citas__estado--confirmada':
+                  estado(cita) === 'CONFIRMADA',
+
+                'vet-citas__estado--completada':
+                  estado(cita) === 'COMPLETADA',
+
+                'vet-citas__estado--cancelada':
+                  estado(cita) === 'CANCELADA'
+
+              }"
+            >
+
+              {{
+                cita.estado ||
+                'Sin estado'
+              }}
+
+            </span>
+
+          </div>
+
+
+          <!-- SERVICIO -->
+
+          <p>
+
+            {{
+              cita.servicio?.nombre ||
+              cita.motivo ||
+              'Servicio no especificado'
+            }}
+
+          </p>
+
+
+          <!-- ==============================================
+               FECHA, PROPIETARIO E ID
+               ============================================== -->
+
+          <div class="vet-citas__meta">
+
+
+            <!-- FECHA -->
+
+            <span>
+
+              📆
+
+              {{
+                cita.fechaHora
+                  ? (
+                    cita.fechaHora |
+                    date:'dd/MM/yyyy, HH:mm'
+                  )
+                  : 'Fecha no disponible'
+              }}
+
+            </span>
+
+
+            <!-- PROPIETARIO -->
+
+            <span>
+
+              👤
+
+              {{
+                cita.mascota?.usuario?.nombre ||
+                'Propietario no disponible'
+              }}
+
+            </span>
+
+
+            <!-- IDENTIFICADOR -->
+
+            <span>
+
+              📋 Cita #{{ cita.id }}
+
+            </span>
+
+          </div>
+
+
+          <!-- MOTIVO REGISTRADO -->
+
+          <small *ngIf="cita.motivo">
+
+            Motivo:
+            {{ cita.motivo }}
+
+          </small>
+
+        </div>
+
+
+        <!-- ================================================
+             11. ACCIONES PARA CITAS PENDIENTES
+             ================================================ -->
+
+        <!--
+          Estos botones solo aparecen si la cita
+          tiene estado PENDIENTE.
+
+          El backend vuelve a validar el estado
+          y el veterinario asignado.
+        -->
+
+        <div
+          class="vet-citas__acciones"
+          *ngIf="estado(cita) === 'PENDIENTE'"
+        >
+
+
+          <!-- ACEPTAR CITA -->
+
+          <button
+            type="button"
+            class="vet-citas__aceptar"
+            [disabled]="!puedeResolver(cita)"
+            (click)="solicitarAccion(cita, 'aceptar')"
+          >
+
+            ✓ Aceptar
+
+          </button>
+
+
+          <!-- RECHAZAR CITA -->
+
+          <button
+            type="button"
+            class="vet-citas__rechazar"
+            [disabled]="!puedeResolver(cita)"
+            (click)="solicitarAccion(cita, 'rechazar')"
+          >
+
+            ✕ Rechazar
+
+          </button>
+
+        </div>
+
+
+        <!-- ================================================
+             MENSAJE PARA CITAS CONFIRMADAS
+             ================================================ -->
+
+        <div
+          class="vet-citas__estado-info"
+          *ngIf="estado(cita) === 'CONFIRMADA'"
+        >
+
+          ✓ Lista para atención
+
+        </div>
+
+
+        <!-- ================================================
+             MENSAJE PARA CITAS COMPLETADAS
+             ================================================ -->
+
+        <div
+          class="vet-citas__estado-info"
+          *ngIf="estado(cita) === 'COMPLETADA'"
+        >
+
+          Atención finalizada
+
+        </div>
+
+      </article>
+
+    </div>
+
+  </section>
+
+
+  <!-- ======================================================
+       12. VENTANA DE CONFIRMACIÓN
+       ====================================================== -->
+
+  <!--
+    Al pulsar Aceptar o Rechazar mostramos primero
+    este diálogo.
+
+    El usuario debe confirmar antes de que se
+    realice la petición PUT a Spring Boot.
+
+    Esta ventana también se cierra con Escape,
+    siempre que no haya una operación en proceso.
+  -->
+
+  <div
+    class="vet-citas__overlay"
+    *ngIf="accionPendiente"
+    (click)="cancelarConfirmacion()"
+  >
+
+
+    <section
+      class="vet-citas__dialogo"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="dialogo-vet-titulo"
+      aria-describedby="dialogo-vet-desc"
+      (click)="$event.stopPropagation()"
+    >
+
+
+      <!-- TÍTULO -->
+
+      <h2 id="dialogo-vet-titulo">
+
+        Confirmar
+
+        {{
+          accionPendiente.tipo === 'aceptar'
+            ? 'aceptación'
+            : 'rechazo'
+        }}
+
+      </h2>
+
+
+      <!-- MENSAJE -->
+
+      <p id="dialogo-vet-desc">
+
+        ¿Deseas
+
+        {{
+          accionPendiente.tipo === 'aceptar'
+            ? 'aceptar'
+            : 'rechazar'
+        }}
+
+        la cita de
+
+        <strong>
+          {{
+            accionPendiente.cita.mascota?.nombre ||
+            'esta mascota'
+          }}
+        </strong>?
+
+        Esta acción actualizará su estado
+        en el sistema.
+
+      </p>
+
+
+      <!-- ================================================
+           BOTONES DE CONFIRMACIÓN
+           ================================================ -->
+
+      <div class="vet-citas__dialogo-acciones">
+
+
+        <!-- VOLVER SIN GUARDAR -->
+
+        <button
+          type="button"
+          class="vet-citas__cancelar"
+          [disabled]="procesandoId !== null"
+          (click)="cancelarConfirmacion()"
+        >
+
+          Volver
+
+        </button>
+
+
+        <!-- CONFIRMAR LA OPERACIÓN -->
+
+        <button
+          type="button"
+          class="vet-citas__confirmar"
+          [disabled]="procesandoId !== null"
+          (click)="confirmarAccion()"
+        >
+
+          {{
+            procesandoId !== null
+              ? 'Guardando...'
+              : 'Sí, confirmar'
+          }}
+
+        </button>
+
+      </div>
+
+    </section>
+
+  </div>
+
+</div>

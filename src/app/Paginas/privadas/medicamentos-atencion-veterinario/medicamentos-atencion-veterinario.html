@@ -1,0 +1,1033 @@
+
+<div class="medicamentos-page">
+
+  <!-- =====================================================
+       ENCABEZADO
+       ===================================================== -->
+
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">VETERINARIA ARÉVALO</p>
+      <h1>Medicamentos de la atención</h1>
+      <p class="intro">
+        Registra los medicamentos utilizados o recetados
+        y continúa con la facturación de la atención médica.
+      </p>
+    </div>
+
+    <button
+      type="button"
+      class="button button--secondary"
+      (click)="cargarDatos()"
+      [disabled]="cargandoDatos || guardando"
+      aria-label="Actualizar información">
+      {{ cargandoDatos ? 'Actualizando...' : 'Actualizar datos' }}
+    </button>
+  </header>
+
+  <!-- =====================================================
+       MENSAJES DEL SISTEMA
+       ===================================================== -->
+
+  <div
+    *ngIf="mensajeError"
+    class="notice notice--error"
+    role="alert"
+    aria-live="assertive">
+    {{ mensajeError }}
+  </div>
+
+  <div
+    *ngIf="mensajeExito"
+    class="notice notice--success"
+    role="status"
+    aria-live="polite">
+    {{ mensajeExito }}
+  </div>
+
+  <!-- =====================================================
+       CARGANDO INFORMACIÓN
+       ===================================================== -->
+
+  <section
+    *ngIf="cargandoDatos"
+    class="panel"
+    role="status"
+    aria-live="polite">
+    <p>Consultando atenciones y medicamentos...</p>
+  </section>
+
+  <!-- =====================================================
+       ERROR DE ATENCIONES
+       ===================================================== -->
+
+  <section
+    *ngIf="errorAtenciones && !cargandoDatos"
+    class="panel">
+    <h2>No se pudieron cargar las atenciones</h2>
+    <p class="section-description">
+      Comprueba tu conexión y vuelve a intentarlo.
+    </p>
+
+    <button
+      type="button"
+      class="button button--primary"
+      (click)="cargarDatos()">
+      Reintentar
+    </button>
+  </section>
+
+  <!-- =====================================================
+       SELECCIÓN DE ATENCIÓN
+       ===================================================== -->
+
+  <section
+    class="panel"
+    *ngIf="!cargandoDatos && !errorAtenciones">
+
+    <h2>1. Seleccionar atención médica</h2>
+
+    <p class="section-description">
+      Selecciona la atención que deseas gestionar.
+    </p>
+
+    <label for="atencionId">
+      Atención médica
+    </label>
+
+    <select
+      id="atencionId"
+      [value]="formulario.get('atencionId')?.value ?? ''"
+      (change)="cambiarAtencion($any($event.target).value)"
+      [disabled]="
+        guardando ||
+        cargandoDetalles ||
+        atenciones.length === 0
+      ">
+
+      <option value="">
+        Seleccionar atención...
+      </option>
+
+      <option
+        *ngFor="let atencion of atenciones"
+        [value]="atencion.id">
+
+        Atención #{{ atencion.id }}
+        <ng-container *ngIf="atencion.nombreMascota">
+          - {{ atencion.nombreMascota }}
+        </ng-container>
+
+      </option>
+
+    </select>
+
+    <p
+      *ngIf="atenciones.length === 0"
+      class="empty-state">
+      No tienes atenciones disponibles para gestionar.
+    </p>
+
+    <!-- INFORMACIÓN DE LA ATENCIÓN -->
+
+    <div
+      *ngIf="atencionSeleccionada"
+      class="selected-attention"
+      aria-live="polite">
+
+      <strong>
+        Atención #{{ atencionSeleccionada.id }}
+      </strong>
+
+      <span *ngIf="atencionSeleccionada.nombreMascota">
+        Mascota:
+        {{ atencionSeleccionada.nombreMascota }}
+      </span>
+
+      <span *ngIf="atencionSeleccionada.fechaAtencion">
+        Fecha:
+        {{ atencionSeleccionada.fechaAtencion | date:'dd/MM/yyyy' }}
+      </span>
+
+    </div>
+
+  </section>
+
+  <!-- =====================================================
+       VERIFICAR HISTORIAL
+       ===================================================== -->
+
+  <section
+    class="panel"
+    *ngIf="atencionSeleccionada">
+
+    <h2>2. Medicamentos de la atención</h2>
+
+    <p
+      *ngIf="cargandoDetalles"
+      role="status"
+      aria-live="polite">
+      Consultando el historial de medicamentos...
+    </p>
+
+    <div
+      *ngIf="errorDetalles"
+      class="notice notice--error">
+
+      No se pudo verificar el historial.
+
+      <button
+        type="button"
+        class="text-button"
+        (click)="cargarDetalles()">
+        Volver a consultar
+      </button>
+
+    </div>
+
+    <ng-container *ngIf="detallesListos && !errorDetalles">
+
+      <fieldset class="choice-group">
+
+        <legend>
+          ¿La atención necesita medicamentos adicionales?
+        </legend>
+
+        <label class="choice-option">
+
+          <input
+            type="radio"
+            name="necesitaMedicamentos"
+            [checked]="opcionMedicamentos === 'SI'"
+            (change)="cambiarNecesitaMedicamentos('SI')"
+            [disabled]="
+              guardando ||
+              pendientes.length > 0
+            ">
+
+          <span>
+            <strong>Sí, necesita medicamentos</strong>
+            <small>
+              Agregar medicamentos utilizados o recetados.
+            </small>
+          </span>
+
+        </label>
+
+        <label class="choice-option">
+
+          <input
+            type="radio"
+            name="necesitaMedicamentos"
+            [checked]="opcionMedicamentos === 'NO'"
+            (change)="cambiarNecesitaMedicamentos('NO')"
+            [disabled]="
+              guardando ||
+              pendientes.length > 0
+            ">
+
+          <span>
+            <strong>No necesita medicamentos</strong>
+            <small>
+              Por ejemplo, una vacunación sin medicamentos
+              adicionales. Continuar directamente a la factura.
+            </small>
+          </span>
+
+        </label>
+
+      </fieldset>
+
+    </ng-container>
+
+  </section>
+
+  <!-- =====================================================
+       FORMULARIO DE MEDICAMENTOS
+       ===================================================== -->
+
+  <section
+    class="panel"
+    *ngIf="
+      atencionSeleccionada &&
+      opcionMedicamentos === 'SI' &&
+      detallesListos
+    ">
+
+    <h2>3. Agregar medicamentos</h2>
+
+    <p class="section-description">
+      Selecciona el medicamento, indica la cantidad
+      y especifica su utilización.
+    </p>
+
+    <!-- CARGANDO CATÁLOGO -->
+
+    <p
+      *ngIf="cargandoCatalogo"
+      role="status"
+      aria-live="polite">
+      Cargando catálogo de medicamentos...
+    </p>
+
+    <!-- ERROR DEL CATÁLOGO -->
+
+    <div
+      *ngIf="errorCatalogo && !cargandoCatalogo"
+      class="notice notice--error">
+
+      No se pudo cargar el catálogo.
+
+      <button
+        type="button"
+        class="text-button"
+        (click)="reintentarCatalogo()">
+        Reintentar
+      </button>
+
+    </div>
+
+    <!-- FORMULARIO -->
+
+    <form
+      *ngIf="catalogoCargado && !errorCatalogo"
+      [formGroup]="formulario"
+      (ngSubmit)="agregarMedicamento()"
+      novalidate>
+
+      <div class="form-grid">
+
+        <!-- MEDICAMENTO -->
+
+        <div class="field field--wide">
+
+          <label for="medicamentoId">
+            Medicamento
+          </label>
+
+          <select
+            id="medicamentoId"
+            formControlName="medicamentoId"
+            required>
+
+            <option [ngValue]="null">
+              Seleccionar medicamento...
+            </option>
+
+            <option
+              *ngFor="let medicamento of medicamentos"
+              [ngValue]="medicamento.id"
+              [disabled]="!disponibleParaSeleccion(medicamento)">
+
+              {{ medicamento.nombre }}
+
+              <ng-container *ngIf="medicamento.concentracion">
+                - {{ medicamento.concentracion }}
+              </ng-container>
+
+              <ng-container *ngIf="medicamento.presentacion">
+                ({{ medicamento.presentacion }})
+              </ng-container>
+
+              <ng-container *ngIf="medicamento.activo !== true">
+                - INACTIVO
+              </ng-container>
+
+            </option>
+
+          </select>
+
+          <small class="help">
+            Los medicamentos inactivos se muestran,
+            pero no pueden seleccionarse.
+          </small>
+
+        </div>
+
+        <!-- TIPO DE REGISTRO -->
+
+        <div class="field">
+
+          <label for="tipoRegistro">
+            Tipo de registro
+          </label>
+
+          <select
+            id="tipoRegistro"
+            formControlName="tipoRegistro">
+
+            <option value="UTILIZADO">
+              Utilizado
+            </option>
+
+            <option value="RECETADO">
+              Recetado
+            </option>
+
+            <option value="RECETADO_ENTREGADO">
+              Recetado y entregado
+            </option>
+
+          </select>
+
+          <small class="help">
+            {{ descripcionTipo(formulario.get('tipoRegistro')?.value) }}
+          </small>
+
+        </div>
+
+        <!-- CANTIDAD -->
+
+        <div class="field">
+
+          <label for="cantidad">
+            Cantidad
+          </label>
+
+          <input
+            id="cantidad"
+            type="number"
+            formControlName="cantidad"
+            min="0.01"
+            step="0.01"
+            inputmode="decimal"
+            placeholder="Ej. 2">
+
+          <small class="help">
+            Ingresa la cantidad correspondiente.
+          </small>
+
+        </div>
+
+        <!-- INDICACIONES -->
+
+        <div class="field field--wide">
+
+          <label for="indicaciones">
+            Indicaciones (opcional)
+          </label>
+
+          <textarea
+            id="indicaciones"
+            formControlName="indicaciones"
+            rows="3"
+            maxlength="1000"
+            placeholder="Escribe las indicaciones del medicamento...">
+          </textarea>
+
+        </div>
+
+      </div>
+
+      <!-- INFORMACIÓN DEL MEDICAMENTO -->
+
+      <div
+        *ngIf="medicamentoSeleccionado"
+        class="medicine-info">
+
+        <strong>
+          {{ medicamentoSeleccionado.nombre }}
+        </strong>
+
+        <span>
+          Unidad:
+          {{ medicamentoSeleccionado.unidadMedida || 'Unidad' }}
+        </span>
+
+        <span>
+          Stock disponible:
+          {{ medicamentoSeleccionado.stockDisponible ?? 'No informado' }}
+        </span>
+
+        <span *ngIf="medicamentoSeleccionado.activo === true">
+          Estado: Activo
+        </span>
+
+      </div>
+
+      <!-- EFECTO SOBRE EL INVENTARIO -->
+
+      <div class="notice notice--success">
+
+        <ng-container
+          *ngIf="tipoConDescuento(); else sinDescuento">
+
+          Este registro descuenta las existencias
+          según las validaciones del backend.
+
+        </ng-container>
+
+        <ng-template #sinDescuento>
+
+          Este medicamento quedará registrado como recetado.
+          No se descontará inventario por este registro.
+
+        </ng-template>
+
+      </div>
+
+      <!-- AGREGAR -->
+
+      <div class="actions">
+
+        <button
+          type="submit"
+          class="button button--primary"
+          [disabled]="
+            guardando ||
+            !detallesListos
+          ">
+
+          Agregar medicamento
+
+        </button>
+
+      </div>
+
+    </form>
+
+    <!-- =================================================
+         LISTA PENDIENTE
+         ================================================= -->
+
+    <div
+      class="pending-list"
+      *ngIf="pendientes.length > 0">
+
+      <div class="list-heading">
+
+        <h3>Medicamentos agregados</h3>
+
+        <span>
+          {{ pendientes.length }}
+        </span>
+
+      </div>
+
+      <ul>
+
+        <li *ngFor="let item of pendientes; let i = index">
+
+          <div>
+
+            <strong>
+              {{ item.nombre }}
+            </strong>
+
+            <span>
+              Cantidad:
+              {{ item.cantidad }}
+              {{ item.unidadMedida }}
+            </span>
+
+            <small>
+              {{ descripcionTipo(item.tipoRegistro) }}
+            </small>
+
+            <small *ngIf="item.indicaciones">
+              {{ item.indicaciones }}
+            </small>
+
+          </div>
+
+          <button
+            type="button"
+            class="button button--remove"
+            (click)="quitarPendiente(i)"
+            [disabled]="guardando"
+            [attr.aria-label]="'Retirar ' + item.nombre">
+
+            Retirar
+
+          </button>
+
+        </li>
+
+      </ul>
+
+      <button
+        type="button"
+        class="button button--primary"
+        (click)="guardarMedicamentos()"
+        [disabled]="guardando">
+
+        {{ guardando ? 'Guardando medicamentos...' : 'Guardar medicamentos' }}
+
+      </button>
+
+    </div>
+
+    <p
+      *ngIf="pendientes.length === 0"
+      class="empty-state">
+
+      Todavía no has agregado medicamentos.
+
+    </p>
+
+  </section>
+
+  <!-- =====================================================
+       HISTORIAL
+       ===================================================== -->
+
+  <section
+    class="panel"
+    *ngIf="
+      atencionSeleccionada &&
+      detallesListos
+    ">
+
+    <h2>Historial de medicamentos</h2>
+
+    <p class="section-description">
+      Medicamentos que ya fueron registrados en esta atención.
+    </p>
+
+    <ul
+      class="history-list"
+      *ngIf="detalles.length > 0">
+
+      <li *ngFor="let detalle of detalles">
+
+        <div>
+
+          <strong>
+            {{ detalle.nombreMedicamento }}
+          </strong>
+
+          <span>
+            Cantidad:
+            {{ detalle.cantidad }}
+            {{ detalle.unidadMedida }}
+          </span>
+
+          <small>
+            {{ descripcionTipo(detalle.tipoRegistro) }}
+          </small>
+
+          <small *ngIf="detalle.fechaRegistro">
+            Registrado:
+            {{ detalle.fechaRegistro | date:'dd/MM/yyyy HH:mm' }}
+          </small>
+
+          <small *ngIf="detalle.indicaciones">
+            Indicaciones:
+            {{ detalle.indicaciones }}
+          </small>
+
+        </div>
+
+        <strong>
+          {{ numero(detalle.subtotal) | currency:'USD':'symbol':'1.2-2' }}
+        </strong>
+
+      </li>
+
+    </ul>
+
+    <p
+      *ngIf="detalles.length === 0"
+      class="empty-state">
+
+      No hay medicamentos registrados en esta atención.
+
+    </p>
+
+  </section>
+
+  <!-- =====================================================
+       CONTINUAR A FACTURA
+       ===================================================== -->
+
+  <section
+    class="panel next-step"
+    *ngIf="
+      atencionSeleccionada &&
+      detallesListos &&
+      !errorDetalles &&
+      !vistaPreviaFactura &&
+      !facturaEmitida
+    ">
+
+    <h2>4. Continuar a facturación</h2>
+
+    <p>
+      Una vez revisada la atención y guardados los medicamentos,
+      puedes consultar el resumen de los valores antes de emitir
+      la factura.
+    </p>
+
+    <button
+      type="button"
+      class="button button--primary"
+      (click)="continuarAFactura()"
+      [disabled]="
+        pendientes.length > 0 ||
+        guardando ||
+        cargandoFactura
+      ">
+
+      {{
+        cargandoFactura
+          ? 'Consultando factura...'
+          : 'Continuar a factura'
+      }}
+
+    </button>
+
+    <small class="help" *ngIf="pendientes.length > 0">
+      Guarda o retira los medicamentos pendientes antes de continuar.
+    </small>
+
+  </section>
+
+  <!-- =====================================================
+       VISTA PREVIA DE FACTURA
+       ===================================================== -->
+
+  <section
+    class="panel invoice-panel"
+    *ngIf="vistaPreviaFactura as factura">
+
+    <h2>5. Vista previa de factura</h2>
+
+    <p class="section-description">
+      Revisa los datos y los valores calculados por el backend
+      antes de emitir la factura.
+    </p>
+
+    <!-- DATOS DEL PROPIETARIO Y MASCOTA -->
+
+    <dl class="invoice-data">
+
+      <div>
+        <dt>Atención</dt>
+        <dd>#{{ factura.atencionId }}</dd>
+      </div>
+
+      <div>
+        <dt>Propietario</dt>
+        <dd>{{ factura.nombreCliente }}</dd>
+      </div>
+
+      <div>
+        <dt>Mascota</dt>
+        <dd>{{ factura.nombreMascota }}</dd>
+      </div>
+
+      <div>
+        <dt>Veterinario</dt>
+        <dd>{{ factura.nombreVeterinario }}</dd>
+      </div>
+
+      <div>
+        <dt>Servicio</dt>
+        <dd>{{ factura.nombreServicio }}</dd>
+      </div>
+
+      <div>
+        <dt>Correo del propietario</dt>
+        <dd>{{ factura.correoCliente || 'No informado' }}</dd>
+      </div>
+
+    </dl>
+
+    <!-- SERVICIO -->
+
+    <h3>Detalle de cobros</h3>
+
+    <div class="invoice-line">
+
+      <span>
+        {{ factura.nombreServicio }}
+      </span>
+
+      <strong>
+        {{ numero(factura.precioServicio) | currency:'USD':'symbol':'1.2-2' }}
+      </strong>
+
+    </div>
+
+    <!-- MEDICAMENTOS -->
+
+    <ng-container *ngIf="factura.medicamentos.length > 0">
+
+      <div
+        class="invoice-line"
+        *ngFor="let medicamento of factura.medicamentos">
+
+        <span>
+
+          {{ medicamento.nombreMedicamento }}
+
+          ({{ medicamento.cantidad }}
+          {{ medicamento.unidadMedida }})
+
+          <small>
+            {{ descripcionTipo(medicamento.tipoRegistro) }}
+          </small>
+
+        </span>
+
+        <strong>
+          {{ numero(medicamento.subtotal) | currency:'USD':'symbol':'1.2-2' }}
+        </strong>
+
+      </div>
+
+    </ng-container>
+
+    <p
+      *ngIf="factura.medicamentos.length === 0"
+      class="empty-state">
+
+      Esta atención no tiene medicamentos adicionales.
+      Se cobrará únicamente el servicio registrado.
+
+    </p>
+
+    <!-- TOTALES -->
+
+    <dl class="totals">
+
+      <div>
+        <dt>Subtotal</dt>
+        <dd>
+          {{ numero(factura.subtotal) | currency:'USD':'symbol':'1.2-2' }}
+        </dd>
+      </div>
+
+      <div>
+        <dt>Impuestos configurados</dt>
+        <dd>
+          {{ numero(factura.impuestos) | currency:'USD':'symbol':'1.2-2' }}
+        </dd>
+      </div>
+
+      <div class="grand-total">
+        <dt>Total</dt>
+        <dd>
+          {{ numero(factura.total) | currency:'USD':'symbol':'1.2-2' }}
+        </dd>
+      </div>
+
+    </dl>
+
+    <div class="notice notice--success">
+      Los valores mostrados provienen del backend.
+      Verifica el resumen antes de emitir.
+    </div>
+
+    <div class="notice notice--error">
+      Este documento es un comprobante interno del sistema.
+      No representa una factura electrónica autorizada por el SRI.
+    </div>
+
+    <!-- ACCIONES -->
+
+    <div class="actions">
+
+      <button
+        type="button"
+        class="button button--secondary"
+        (click)="volverASeleccion()"
+        [disabled]="emitiendoFactura">
+
+        Volver
+
+      </button>
+
+      <button
+        type="button"
+        class="button button--primary"
+        (click)="emitirFactura()"
+        [disabled]="emitiendoFactura">
+
+        {{
+          emitiendoFactura
+            ? 'Emitiendo factura...'
+            : 'Emitir factura'
+        }}
+
+      </button>
+
+    </div>
+
+  </section>
+
+  <!-- =====================================================
+       FACTURA EMITIDA
+       ===================================================== -->
+
+  <section
+    class="panel invoice-panel"
+    *ngIf="facturaEmitida as factura">
+
+    <h2>Factura emitida correctamente</h2>
+
+    <p class="invoice-number">
+      {{ factura.numeroFactura }}
+    </p>
+
+    <dl class="invoice-data">
+
+      <div>
+        <dt>Propietario</dt>
+        <dd>{{ factura.nombreCliente }}</dd>
+      </div>
+
+      <div>
+        <dt>Mascota</dt>
+        <dd>{{ factura.nombreMascota }}</dd>
+      </div>
+
+      <div>
+        <dt>Servicio</dt>
+        <dd>{{ factura.nombreServicio }}</dd>
+      </div>
+
+      <div>
+        <dt>Estado</dt>
+        <dd>{{ factura.estado }}</dd>
+      </div>
+
+      <div>
+        <dt>Correo del propietario</dt>
+        <dd>{{ factura.correoCliente || 'No informado' }}</dd>
+      </div>
+
+      <div>
+        <dt>Total</dt>
+        <dd>
+          {{ numero(factura.total) | currency:'USD':'symbol':'1.2-2' }}
+        </dd>
+      </div>
+
+    </dl>
+
+    <!-- DETALLE DE MEDICAMENTOS -->
+
+    <h3>Medicamentos facturados</h3>
+
+    <div
+      class="invoice-line"
+      *ngFor="let medicamento of factura.medicamentos">
+
+      <span>
+        {{ medicamento.nombreMedicamento }}
+        ({{ medicamento.cantidad }} {{ medicamento.unidadMedida }})
+      </span>
+
+      <strong>
+        {{ numero(medicamento.subtotal) | currency:'USD':'symbol':'1.2-2' }}
+      </strong>
+
+    </div>
+
+    <p
+      *ngIf="factura.medicamentos.length === 0"
+      class="empty-state">
+
+      Factura sin medicamentos adicionales.
+
+    </p>
+
+    <!-- TOTAL -->
+
+    <dl class="totals">
+
+      <div>
+        <dt>Subtotal</dt>
+        <dd>
+          {{ numero(factura.subtotal) | currency:'USD':'symbol':'1.2-2' }}
+        </dd>
+      </div>
+
+      <div>
+        <dt>Impuestos</dt>
+        <dd>
+          {{ numero(factura.impuestos) | currency:'USD':'symbol':'1.2-2' }}
+        </dd>
+      </div>
+
+      <div class="grand-total">
+        <dt>Total</dt>
+        <dd>
+          {{ numero(factura.total) | currency:'USD':'symbol':'1.2-2' }}
+        </dd>
+      </div>
+
+    </dl>
+
+    <!-- DESCARGAR PDF -->
+
+    <div class="actions actions--wrap">
+
+      <button
+        type="button"
+        class="button button--secondary"
+        (click)="descargarPdf()"
+        [disabled]="descargandoPdf">
+
+        {{
+          descargandoPdf
+            ? 'Preparando PDF...'
+            : 'Descargar PDF'
+        }}
+
+      </button>
+
+      <!-- ENVIAR CORREO -->
+
+      <button
+        *ngIf="!factura.correoEnviado"
+        type="button"
+        class="button button--primary"
+        (click)="enviarFacturaCorreo()"
+        [disabled]="
+          enviandoCorreo ||
+          !factura.correoCliente
+        ">
+
+        {{
+          enviandoCorreo
+            ? 'Enviando correo...'
+            : 'Enviar factura al correo'
+        }}
+
+      </button>
+
+    </div>
+
+    <!-- ESTADO DEL CORREO -->
+
+    <div
+      *ngIf="factura.correoEnviado"
+      class="notice notice--success"
+      role="status">
+
+      La factura figura como enviada al correo del propietario.
+
+    </div>
+
+    <div
+      *ngIf="mensajeCorreo"
+      class="notice notice--success"
+      role="status"
+      aria-live="polite">
+
+      {{ mensajeCorreo }}
+
+    </div>
+
+    <p
+      *ngIf="!factura.correoCliente"
+      class="help">
+      No existe un correo registrado para el propietario.
+      No se puede enviar la factura por correo.
+    </p>
+
+  </section>
+
+</div>

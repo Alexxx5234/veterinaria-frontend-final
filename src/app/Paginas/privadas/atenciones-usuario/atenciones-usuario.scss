@@ -1,0 +1,367 @@
+
+/* ==========================================================
+   VETERINARIA ARÉVALO
+   MIS ATENCIONES MÉDICAS - USER
+========================================================== */
+
+:host {
+  display: block;
+  min-width: 0;
+}
+
+:host * {
+  box-sizing: border-box;
+}
+
+.atenciones-user {
+  --verde: #08765a;
+  --oscuro: #075642;
+  --claro: #e8f8ef;
+  --borde: #dcebe2;
+  --texto: #173f33;
+  --secundario: #627d70;
+
+  max-width: 1300px;
+  margin: 0 auto;
+  color: var(--texto);
+  font-family: 'Segoe UI', Arial, sans-serif;
+  line-height: 1.55;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.eyebrow {
+  color: var(--verde);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.1px;
+}
+
+h1 {
+  margin: 7px 0;
+  color: var(--oscuro);
+  font-size: clamp(24px, 3vw, 31px);
+}
+
+h2, h3, h4 {
+  color: var(--oscuro);
+}
+
+h2 {
+  margin: 0;
+  font-size: 19px;
+}
+
+.page-header p {
+  color: var(--secundario);
+  margin: 0;
+}
+
+.quick-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 21px;
+}
+
+.quick-nav a,
+.enlace-factura {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 43px;
+  padding: 10px 14px;
+  border: 1px solid #cce5d6;
+  border-radius: 10px;
+  background: white;
+  color: var(--verde);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.quick-nav a:hover,
+.enlace-factura:hover {
+  background: var(--claro);
+}
+
+.resumen {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.resumen article,
+.panel,
+.atencion-card {
+  border: 1px solid var(--borde);
+  border-radius: 15px;
+  background: #fff;
+  box-shadow: 0 5px 18px rgba(15, 84, 55, .04);
+}
+
+.resumen article {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 20px;
+}
+
+.resumen span {
+  color: var(--secundario);
+  font-size: 13px;
+}
+
+.resumen strong {
+  color: var(--oscuro);
+  font-size: 26px;
+}
+
+.panel {
+  padding: 23px;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 19px;
+}
+
+.panel-header span {
+  padding: 7px 11px;
+  border-radius: 20px;
+  background: var(--claro);
+  color: var(--oscuro);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.filtros {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: end;
+  gap: 13px;
+  margin-bottom: 23px;
+}
+
+.filtros label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.filtros input,
+.filtros select {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px;
+  border: 1px solid #cbded3;
+  border-radius: 9px;
+  background: #fff;
+  color: var(--texto);
+  font: inherit;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 43px;
+  padding: 10px 15px;
+  border-radius: 9px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn--primary {
+  border: 1px solid var(--verde);
+  background: var(--verde);
+  color: white;
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: var(--oscuro);
+}
+
+.btn--outline {
+  border: 1px solid #cce5d6;
+  background: white;
+  color: var(--verde);
+}
+
+.btn--outline:hover:not(:disabled) {
+  background: var(--claro);
+}
+
+.btn:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+.atenciones-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 15px;
+}
+
+.atencion-card {
+  min-width: 0;
+  padding: 19px;
+}
+
+.atencion-card__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.atencion-card__top small {
+  color: var(--secundario);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.atencion-card__top h3 {
+  margin: 4px 0 0;
+  font-size: 19px;
+}
+
+.estado {
+  border-radius: 20px;
+  padding: 6px 10px;
+  background: var(--claro);
+  color: var(--oscuro);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.atencion-card dl {
+  margin: 17px 0;
+}
+
+.atencion-card dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid #e8f1e9;
+}
+
+.atencion-card dt {
+  color: var(--secundario);
+}
+
+.atencion-card dd {
+  margin: 0;
+  text-align: right;
+  font-weight: 700;
+}
+
+.diagnostico {
+  margin-bottom: 17px;
+  padding: 14px;
+  border-radius: 10px;
+  background: #f3faf6;
+}
+
+.diagnostico p {
+  margin: 5px 0 0;
+  overflow-wrap: anywhere;
+}
+
+.detalle {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid #e2efe5;
+}
+
+.detalle h4 {
+  margin: 15px 0 5px;
+}
+
+.detalle p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.detalle .nota {
+  margin: 17px 0;
+  color: var(--secundario);
+  font-size: 12px;
+}
+
+.alerta,
+.advertencia {
+  margin-bottom: 16px;
+  padding: 14px;
+  border-radius: 10px;
+}
+
+.alerta {
+  border: 1px solid #edc5c5;
+  background: #fff2f2;
+  color: #972e36;
+}
+
+.advertencia {
+  border: 1px solid #f0ddad;
+  background: #fff9e9;
+  color: #825e19;
+}
+
+.vacio {
+  padding: 35px 18px;
+  border-radius: 11px;
+  background: #f3faf6;
+  text-align: center;
+  color: var(--secundario);
+}
+
+:host :is(a, button, input, select):focus-visible {
+  outline: 3px solid #08765a;
+  outline-offset: 3px;
+}
+
+@media (max-width: 850px) {
+  .atenciones-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .resumen,
+  .filtros {
+    grid-template-columns: 1fr;
+  }
+
+  .panel {
+    padding: 16px;
+  }
+
+  .atencion-card dl div {
+    flex-wrap: wrap;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

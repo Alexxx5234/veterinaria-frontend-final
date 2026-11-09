@@ -1,31 +1,54 @@
-// inject permite utilizar servicios dentro de un Guard funcional.
-import { inject } from '@angular/core';
 
-// Herramientas necesarias para proteger las rutas.
+/* ==========================================================
+   VETERINARIA ARÉVALO
+   GUARD DE ROLES
+
+   FUNCIONALIDADES:
+   - Comprobar que exista una sesión JWT.
+   - Verificar el rol exigido por la ruta.
+   - Permitir ADMIN, USER y VETERINARIO.
+   - Bloquear rutas de otros roles.
+   - Redirigir al dashboard correspondiente.
+   ========================================================== */
+
+// ==========================================================
+// IMPORTACIONES
+// ==========================================================
+
+import {
+  inject
+} from '@angular/core';
+
 import {
   CanActivateFn,
   Router
 } from '@angular/router';
 
-// Servicio de autenticación.
-import { AuthServicio } from '../Servicios/auth-servicio';
+import {
+  AuthServicio,
+  RolUsuario
+} from '../Servicios/auth-servicio';
 
 
 // ==========================================================
-// GUARD DE ROLES
+// GUARD FUNCIONAL
 // ==========================================================
 
-export const rolGuard: CanActivateFn = (route, state) => {
+export const rolGuard: CanActivateFn = (
+  route
+) => {
 
-  // Servicio donde tenemos token y rol.
-  const authServicio = inject(AuthServicio);
+  // Servicio de autenticación.
+  const authServicio =
+    inject(AuthServicio);
 
-  // Router para realizar redirecciones.
-  const router = inject(Router);
+  // Navegación Angular.
+  const router =
+    inject(Router);
 
 
   // ========================================================
-  // COMPROBAR SESIÓN
+  // 1. COMPROBAR AUTENTICACIÓN
   // ========================================================
 
   if (!authServicio.estaAutenticado()) {
@@ -38,23 +61,49 @@ export const rolGuard: CanActivateFn = (route, state) => {
 
 
   // ========================================================
-  // OBTENER ROLES
+  // 2. OBTENER EL ROL DE LA SESIÓN
   // ========================================================
 
-  // Rol guardado durante el login.
   const rolUsuario =
     authServicio.obtenerRol();
 
-  // Rol permitido para la ruta.
+
+  // ========================================================
+  // 3. OBTENER EL ROL EXIGIDO POR LA RUTA
+  // ========================================================
+
   const rolPermitido =
-    route.data['rol'];
+    route.data['rol'] as RolUsuario | undefined;
 
 
   // ========================================================
-  // PERMITIR ACCESO
+  // 4. VALIDAR QUE EL ROL SEA CONOCIDO
   // ========================================================
 
-  if (rolUsuario === rolPermitido) {
+  if (!rolUsuario) {
+
+    return router.createUrlTree([
+      '/login'
+    ]);
+
+  }
+
+
+  // ========================================================
+  // 5. PERMITIR ACCESO CUANDO COINCIDE EL ROL
+  // ========================================================
+
+  /*
+    Ejemplos:
+
+    ADMIN accede a /admin/dashboard
+
+    USER accede a /usuario/dashboard
+
+    VETERINARIO accede a /veterinario/dashboard
+  */
+
+  if (rolPermitido === rolUsuario) {
 
     return true;
 
@@ -62,32 +111,23 @@ export const rolGuard: CanActivateFn = (route, state) => {
 
 
   // ========================================================
-  // REDIRECCIONES
+  // 6. BLOQUEAR ACCESO A OTROS ROLES
   // ========================================================
 
-  // Si ADMIN intenta entrar a una página USER.
-  if (rolUsuario === 'ADMIN') {
+  /*
+    Si un USER intenta entrar a ADMIN,
+    será redirigido a su propio dashboard.
 
-    return router.createUrlTree([
-      '/admin/dashboard'
-    ]);
+    Lo mismo ocurre con ADMIN y VETERINARIO.
+  */
 
-  }
+  const rutaInicio =
+    authServicio.obtenerRutaInicio(
+      rolUsuario
+    );
 
-
-  // Si USER intenta entrar a una página ADMIN.
-  if (rolUsuario === 'USER') {
-
-    return router.createUrlTree([
-      '/usuario/dashboard'
-    ]);
-
-  }
-
-
-  // Rol desconocido.
-  return router.createUrlTree([
-    '/login'
-  ]);
+  return router.parseUrl(
+    rutaInicio
+  );
 
 };

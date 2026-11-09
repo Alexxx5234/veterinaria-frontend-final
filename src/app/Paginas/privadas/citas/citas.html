@@ -1,239 +1,142 @@
 
 <!-- ==========================================================
-     VETERINARIA AREVALO - MIS CITAS (USER)
+ VETERINARIA ARÉVALO · MIS CITAS · USER
 
-     MEJORAS:
-     - Resumen de citas.
-     - Buscador y filtro de estados.
-     - Formulario accesible.
-     - Validaciones claras.
-     - Tarjetas con información organizada.
-     - Interfaz adaptable a celulares.
+ Funcionalidades conservadas:
+ - Agendar y editar citas.
+ - Consultar y cancelar citas.
+ - Validaciones del formulario.
+ - Buscar por mascota, servicio o motivo.
+ - Filtrar por estado.
+ - Resumen de citas.
+ - Estados de carga, error y sin resultados.
 
-     El menú lateral y la accesibilidad están
-     en LayoutPrivado, por eso no se duplican aquí.
-     ========================================================== -->
+ Nuevo: accesos rápidos entre módulos USER.
+ La accesibilidad global pertenece a LayoutPrivado.
+========================================================== -->
 
 <div class="citas-container">
 
-
-  <!-- ========================================================
-       1. CABECERA
-       ======================================================== -->
-
+  <!-- 1. ENCABEZADO -->
   <header class="citas-header">
-
     <div class="header-texto">
-
-      <span class="etiqueta-pagina">
-        MI ESPACIO PERSONAL
-      </span>
-
-      <h1>
-        Mis Citas 📅
-      </h1>
-
-      <p>
-        Agenda y consulta las citas veterinarias
-        de tus mascotas.
-      </p>
-
+      <span class="etiqueta-pagina">MI ESPACIO PERSONAL</span>
+      <h1>Mis Citas 📅</h1>
+      <p>Agenda y consulta las citas veterinarias de tus mascotas.</p>
     </div>
 
-
-    <!-- BOTONES DE LA CABECERA -->
     <div class="acciones-header">
-
       <button
         type="button"
         class="btn-nueva"
         (click)="nuevaCita()"
         [disabled]="cargando || guardando || mascotas.length === 0"
         [attr.aria-expanded]="mostrarFormulario"
-        aria-controls="formulario-cita"
-      >
+        aria-controls="formulario-cita">
         + Agendar cita
       </button>
-
 
       <button
         type="button"
         class="btn-volver"
-        (click)="volverDashboard()"
-      >
+        (click)="volverDashboard()">
         ← Volver al panel
       </button>
-
     </div>
-
   </header>
 
+  <!-- 2. ACCESOS RÁPIDOS DEL USUARIO -->
+  <nav class="user-accesos" aria-label="Accesos rápidos del cliente">
+    <a href="/usuario/dashboard">🏠 Inicio</a>
+    <a href="/usuario/mascotas">🐾 Mis Mascotas</a>
+    <a href="/usuario/atenciones">🩺 Mis Atenciones</a>
+    <a href="/usuario/facturas">🧾 Mis Facturas</a>
+    <a href="/usuario/servicios">💚 Servicios</a>
+    <a href="/usuario/veterinarios">👨‍⚕️ Veterinarios</a>
+  </nav>
 
-  <!-- ========================================================
-       2. MENSAJES DE ÉXITO Y ERROR
-       ======================================================== -->
-
-  <div
-    class="mensaje-exito"
-    *ngIf="mensajeExito"
-    role="status"
-  >
-    <span aria-hidden="true">✅</span>
-    {{ mensajeExito }}
+  <!-- 3. MENSAJES DEL SISTEMA -->
+  <div class="mensaje-exito" *ngIf="mensajeExito" role="status">
+    ✅ {{ mensajeExito }}
   </div>
 
-
-  <div
-    class="mensaje-error"
-    *ngIf="mensajeError"
-    role="alert"
-  >
-
-    <span aria-hidden="true">⚠️</span>
-
-    {{ mensajeError }}
+  <div class="mensaje-error" *ngIf="mensajeError" role="alert">
+    ⚠️ {{ mensajeError }}
 
     <button
       type="button"
       class="btn-reintentar"
       *ngIf="errorCarga"
-      (click)="cargarDatos()"
-    >
+      (click)="cargarDatos()">
       Reintentar
     </button>
-
   </div>
 
-
-  <!-- ========================================================
-       3. RESUMEN DE MIS CITAS
-       ======================================================== -->
-
+  <!-- 4. INDICADORES DE MIS CITAS -->
   <section
     class="resumen-grid"
     *ngIf="!cargando && !errorCarga"
-    aria-label="Resumen de mis citas"
-  >
+    aria-label="Resumen de mis citas">
 
-    <!-- TOTAL -->
     <article class="resumen-card">
-
-      <div class="resumen-icono icono-total" aria-hidden="true">
-        📅
-      </div>
-
+      <span class="resumen-icono icono-total" aria-hidden="true">📅</span>
       <div>
         <span>Total de citas</span>
-
-        <strong>
-          {{ citas.length }}
-        </strong>
+        <strong>{{ citas.length }}</strong>
       </div>
-
     </article>
 
-
-    <!-- PENDIENTES -->
     <article class="resumen-card">
-
-      <div class="resumen-icono icono-pendientes" aria-hidden="true">
-        ⏳
-      </div>
-
+      <span class="resumen-icono icono-pendientes" aria-hidden="true">⏳</span>
       <div>
         <span>Pendientes</span>
-
-        <strong>
-          {{ totalPendientes }}
-        </strong>
+        <strong>{{ totalPendientes }}</strong>
       </div>
-
     </article>
 
-
-    <!-- CANCELADAS -->
     <article class="resumen-card">
-
-      <div class="resumen-icono icono-canceladas" aria-hidden="true">
-        🚫
-      </div>
-
+      <span class="resumen-icono icono-canceladas" aria-hidden="true">🚫</span>
       <div>
         <span>Canceladas</span>
-
-        <strong>
-          {{ totalCanceladas }}
-        </strong>
+        <strong>{{ totalCanceladas }}</strong>
       </div>
-
     </article>
-
   </section>
 
-
-  <!-- ========================================================
-       4. AVISO SI NO HAY MASCOTAS
-       ======================================================== -->
-
+  <!-- 5. AVISO CUANDO EL USUARIO NO TIENE MASCOTAS -->
   <section
     class="aviso-requisito"
-    *ngIf="
-      !cargando &&
-      !errorCarga &&
-      mascotas.length === 0
-    "
-  >
+    *ngIf="!cargando && !errorCarga && mascotas.length === 0">
 
-    <div class="aviso-icono" aria-hidden="true">
-      🐾
-    </div>
+    <div class="aviso-icono" aria-hidden="true">🐾</div>
 
     <div>
-
-      <h2>
-        Primero registra una mascota
-      </h2>
-
+      <h2>Primero registra una mascota</h2>
       <p>
-        Para agendar una cita veterinaria,
-        necesitas tener al menos una mascota
-        registrada en tu cuenta.
+        Para agendar una cita veterinaria necesitas tener
+        al menos una mascota registrada en tu cuenta.
       </p>
-
     </div>
 
     <button
       type="button"
       class="btn-ir-mascotas"
-      (click)="irMascotas()"
-    >
+      (click)="irMascotas()">
       Ir a Mis Mascotas
     </button>
-
   </section>
 
-
-  <!-- ========================================================
-       5. FORMULARIO DE CITAS
-       ======================================================== -->
-
+  <!-- 6. FORMULARIO DE REGISTRO Y EDICIÓN -->
   <section
     id="formulario-cita"
     class="formulario-card"
     *ngIf="mostrarFormulario"
-    aria-labelledby="titulo-formulario"
-  >
+    aria-labelledby="titulo-formulario">
 
-
-    <!-- ENCABEZADO DEL FORMULARIO -->
     <div class="formulario-header">
-
-      <div class="formulario-logo" aria-hidden="true">
-        📅
-      </div>
+      <div class="formulario-logo" aria-hidden="true">📅</div>
 
       <div>
-
         <h2 id="titulo-formulario">
           {{
             citaEditandoId === null
@@ -241,48 +144,27 @@
               : 'Editar cita veterinaria'
           }}
         </h2>
-
-        <p>
-          Selecciona los datos necesarios
-          y completa la información solicitada.
-        </p>
-
+        <p>Selecciona los datos y completa la información solicitada.</p>
       </div>
-
     </div>
 
-
-    <!-- FORMULARIO REACTIVO -->
     <form
       [formGroup]="citaForm"
       (ngSubmit)="guardarCita()"
       novalidate
-      [attr.aria-busy]="guardando"
-    >
+      [attr.aria-busy]="guardando">
 
-      <!-- Agrupa y bloquea los campos mientras guarda. -->
-      <fieldset
-        class="campos-formulario"
-        [disabled]="guardando"
-      >
-
+      <fieldset class="campos-formulario" [disabled]="guardando">
         <legend class="solo-lectores">
           Datos de la cita veterinaria
         </legend>
 
-
         <div class="form-grid">
 
-
-          <!-- ================================================
-               MASCOTA
-               ================================================ -->
-
+          <!-- MASCOTA -->
           <div class="form-group">
-
             <label for="mascota">
-              Mascota
-              <span class="obligatorio" aria-hidden="true">*</span>
+              Mascota <span class="obligatorio" aria-hidden="true">*</span>
             </label>
 
             <select
@@ -290,55 +172,26 @@
               id="mascota"
               formControlName="mascotaId"
               required
-              [class.input-error]="
-                citaForm.get('mascotaId')?.touched &&
-                citaForm.get('mascotaId')?.invalid
-              "
-              [attr.aria-invalid]="
-                citaForm.get('mascotaId')?.touched &&
-                citaForm.get('mascotaId')?.invalid
-              "
-              [attr.aria-describedby]="
-                citaForm.get('mascotaId')?.touched &&
-                citaForm.get('mascotaId')?.invalid
-                  ? 'mascota-error'
-                  : null
-              "
-            >
+              [class.input-error]="citaForm.get('mascotaId')?.touched && citaForm.get('mascotaId')?.invalid"
+              [attr.aria-invalid]="citaForm.get('mascotaId')?.touched && citaForm.get('mascotaId')?.invalid"
+              [attr.aria-describedby]="citaForm.get('mascotaId')?.touched && citaForm.get('mascotaId')?.invalid ? 'mascota-error' : null">
 
-              <option value="">
-                Selecciona una mascota
-              </option>
-
-              <option
-                *ngFor="let mascota of mascotas"
-                [ngValue]="mascota.id"
-              >
+              <option value="">Selecciona una mascota</option>
+              <option *ngFor="let mascota of mascotas" [ngValue]="mascota.id">
                 {{ mascota.nombre }} - {{ mascota.especie }}
               </option>
-
             </select>
 
             <small
               id="mascota-error"
               class="error-validacion"
-              *ngIf="
-                citaForm.get('mascotaId')?.touched &&
-                citaForm.get('mascotaId')?.hasError('required')
-              "
-            >
+              *ngIf="citaForm.get('mascotaId')?.touched && citaForm.get('mascotaId')?.hasError('required')">
               Debes seleccionar una mascota.
             </small>
-
           </div>
 
-
-          <!-- ================================================
-               SERVICIO
-               ================================================ -->
-
+          <!-- SERVICIO -->
           <div class="form-group">
-
             <label for="servicio">
               Servicio veterinario
               <span class="obligatorio" aria-hidden="true">*</span>
@@ -348,55 +201,26 @@
               id="servicio"
               formControlName="servicioId"
               required
-              [class.input-error]="
-                citaForm.get('servicioId')?.touched &&
-                citaForm.get('servicioId')?.invalid
-              "
-              [attr.aria-invalid]="
-                citaForm.get('servicioId')?.touched &&
-                citaForm.get('servicioId')?.invalid
-              "
-              [attr.aria-describedby]="
-                citaForm.get('servicioId')?.touched &&
-                citaForm.get('servicioId')?.invalid
-                  ? 'servicio-error'
-                  : null
-              "
-            >
+              [class.input-error]="citaForm.get('servicioId')?.touched && citaForm.get('servicioId')?.invalid"
+              [attr.aria-invalid]="citaForm.get('servicioId')?.touched && citaForm.get('servicioId')?.invalid"
+              [attr.aria-describedby]="citaForm.get('servicioId')?.touched && citaForm.get('servicioId')?.invalid ? 'servicio-error' : null">
 
-              <option value="">
-                Selecciona un servicio
-              </option>
-
-              <option
-                *ngFor="let servicio of servicios"
-                [ngValue]="servicio.id"
-              >
+              <option value="">Selecciona un servicio</option>
+              <option *ngFor="let servicio of servicios" [ngValue]="servicio.id">
                 {{ servicio.nombre }} - ${{ servicio.precio }}
               </option>
-
             </select>
 
             <small
               id="servicio-error"
               class="error-validacion"
-              *ngIf="
-                citaForm.get('servicioId')?.touched &&
-                citaForm.get('servicioId')?.hasError('required')
-              "
-            >
+              *ngIf="citaForm.get('servicioId')?.touched && citaForm.get('servicioId')?.hasError('required')">
               Debes seleccionar un servicio.
             </small>
-
           </div>
 
-
-          <!-- ================================================
-               VETERINARIO
-               ================================================ -->
-
+          <!-- VETERINARIO -->
           <div class="form-group">
-
             <label for="veterinario">
               Veterinario
               <span class="obligatorio" aria-hidden="true">*</span>
@@ -406,58 +230,27 @@
               id="veterinario"
               formControlName="veterinarioId"
               required
-              [class.input-error]="
-                citaForm.get('veterinarioId')?.touched &&
-                citaForm.get('veterinarioId')?.invalid
-              "
-              [attr.aria-invalid]="
-                citaForm.get('veterinarioId')?.touched &&
-                citaForm.get('veterinarioId')?.invalid
-              "
-              [attr.aria-describedby]="
-                citaForm.get('veterinarioId')?.touched &&
-                citaForm.get('veterinarioId')?.invalid
-                  ? 'veterinario-error'
-                  : null
-              "
-            >
+              [class.input-error]="citaForm.get('veterinarioId')?.touched && citaForm.get('veterinarioId')?.invalid"
+              [attr.aria-invalid]="citaForm.get('veterinarioId')?.touched && citaForm.get('veterinarioId')?.invalid"
+              [attr.aria-describedby]="citaForm.get('veterinarioId')?.touched && citaForm.get('veterinarioId')?.invalid ? 'veterinario-error' : null">
 
-              <option value="">
-                Selecciona un veterinario
-              </option>
-
-              <option
-                *ngFor="let veterinario of veterinarios"
-                [ngValue]="veterinario.id"
-              >
+              <option value="">Selecciona un veterinario</option>
+              <option *ngFor="let veterinario of veterinarios" [ngValue]="veterinario.id">
                 {{ veterinario.nombre }}
-                {{ veterinario.especialidad
-                    ? '- ' + veterinario.especialidad
-                    : '' }}
+                {{ veterinario.especialidad ? '- ' + veterinario.especialidad : '' }}
               </option>
-
             </select>
 
             <small
               id="veterinario-error"
               class="error-validacion"
-              *ngIf="
-                citaForm.get('veterinarioId')?.touched &&
-                citaForm.get('veterinarioId')?.hasError('required')
-              "
-            >
+              *ngIf="citaForm.get('veterinarioId')?.touched && citaForm.get('veterinarioId')?.hasError('required')">
               Debes seleccionar un veterinario.
             </small>
-
           </div>
 
-
-          <!-- ================================================
-               FECHA Y HORA
-               ================================================ -->
-
+          <!-- FECHA Y HORA -->
           <div class="form-group">
-
             <label for="fechaHora">
               Fecha y hora
               <span class="obligatorio" aria-hidden="true">*</span>
@@ -468,70 +261,30 @@
               type="datetime-local"
               formControlName="fechaHora"
               required
-              [attr.min]="
-                citaEditandoId === null
-                  ? fechaMinima
-                  : null
-              "
-              [class.input-error]="
-                citaForm.get('fechaHora')?.touched &&
-                citaForm.get('fechaHora')?.invalid
-              "
-              [attr.aria-invalid]="
-                citaForm.get('fechaHora')?.touched &&
-                citaForm.get('fechaHora')?.invalid
-              "
-              [attr.aria-describedby]="
-                citaForm.get('fechaHora')?.touched &&
-                citaForm.get('fechaHora')?.invalid
-                  ? 'fecha-error'
-                  : 'fecha-ayuda'
-              "
-            >
+              [attr.min]="citaEditandoId === null ? fechaMinima : null"
+              [class.input-error]="citaForm.get('fechaHora')?.touched && citaForm.get('fechaHora')?.invalid"
+              [attr.aria-invalid]="citaForm.get('fechaHora')?.touched && citaForm.get('fechaHora')?.invalid"
+              [attr.aria-describedby]="citaForm.get('fechaHora')?.touched && citaForm.get('fechaHora')?.invalid ? 'fecha-error' : 'fecha-ayuda'">
 
-            <small
-              id="fecha-ayuda"
-              class="texto-ayuda"
-            >
+            <small id="fecha-ayuda" class="texto-ayuda">
               Selecciona la fecha y hora de tu cita.
             </small>
 
             <small
               id="fecha-error"
               class="error-validacion"
-              *ngIf="
-                citaForm.get('fechaHora')?.touched &&
-                citaForm.get('fechaHora')?.invalid
-              "
-            >
-
-              <span
-                *ngIf="
-                  citaForm.get('fechaHora')?.hasError('required')
-                "
-              >
+              *ngIf="citaForm.get('fechaHora')?.touched && citaForm.get('fechaHora')?.invalid">
+              <span *ngIf="citaForm.get('fechaHora')?.hasError('required')">
                 La fecha y hora son obligatorias.
               </span>
-
-              <span
-                *ngIf="
-                  citaForm.get('fechaHora')?.hasError('fechaPasada')
-                "
-              >
+              <span *ngIf="citaForm.get('fechaHora')?.hasError('fechaPasada')">
                 Selecciona una fecha y hora futuras.
               </span>
-
             </small>
-
           </div>
 
-
-          <!-- ================================================
-               MOTIVO
-               ================================================ -->
-
+          <!-- MOTIVO DE LA CITA -->
           <div class="form-group campo-ancho">
-
             <label for="motivo">
               Motivo de la cita
               <span class="obligatorio" aria-hidden="true">*</span>
@@ -543,464 +296,219 @@
               formControlName="motivo"
               placeholder="Ejemplo: Vacunación anual de mi mascota"
               required
-              [class.input-error]="
-                citaForm.get('motivo')?.touched &&
-                citaForm.get('motivo')?.invalid
-              "
-              [attr.aria-invalid]="
-                citaForm.get('motivo')?.touched &&
-                citaForm.get('motivo')?.invalid
-              "
-              [attr.aria-describedby]="
-                citaForm.get('motivo')?.touched &&
-                citaForm.get('motivo')?.invalid
-                  ? 'motivo-error'
-                  : null
-              "
-            ></textarea>
+              [class.input-error]="citaForm.get('motivo')?.touched && citaForm.get('motivo')?.invalid"
+              [attr.aria-invalid]="citaForm.get('motivo')?.touched && citaForm.get('motivo')?.invalid"
+              [attr.aria-describedby]="citaForm.get('motivo')?.touched && citaForm.get('motivo')?.invalid ? 'motivo-error' : null"></textarea>
 
             <small
               id="motivo-error"
               class="error-validacion"
-              *ngIf="
-                citaForm.get('motivo')?.touched &&
-                citaForm.get('motivo')?.hasError('required')
-              "
-            >
+              *ngIf="citaForm.get('motivo')?.touched && citaForm.get('motivo')?.hasError('required')">
               Explica brevemente el motivo de la cita.
             </small>
-
           </div>
 
-
         </div>
-
       </fieldset>
 
-
-      <!-- ====================================================
-           BOTONES DEL FORMULARIO
-           ==================================================== -->
-
+      <!-- ACCIONES DEL FORMULARIO -->
       <div class="form-acciones">
-
         <button
           type="submit"
           class="btn-guardar"
-          [disabled]="guardando"
-        >
-
+          [disabled]="guardando">
           {{
             guardando
               ? 'Guardando...'
-              : (
-                  citaEditandoId === null
-                    ? 'Agendar cita'
-                    : 'Guardar cambios'
-                )
+              : (citaEditandoId === null ? 'Agendar cita' : 'Guardar cambios')
           }}
-
         </button>
-
 
         <button
           type="button"
           class="btn-cancelar-form"
           [disabled]="guardando"
-          (click)="cerrarFormulario()"
-        >
+          (click)="cerrarFormulario()">
           Cancelar
         </button>
-
       </div>
-
     </form>
-
   </section>
 
+  <!-- 7. LISTADO DE CITAS -->
+  <section class="listado-section" aria-labelledby="titulo-listado">
 
-  <!-- ========================================================
-       6. LISTADO Y FILTROS
-       ======================================================== -->
-
-  <section
-    class="listado-section"
-    aria-labelledby="titulo-listado"
-  >
-
-
-    <!-- ENCABEZADO -->
     <div class="listado-header">
-
       <div>
-
-        <h2 id="titulo-listado">
-          Mis citas registradas
-        </h2>
-
-        <p>
-          Consulta fechas, servicios y estados
-          de tus citas veterinarias.
-        </p>
-
+        <h2 id="titulo-listado">Mis citas registradas</h2>
+        <p>Consulta fechas, servicios y estados de tus citas veterinarias.</p>
       </div>
 
-
       <div class="listado-acciones">
-
-        <span
-          class="total-citas"
-          *ngIf="!cargando && !errorCarga"
-        >
+        <span class="total-citas" *ngIf="!cargando && !errorCarga">
           {{ citas.length }}
           {{ citas.length === 1 ? 'cita' : 'citas' }}
         </span>
-
 
         <button
           type="button"
           class="btn-actualizar"
           (click)="cargarDatos()"
-          [disabled]="cargando"
-        >
+          [disabled]="cargando">
           {{ cargando ? 'Consultando...' : '↻ Actualizar' }}
         </button>
-
       </div>
-
     </div>
 
-
-    <!-- ======================================================
-         BUSCADOR Y FILTRO
-         ====================================================== -->
-
+    <!-- 8. BUSCADOR Y FILTROS -->
     <div
       class="filtros-card"
-      *ngIf="!cargando && !errorCarga && citas.length > 0"
-    >
+      *ngIf="!cargando && !errorCarga && citas.length > 0">
 
       <div class="filtro-grupo">
-
-        <label for="buscarCitas">
-          Buscar cita
-        </label>
-
+        <label for="buscarCitas">Buscar cita</label>
         <input
           id="buscarCitas"
           type="search"
           [(ngModel)]="busqueda"
           placeholder="Mascota, servicio, motivo..."
-        >
-
+          autocomplete="off">
       </div>
-
 
       <div class="filtro-grupo">
-
-        <label for="filtrarEstado">
-          Filtrar por estado
-        </label>
-
-        <select
-          id="filtrarEstado"
-          [(ngModel)]="filtroEstado"
-        >
-
-          <option value="TODOS">
-            Todos los estados
-          </option>
-
-          <option
-            *ngFor="let estado of estadosDisponibles"
-            [value]="estado"
-          >
+        <label for="filtrarEstado">Filtrar por estado</label>
+        <select id="filtrarEstado" [(ngModel)]="filtroEstado">
+          <option value="TODOS">Todos los estados</option>
+          <option *ngFor="let estado of estadosDisponibles" [value]="estado">
             {{ estado }}
           </option>
-
         </select>
-
       </div>
-
     </div>
 
-
-    <!-- ======================================================
-         CARGANDO
-         ====================================================== -->
-
-    <div
-      class="mensaje-info"
-      *ngIf="cargando"
-      role="status"
-    >
+    <!-- 9. ESTADOS DE CONSULTA -->
+    <div class="mensaje-info" *ngIf="cargando" role="status">
       Consultando tus citas veterinarias...
     </div>
 
-
-    <!-- ======================================================
-         SIN CITAS
-         ====================================================== -->
-
     <div
       class="sin-citas"
-      *ngIf="
-        !cargando &&
-        !errorCarga &&
-        citas.length === 0
-      "
-    >
+      *ngIf="!cargando && !errorCarga && citas.length === 0">
 
-      <div class="sin-icono" aria-hidden="true">
-        📅
-      </div>
-
-      <h3>
-        Todavía no tienes citas registradas
-      </h3>
-
+      <div class="sin-icono" aria-hidden="true">📅</div>
+      <h3>Todavía no tienes citas registradas</h3>
       <p>
-        Agenda tu primera cita para recibir
-        atención veterinaria para tu mascota.
+        Agenda tu primera cita para recibir atención
+        veterinaria para tu mascota.
       </p>
 
       <button
         *ngIf="mascotas.length > 0"
         type="button"
         class="btn-nueva"
-        (click)="nuevaCita()"
-      >
+        (click)="nuevaCita()">
         + Agendar mi primera cita
       </button>
-
     </div>
-
-
-    <!-- ======================================================
-         SIN RESULTADOS DE BÚSQUEDA
-         ====================================================== -->
 
     <div
       class="sin-resultados"
-      *ngIf="
-        !cargando &&
-        citas.length > 0 &&
-        citasFiltradas.length === 0
-      "
-    >
+      *ngIf="!cargando && !errorCarga && citas.length > 0 && citasFiltradas.length === 0">
 
-      <span aria-hidden="true">
-        🔎
-      </span>
-
-      <h3>
-        No encontramos citas con esos filtros
-      </h3>
-
-      <p>
-        Prueba otro nombre o selecciona otro estado.
-      </p>
+      <span aria-hidden="true">🔎</span>
+      <h3>No encontramos citas con esos filtros</h3>
+      <p>Prueba otro nombre o selecciona otro estado.</p>
 
       <button
         type="button"
         class="btn-limpiar-filtros"
-        (click)="busqueda = ''; filtroEstado = 'TODOS'"
-      >
+        (click)="busqueda = ''; filtroEstado = 'TODOS'">
         Limpiar filtros
       </button>
-
     </div>
 
-
-    <!-- ======================================================
-         TARJETAS DE CITAS
-         ====================================================== -->
-
+    <!-- 10. TARJETAS DE CITAS -->
     <div
       class="citas-grid"
-      *ngIf="
-        !cargando &&
-        citasFiltradas.length > 0
-      "
-    >
+      *ngIf="!cargando && !errorCarga && citasFiltradas.length > 0">
 
       <article
         class="cita-card"
-        *ngFor="
-          let cita of citasFiltradas;
-          trackBy: trackByCita
-        "
-      >
-
-
-        <!-- ================================================
-             ENCABEZADO DE LA TARJETA
-             ================================================ -->
+        *ngFor="let cita of citasFiltradas; trackBy: trackByCita">
 
         <div class="tarjeta-superior">
-
-          <div class="cita-icono" aria-hidden="true">
-            🐾
-          </div>
-
+          <div class="cita-icono" aria-hidden="true">🐾</div>
 
           <span
             class="estado-cita"
             [class.pendiente]="cita.estado === 'PENDIENTE'"
             [class.confirmada]="cita.estado === 'CONFIRMADA'"
             [class.cancelada]="cita.estado === 'CANCELADA'"
-            [class.completada]="cita.estado === 'COMPLETADA'"
-          >
+            [class.completada]="cita.estado === 'COMPLETADA'">
             {{ cita.estado || 'SIN ESTADO' }}
           </span>
-
         </div>
 
-
-        <!-- MASCOTA -->
         <h3 class="nombre-mascota">
           {{ cita.mascota?.nombre || 'Mascota' }}
         </h3>
 
-
-        <!-- ================================================
-             DATOS DE LA CITA
-             ================================================ -->
-
         <div class="cita-info">
-
           <div class="info-fila">
-
-            <strong>
-              Servicio
-            </strong>
-
-            <span>
-              {{ cita.servicio?.nombre || 'No disponible' }}
-            </span>
-
+            <strong>Servicio</strong>
+            <span>{{ cita.servicio?.nombre || 'No disponible' }}</span>
           </div>
 
-
           <div class="info-fila">
-
-            <strong>
-              Veterinario
-            </strong>
-
-            <span>
-              {{ cita.veterinario?.nombre || 'No disponible' }}
-            </span>
-
+            <strong>Veterinario</strong>
+            <span>{{ cita.veterinario?.nombre || 'No disponible' }}</span>
           </div>
 
-
           <div class="info-fila">
-
-            <strong>
-              Fecha
-            </strong>
-
-            <span>
-              {{ cita.fechaHora | date:'dd/MM/yyyy' }}
-            </span>
-
+            <strong>Fecha</strong>
+            <span>{{ cita.fechaHora | date:'dd/MM/yyyy' }}</span>
           </div>
 
-
           <div class="info-fila">
-
-            <strong>
-              Hora
-            </strong>
-
-            <span>
-              {{ cita.fechaHora | date:'HH:mm' }}
-            </span>
-
+            <strong>Hora</strong>
+            <span>{{ cita.fechaHora | date:'HH:mm' }}</span>
           </div>
-
         </div>
 
-
-        <!-- MOTIVO -->
         <div class="motivo-cita">
-
-          <strong>
-            Motivo de la cita
-          </strong>
-
-          <p>
-            {{ cita.motivo }}
-          </p>
-
+          <strong>Motivo de la cita</strong>
+          <p>{{ cita.motivo }}</p>
         </div>
 
-
-        <!-- ================================================
-             BOTONES DE CADA CITA
-             ================================================ -->
-
-        <!--
-          Conservamos la regla original:
-          una cita CANCELADA no puede editarse
-          ni volver a cancelarse desde esta página.
-        -->
-
-        <div
-          class="acciones-cita"
-          *ngIf="cita.estado !== 'CANCELADA'"
-        >
-
+        <!-- Se mantiene la regla original de las acciones. -->
+        <div class="acciones-cita" *ngIf="cita.estado !== 'CANCELADA'">
           <button
             type="button"
             class="btn-editar"
             [disabled]="cancelandoId !== null"
             (click)="editarCita(cita)"
-            [attr.aria-label]="
-              'Editar cita de ' +
-              (cita.mascota?.nombre || 'mascota')
-            "
-          >
+            [attr.aria-label]="'Editar cita de ' + (cita.mascota?.nombre || 'mascota')">
             ✏️ Editar
           </button>
-
 
           <button
             type="button"
             class="btn-cancelar-cita"
             [disabled]="cancelandoId !== null"
             (click)="cancelarCita(cita)"
-            [attr.aria-label]="
-              'Cancelar cita de ' +
-              (cita.mascota?.nombre || 'mascota')
-            "
-          >
-
+            [attr.aria-label]="'Cancelar cita de ' + (cita.mascota?.nombre || 'mascota')">
             {{
               cancelandoId === cita.id
                 ? 'Cancelando...'
                 : 'Cancelar cita'
             }}
-
           </button>
-
         </div>
 
-
-        <!-- CITA CANCELADA -->
-        <p
-          class="aviso-cancelada"
-          *ngIf="cita.estado === 'CANCELADA'"
-        >
-          Esta cita fue cancelada y permanece
-          en tu historial.
+        <p class="aviso-cancelada" *ngIf="cita.estado === 'CANCELADA'">
+          Esta cita fue cancelada y permanece en tu historial.
         </p>
-
       </article>
-
     </div>
-
   </section>
-
 </div>

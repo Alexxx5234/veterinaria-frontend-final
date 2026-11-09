@@ -1,0 +1,1084 @@
+
+/* ==========================================================
+   VETERINARIA ARÉVALO
+   MÓDULO: MIS CITAS DEL VETERINARIO
+
+   DISEÑO:
+   - Colores verdes de Veterinaria Arévalo.
+   - Tarjetas blancas.
+   - Estados con colores diferenciados.
+   - Botones modernos.
+   - Ventana de confirmación.
+   - Adaptación a celulares.
+   - Compatibilidad con accesibilidad.
+
+   IMPORTANTE:
+   No añadimos otro menú lateral porque
+   ya existe en LayoutPrivado.
+   ========================================================== */
+
+
+/* ==========================================================
+   1. CONFIGURACIÓN GENERAL
+   ========================================================== */
+
+:host {
+
+  display: block;
+
+  min-width: 0;
+
+}
+
+:host *,
+:host *::before,
+:host *::after {
+
+  box-sizing: border-box;
+
+}
+
+
+/* ==========================================================
+   2. CONTENEDOR PRINCIPAL
+   ========================================================== */
+
+.vet-citas {
+
+  // Colores principales del módulo.
+  --vet-primario: #08745c;
+
+  --vet-oscuro: #075744;
+
+  --vet-texto: #183a30;
+
+  --vet-muted: #58756a;
+
+  --vet-borde: #d9ece2;
+
+  width: 100%;
+
+  max-width: 1450px;
+
+  min-width: 0;
+
+  margin-inline: auto;
+
+  color: var(--vet-texto);
+
+  font-family: 'Segoe UI', Arial, sans-serif;
+
+}
+
+
+/* ==========================================================
+   3. ENCABEZADO
+   ========================================================== */
+
+.vet-citas__header {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  flex-wrap: wrap;
+
+  gap: 16px;
+
+  margin-bottom: 23px;
+
+}
+
+.vet-citas__eyebrow {
+
+  color: var(--vet-primario);
+
+  font-size: 12px;
+
+  font-weight: 800;
+
+  letter-spacing: 0.7px;
+
+}
+
+.vet-citas__header h1 {
+
+  margin: 8px 0 6px;
+
+  color: var(--vet-texto);
+
+  font-size: clamp(25px, 3vw, 35px);
+
+  font-weight: 800;
+
+  line-height: 1.25;
+
+}
+
+.vet-citas__header p {
+
+  margin: 0;
+
+  color: var(--vet-muted);
+
+  font-size: 14px;
+
+  line-height: 1.6;
+
+}
+
+
+/* ==========================================================
+   4. BOTÓN ACTUALIZAR
+   ========================================================== */
+
+.vet-citas__actualizar {
+
+  min-height: 44px;
+
+  padding: 12px 18px;
+
+  border: 1px solid var(--vet-borde);
+
+  border-radius: 12px;
+
+  background: #ffffff;
+
+  color: var(--vet-primario);
+
+  font-family: inherit;
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: background-color 0.2s ease;
+
+}
+
+.vet-citas__actualizar:hover:not(:disabled) {
+
+  background: #e8f7ef;
+
+}
+
+
+/* ==========================================================
+   5. CUADRÍCULA DE ESTADÍSTICAS
+   ========================================================== */
+
+.vet-citas__resumen {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 14px;
+
+  margin-bottom: 22px;
+
+}
+
+
+/* ==========================================================
+   6. TARJETAS DE ESTADÍSTICAS
+   ========================================================== */
+
+.vet-citas__resumen article {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 13px;
+
+  min-width: 0;
+
+  padding: 18px;
+
+  border: 1px solid var(--vet-borde);
+
+  border-radius: 18px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 5px 17px rgba(14, 81, 55, 0.04);
+
+}
+
+.vet-citas__ico {
+
+  display: grid;
+
+  place-items: center;
+
+  flex-shrink: 0;
+
+  width: 45px;
+
+  height: 45px;
+
+  border-radius: 13px;
+
+  background: #e0f6ea;
+
+  font-size: 22px;
+
+}
+
+.vet-citas__resumen small {
+
+  display: block;
+
+  color: var(--vet-muted);
+
+  font-size: 12px;
+
+  line-height: 1.4;
+
+}
+
+.vet-citas__resumen strong {
+
+  display: block;
+
+  margin-top: 5px;
+
+  color: var(--vet-texto);
+
+  font-size: 29px;
+
+  font-weight: 800;
+
+  line-height: 1.1;
+
+}
+
+
+/* ==========================================================
+   7. MENSAJES DE ERROR Y ÉXITO
+   ========================================================== */
+
+.vet-citas__mensaje {
+
+  margin: 12px 0;
+
+  padding: 12px 16px;
+
+  border-radius: 11px;
+
+  font-size: 13px;
+
+  line-height: 1.55;
+
+}
+
+.vet-citas__mensaje--error {
+
+  border: 1px solid #f1b9bf;
+
+  background: #fff0f1;
+
+  color: #8f2636;
+
+}
+
+.vet-citas__mensaje--exito {
+
+  border: 1px solid #b4e2ca;
+
+  background: #e7f8ef;
+
+  color: #116445;
+
+}
+
+
+/* ==========================================================
+   8. PANEL DE CITAS
+   ========================================================== */
+
+.vet-citas__panel {
+
+  min-width: 0;
+
+  padding: 22px;
+
+  border: 1px solid var(--vet-borde);
+
+  border-radius: 20px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 5px 18px rgba(14, 81, 55, 0.04);
+
+}
+
+.vet-citas__panel-titulo h2 {
+
+  margin: 0 0 6px;
+
+  color: var(--vet-texto);
+
+  font-size: 21px;
+
+  font-weight: 800;
+
+}
+
+.vet-citas__panel-titulo p {
+
+  margin: 0;
+
+  color: var(--vet-muted);
+
+  font-size: 13px;
+
+  line-height: 1.6;
+
+}
+
+
+/* ==========================================================
+   9. BUSCADOR Y FILTROS
+   ========================================================== */
+
+.vet-citas__filtros {
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(170px, 220px);
+
+  gap: 14px;
+
+  margin: 22px 0;
+
+}
+
+.vet-citas__campo {
+
+  min-width: 0;
+
+}
+
+.vet-citas__campo label {
+
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: var(--vet-texto);
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+}
+
+.vet-citas__campo input,
+.vet-citas__campo select {
+
+  display: block;
+
+  width: 100%;
+
+  min-height: 46px;
+
+  padding: 10px 13px;
+
+  border: 1px solid #cbded4;
+
+  border-radius: 10px;
+
+  background: #fbfffc;
+
+  color: var(--vet-texto);
+
+  font-family: inherit;
+
+  font-size: 14px;
+
+}
+
+
+/* ==========================================================
+   10. SIN RESULTADOS / CARGANDO
+   ========================================================== */
+
+.vet-citas__vacio {
+
+  margin: 0;
+
+  padding: 28px 14px;
+
+  border-radius: 12px;
+
+  background: #f2faf5;
+
+  color: var(--vet-muted);
+
+  font-size: 13px;
+
+  line-height: 1.6;
+
+  text-align: center;
+
+}
+
+
+/* ==========================================================
+   11. LISTADO DE CITAS
+   ========================================================== */
+
+.vet-citas__lista {
+
+  display: grid;
+
+  gap: 12px;
+
+}
+
+
+/* ==========================================================
+   12. TARJETA INDIVIDUAL
+   ========================================================== */
+
+.vet-citas__cita {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 14px;
+
+  min-width: 0;
+
+  padding: 15px;
+
+  border: 1px solid #e4eee9;
+
+  border-radius: 15px;
+
+  background: #fcfffd;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+
+}
+
+.vet-citas__cita:hover {
+
+  border-color: #aedbc5;
+
+  box-shadow:
+    0 6px 17px rgba(14, 81, 55, 0.05);
+
+}
+
+
+/* ==========================================================
+   13. ICONO DE MASCOTA
+   ========================================================== */
+
+.vet-citas__avatar {
+
+  display: grid;
+
+  place-items: center;
+
+  flex-shrink: 0;
+
+  width: 48px;
+
+  height: 48px;
+
+  border-radius: 13px;
+
+  background: #ddf5e9;
+
+  font-size: 22px;
+
+}
+
+
+/* ==========================================================
+   14. INFORMACIÓN DE LA CITA
+   ========================================================== */
+
+.vet-citas__datos {
+
+  flex: 1;
+
+  min-width: 0;
+
+}
+
+.vet-citas__linea {
+
+  display: flex;
+
+  align-items: center;
+
+  flex-wrap: wrap;
+
+  gap: 9px;
+
+}
+
+.vet-citas__linea h3 {
+
+  margin: 0;
+
+  color: var(--vet-texto);
+
+  font-size: 16px;
+
+  font-weight: 800;
+
+}
+
+.vet-citas__datos p {
+
+  margin: 5px 0 8px;
+
+  color: var(--vet-muted);
+
+  font-size: 13px;
+
+  line-height: 1.5;
+
+}
+
+.vet-citas__datos small {
+
+  color: var(--vet-muted);
+
+  font-size: 12px;
+
+  line-height: 1.5;
+
+}
+
+
+/* ==========================================================
+   15. FECHA, PROPIETARIO Y NÚMERO
+   ========================================================== */
+
+.vet-citas__meta {
+
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 7px 15px;
+
+  margin-bottom: 7px;
+
+  color: var(--vet-muted);
+
+  font-size: 12px;
+
+  line-height: 1.6;
+
+}
+
+
+/* ==========================================================
+   16. ETIQUETAS DE ESTADO
+   ========================================================== */
+
+.vet-citas__estado {
+
+  display: inline-flex;
+
+  align-items: center;
+
+  padding: 5px 10px;
+
+  border-radius: 20px;
+
+  background: #edf1ee;
+
+  color: #51675c;
+
+  font-size: 11px;
+
+  font-weight: 800;
+
+  white-space: nowrap;
+
+}
+
+
+// Cita pendiente: amarillo.
+.vet-citas__estado--pendiente {
+
+  background: #fff1cd;
+
+  color: #805900;
+
+}
+
+
+// Cita confirmada: verde.
+.vet-citas__estado--confirmada {
+
+  background: #d8f8e7;
+
+  color: #116e4c;
+
+}
+
+
+// Cita completada: azul.
+.vet-citas__estado--completada {
+
+  background: #def0ff;
+
+  color: #175a88;
+
+}
+
+
+// Cita cancelada: rojo.
+.vet-citas__estado--cancelada {
+
+  background: #fee8eb;
+
+  color: #a02a3d;
+
+}
+
+
+/* ==========================================================
+   17. BOTONES ACEPTAR Y RECHAZAR
+   ========================================================== */
+
+.vet-citas__acciones {
+
+  display: flex;
+
+  flex-shrink: 0;
+
+  gap: 7px;
+
+}
+
+.vet-citas__acciones button {
+
+  min-height: 41px;
+
+  padding: 10px 13px;
+
+  border-radius: 10px;
+
+  font-family: inherit;
+
+  font-size: 12px;
+
+  font-weight: 800;
+
+  cursor: pointer;
+
+}
+
+
+// Aceptar cita.
+.vet-citas__aceptar {
+
+  border: 1px solid var(--vet-primario);
+
+  background: var(--vet-primario);
+
+  color: #ffffff;
+
+}
+
+.vet-citas__aceptar:hover:not(:disabled) {
+
+  background: #075744;
+
+}
+
+
+// Rechazar cita.
+.vet-citas__rechazar {
+
+  border: 1px solid #e8b0bc;
+
+  background: #ffffff;
+
+  color: #a32b40;
+
+}
+
+.vet-citas__rechazar:hover:not(:disabled) {
+
+  background: #fff0f2;
+
+}
+
+
+/* ==========================================================
+   18. MENSAJES DE CITAS CONFIRMADAS Y COMPLETADAS
+   ========================================================== */
+
+.vet-citas__estado-info {
+
+  flex-shrink: 0;
+
+  padding: 9px 12px;
+
+  border: 1px solid #d2e9dc;
+
+  border-radius: 10px;
+
+  background: #edf9f2;
+
+  color: #176647;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+}
+
+
+/* ==========================================================
+   19. BOTONES DESHABILITADOS
+   ========================================================== */
+
+.vet-citas button:disabled {
+
+  opacity: 0.55;
+
+  cursor: not-allowed;
+
+}
+
+
+/* ==========================================================
+   20. VENTANA DE CONFIRMACIÓN
+   ========================================================== */
+
+.vet-citas__overlay {
+
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 3000;
+
+  display: grid;
+
+  place-items: center;
+
+  padding: 18px;
+
+  background: rgba(10, 35, 26, 0.5);
+
+}
+
+
+/* ==========================================================
+   21. CONTENIDO DE LA VENTANA
+   ========================================================== */
+
+.vet-citas__dialogo {
+
+  width: min(100%, 420px);
+
+  max-height: 90vh;
+
+  overflow-y: auto;
+
+  padding: 25px;
+
+  border: 1px solid #c5e5d4;
+
+  border-radius: 18px;
+
+  background: #ffffff;
+
+  color: #183a30;
+
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.18);
+
+}
+
+.vet-citas__dialogo h2 {
+
+  margin: 0 0 12px;
+
+  color: #183a30;
+
+  font-size: 22px;
+
+}
+
+.vet-citas__dialogo p {
+
+  margin: 0;
+
+  color: #435e51;
+
+  font-size: 14px;
+
+  line-height: 1.65;
+
+}
+
+
+/* ==========================================================
+   22. BOTONES DEL DIÁLOGO
+   ========================================================== */
+
+.vet-citas__dialogo-acciones {
+
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  margin-top: 20px;
+
+}
+
+.vet-citas__dialogo-acciones button {
+
+  min-height: 43px;
+
+  padding: 10px 15px;
+
+  border-radius: 10px;
+
+  font-family: inherit;
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+}
+
+
+// Cancelar operación.
+.vet-citas__cancelar {
+
+  border: 1px solid #c6ddd1;
+
+  background: #ffffff;
+
+  color: #264c3b;
+
+}
+
+
+// Confirmar operación.
+.vet-citas__confirmar {
+
+  border: 1px solid var(--vet-primario);
+
+  background: var(--vet-primario);
+
+  color: #ffffff;
+
+}
+
+
+/* ==========================================================
+   23. ACCESIBILIDAD POR TECLADO
+   ========================================================== */
+
+.vet-citas button:focus-visible,
+.vet-citas input:focus-visible,
+.vet-citas select:focus-visible {
+
+  outline: 3px solid #0a775b;
+
+  outline-offset: 3px;
+
+}
+
+
+/* ==========================================================
+   24. PANTALLAS MEDIANAS
+   ========================================================== */
+
+@media (max-width: 1100px) {
+
+  // Dos tarjetas de estadísticas por fila.
+  .vet-citas__resumen {
+
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+  }
+
+  // Permitir que las acciones bajen de línea.
+  .vet-citas__cita {
+
+    flex-wrap: wrap;
+
+  }
+
+  .vet-citas__acciones {
+
+    width: 100%;
+
+    padding-left: 62px;
+
+  }
+
+}
+
+
+/* ==========================================================
+   25. CELULARES
+   ========================================================== */
+
+@media (max-width: 600px) {
+
+
+  // Estadísticas.
+  .vet-citas__resumen {
+
+    gap: 9px;
+
+  }
+
+  .vet-citas__resumen article {
+
+    gap: 9px;
+
+    padding: 12px;
+
+  }
+
+  .vet-citas__ico {
+
+    width: 37px;
+
+    height: 37px;
+
+    font-size: 18px;
+
+  }
+
+  .vet-citas__resumen strong {
+
+    font-size: 25px;
+
+  }
+
+
+  // Panel principal.
+  .vet-citas__panel {
+
+    padding: 14px;
+
+  }
+
+
+  // Buscador y filtros: una sola columna.
+  .vet-citas__filtros {
+
+    grid-template-columns: 1fr;
+
+  }
+
+
+  // Tarjetas de citas.
+  .vet-citas__cita {
+
+    align-items: flex-start;
+
+    gap: 10px;
+
+    padding: 12px;
+
+  }
+
+  .vet-citas__avatar {
+
+    width: 38px;
+
+    height: 38px;
+
+  }
+
+
+  // Acciones a todo el ancho.
+  .vet-citas__acciones {
+
+    width: 100%;
+
+    padding-left: 0;
+
+  }
+
+  .vet-citas__acciones button {
+
+    flex: 1;
+
+  }
+
+
+  // Mensaje de estado.
+  .vet-citas__estado-info {
+
+    width: 100%;
+
+    text-align: center;
+
+  }
+
+
+  // Diálogo adaptado al celular.
+  .vet-citas__dialogo {
+
+    padding: 20px;
+
+  }
+
+}
+
+
+/* ==========================================================
+   26. REDUCCIÓN DE ANIMACIONES
+   ========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .vet-citas *,
+  .vet-citas *::before,
+  .vet-citas *::after {
+
+    animation: none !important;
+
+    transition: none !important;
+
+    scroll-behavior: auto !important;
+
+  }
+
+}
+
+
+/* ==========================================================
+   FIN DEL MÓDULO
+   VETERINARIA ARÉVALO - MIS CITAS
+   ========================================================== */

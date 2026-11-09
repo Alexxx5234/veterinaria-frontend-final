@@ -1,3 +1,4 @@
+import { environment } from '../../../../environments/environment';
 
 /* ==========================================================
    VETERINARIA AREVALO
@@ -99,7 +100,7 @@ export class DashboardUsuario implements OnInit {
   // ========================================================
 
   private readonly apiUrl =
-    'http://100.110.172.31:8080/api';
+    environment.apiUrl;
 
 
   // ========================================================

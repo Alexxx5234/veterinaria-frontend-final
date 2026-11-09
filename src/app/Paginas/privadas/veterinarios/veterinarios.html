@@ -1,233 +1,132 @@
 
 <!-- ==========================================================
-     VETERINARIA AREVALO
-     PÁGINA: VETERINARIOS (USER)
+ VETERINARIA ARÉVALO · VETERINARIOS · USER
 
-     MEJORAS:
-     - Catálogo de profesionales.
-     - Búsqueda por nombre y especialidad.
-     - Filtros y ordenamiento.
-     - Información organizada en tarjetas.
-     - Navegación a Mis Citas.
-     - Mensajes accesibles y diseño responsivo.
+ Funcionalidades conservadas:
+ 1. Consultar profesionales registrados.
+ 2. Buscar por nombre, apellido o especialidad.
+ 3. Filtrar por especialidad.
+ 4. Ordenar profesionales por nombre.
+ 5. Mostrar datos profesionales.
+ 6. Acceder al agendamiento de citas.
 
-     El menú lateral, las notificaciones y
-     accesibilidad pertenecen a LayoutPrivado.
-     ========================================================== -->
+ Nuevo: accesos rápidos y estilo verde.
+========================================================== -->
 
 <div class="veterinarios-container">
 
-
-  <!-- ========================================================
-       1. CABECERA
-       ======================================================== -->
-
+  <!-- 1. ENCABEZADO -->
   <header class="veterinarios-header">
-
     <div class="header-texto">
-
-      <span class="etiqueta-pagina">
-        NUESTRO EQUIPO
-      </span>
-
-      <h1>
-        Veterinarios 👨‍⚕️
-      </h1>
-
+      <span class="etiqueta-pagina">NUESTRO EQUIPO</span>
+      <h1>Veterinarios 👨‍⚕️</h1>
       <p>
         Conoce a los profesionales veterinarios
         registrados en nuestra clínica.
       </p>
-
     </div>
 
-
-    <!-- ACCIONES PRINCIPALES -->
     <div class="acciones-header">
-
       <button
         type="button"
         class="btn-agendar"
-        (click)="irCitas()"
-      >
+        (click)="irCitas()">
         📅 Agendar cita
       </button>
 
       <button
         type="button"
         class="btn-volver"
-        (click)="volverDashboard()"
-      >
+        (click)="volverDashboard()">
         ← Volver al panel
       </button>
-
     </div>
-
   </header>
 
+  <!-- 2. ACCESOS RÁPIDOS -->
+  <nav class="user-accesos" aria-label="Accesos rápidos del cliente">
+    <a href="/usuario/dashboard">🏠 Inicio</a>
+    <a href="/usuario/mascotas">🐾 Mis Mascotas</a>
+    <a href="/usuario/citas">📅 Mis Citas</a>
+    <a href="/usuario/atenciones">🩺 Mis Atenciones</a>
+    <a href="/usuario/facturas">🧾 Mis Facturas</a>
+    <a href="/usuario/servicios">💚 Servicios</a>
+  </nav>
 
-  <!-- ========================================================
-       2. MENSAJES
-       ======================================================== -->
-
-  <!-- CONFIRMACIÓN -->
-  <div
-    class="mensaje-exito"
-    *ngIf="mensajeExito"
-    role="status"
-  >
+  <!-- 3. MENSAJES -->
+  <div class="mensaje-exito" *ngIf="mensajeExito" role="status">
     ✅ {{ mensajeExito }}
   </div>
 
-
-  <!-- ERROR -->
-  <div
-    class="mensaje-error"
-    *ngIf="mensajeError"
-    role="alert"
-  >
-
+  <div class="mensaje-error" *ngIf="mensajeError" role="alert">
     ⚠️ {{ mensajeError }}
 
     <button
       type="button"
       class="btn-reintentar"
       *ngIf="errorCarga"
-      (click)="cargarVeterinarios()"
-    >
+      (click)="cargarVeterinarios()">
       Reintentar
     </button>
-
   </div>
 
-
-  <!-- ========================================================
-       3. RESUMEN DE PROFESIONALES
-       ======================================================== -->
-
+  <!-- 4. RESUMEN DE PROFESIONALES -->
   <section
     class="resumen-veterinarios"
     *ngIf="!cargando && !errorCarga"
-    aria-label="Resumen de veterinarios"
-  >
+    aria-label="Resumen de veterinarios">
 
-    <div
-      class="resumen-icono"
-      aria-hidden="true"
-    >
-      👨‍⚕️
-    </div>
-
+    <div class="resumen-icono" aria-hidden="true">👨‍⚕️</div>
 
     <div class="resumen-texto">
-
-      <span>
-        Profesionales registrados
-      </span>
-
-      <strong>
-        {{ veterinarios.length }}
-      </strong>
-
-      <small>
-        Consulta su información y especialidad.
-      </small>
-
+      <span>Profesionales registrados</span>
+      <strong>{{ veterinarios.length }}</strong>
+      <small>Consulta su información y especialidad.</small>
     </div>
 
-
-    <span
-      class="resumen-decoracion"
-      aria-hidden="true"
-    >
-      🐾
-    </span>
-
+    <span class="resumen-decoracion" aria-hidden="true">🐾</span>
   </section>
 
+  <!-- 5. CATÁLOGO DE VETERINARIOS -->
+  <section class="listado-section" aria-labelledby="titulo-listado">
 
-  <!-- ========================================================
-       4. CATÁLOGO
-       ======================================================== -->
-
-  <section
-    class="listado-section"
-    aria-labelledby="titulo-listado"
-  >
-
-
-    <!-- ENCABEZADO DEL LISTADO -->
     <div class="listado-header">
-
       <div>
-
-        <h2 id="titulo-listado">
-          Equipo veterinario
-        </h2>
-
+        <h2 id="titulo-listado">Equipo veterinario</h2>
         <p>
           Consulta los datos de los profesionales
           registrados en el sistema.
         </p>
-
       </div>
 
-
       <div class="listado-acciones">
-
-        <!-- CONTADOR -->
         <span
           class="total-veterinarios"
-          *ngIf="!cargando && !errorCarga"
-        >
+          *ngIf="!cargando && !errorCarga">
+
           {{ veterinarios.length }}
-          {{
-            veterinarios.length === 1
-              ? 'veterinario'
-              : 'veterinarios'
-          }}
+          {{ veterinarios.length === 1 ? 'veterinario' : 'veterinarios' }}
         </span>
 
-
-        <!-- ACTUALIZAR -->
         <button
           type="button"
           class="btn-actualizar"
           (click)="cargarVeterinarios(true)"
-          [disabled]="cargando"
-        >
-          {{
-            cargando
-              ? 'Consultando...'
-              : '↻ Actualizar'
-          }}
+          [disabled]="cargando">
+
+          {{ cargando ? 'Consultando...' : '↻ Actualizar' }}
         </button>
-
       </div>
-
     </div>
 
-
-    <!-- ======================================================
-         5. BUSCADOR Y FILTROS
-         ====================================================== -->
-
+    <!-- 6. BUSCADOR, ESPECIALIDAD Y ORDENAMIENTO -->
     <div
       class="filtros-card"
-      *ngIf="
-        !cargando &&
-        !errorCarga &&
-        veterinarios.length > 0
-      "
-    >
+      *ngIf="!cargando && !errorCarga && veterinarios.length > 0">
 
-
-      <!-- BUSCADOR -->
+      <!-- Buscar -->
       <div class="filtro-grupo">
-
-        <label for="buscarVeterinario">
-          Buscar veterinario
-        </label>
+        <label for="buscarVeterinario">Buscar veterinario</label>
 
         <input
           id="buscarVeterinario"
@@ -235,124 +134,71 @@
           [(ngModel)]="busqueda"
           placeholder="Nombre, apellido o especialidad..."
           autocomplete="off"
-          aria-describedby="ayuda-busqueda"
-        >
+          aria-describedby="ayuda-busqueda">
 
-        <small
-          id="ayuda-busqueda"
-          class="filtro-ayuda"
-        >
+        <small id="ayuda-busqueda" class="filtro-ayuda">
           La búsqueda no distingue mayúsculas ni tildes.
         </small>
-
       </div>
 
-
-      <!-- FILTRO DE ESPECIALIDAD -->
+      <!-- Filtrar por especialidad -->
       <div class="filtro-grupo">
-
-        <label for="filtroEspecialidad">
-          Especialidad
-        </label>
+        <label for="filtroEspecialidad">Especialidad</label>
 
         <select
           id="filtroEspecialidad"
-          [(ngModel)]="filtroEspecialidad"
-        >
+          [(ngModel)]="filtroEspecialidad">
 
-          <option value="TODAS">
-            Todas las especialidades
-          </option>
+          <option value="TODAS">Todas las especialidades</option>
 
           <option
             *ngFor="let especialidad of especialidadesDisponibles"
-            [value]="especialidad"
-          >
+            [value]="especialidad">
             {{ especialidad }}
           </option>
-
         </select>
-
       </div>
 
-
-      <!-- ORDENAMIENTO -->
+      <!-- Ordenar -->
       <div class="filtro-grupo">
-
-        <label for="ordenarVeterinarios">
-          Ordenar por nombre
-        </label>
+        <label for="ordenarVeterinarios">Ordenar por nombre</label>
 
         <select
           id="ordenarVeterinarios"
-          [(ngModel)]="ordenarPor"
-        >
+          [(ngModel)]="ordenarPor">
 
-          <option value="nombreAsc">
-            Nombre (A-Z)
-          </option>
-
-          <option value="nombreDesc">
-            Nombre (Z-A)
-          </option>
-
+          <option value="nombreAsc">Nombre (A-Z)</option>
+          <option value="nombreDesc">Nombre (Z-A)</option>
         </select>
-
       </div>
-
     </div>
 
-
-    <!-- ======================================================
-         6. CARGANDO
-         ====================================================== -->
-
+    <!-- 7. ESTADO DE CARGA -->
     <div
       class="mensaje-info"
       *ngIf="cargando"
       role="status"
-      aria-live="polite"
-    >
+      aria-live="polite">
+
       Consultando los veterinarios registrados...
     </div>
 
-
-    <!-- ======================================================
-         7. SIN VETERINARIOS
-         ====================================================== -->
-
+    <!-- 8. SIN VETERINARIOS -->
     <div
       class="sin-veterinarios"
-      *ngIf="
-        !cargando &&
-        !errorCarga &&
-        veterinarios.length === 0
-      "
-    >
+      *ngIf="!cargando && !errorCarga && veterinarios.length === 0">
 
-      <div
-        class="sin-icono"
-        aria-hidden="true"
-      >
-        👨‍⚕️
-      </div>
+      <div class="sin-icono" aria-hidden="true">👨‍⚕️</div>
 
-      <h3>
-        No hay veterinarios registrados
-      </h3>
+      <h3>No hay veterinarios registrados</h3>
 
       <p>
         El administrador todavía no ha registrado
         profesionales veterinarios en el sistema.
       </p>
-
     </div>
 
-
-    <!-- ======================================================
-         8. SIN RESULTADOS DEL FILTRO
-         ====================================================== -->
-
+    <!-- 9. SIN RESULTADOS -->
     <div
       class="sin-resultados"
       *ngIf="
@@ -360,19 +206,10 @@
         !errorCarga &&
         veterinarios.length > 0 &&
         veterinariosFiltrados.length === 0
-      "
-    >
+      ">
 
-      <div
-        class="sin-icono"
-        aria-hidden="true"
-      >
-        🔎
-      </div>
-
-      <h3>
-        No encontramos veterinarios
-      </h3>
+      <div class="sin-icono" aria-hidden="true">🔎</div>
+      <h3>No encontramos veterinarios</h3>
 
       <p>
         Prueba otro nombre o selecciona
@@ -382,173 +219,103 @@
       <button
         type="button"
         class="btn-limpiar"
-        (click)="limpiarFiltros()"
-      >
+        (click)="limpiarFiltros()">
         Limpiar filtros
       </button>
-
     </div>
 
-
-    <!-- ======================================================
-         9. TARJETAS DE VETERINARIOS
-         ====================================================== -->
-
+    <!-- 10. TARJETAS DE PROFESIONALES -->
     <div
       class="veterinarios-grid"
-      *ngIf="
-        !cargando &&
-        !errorCarga &&
-        veterinariosFiltrados.length > 0
-      "
-    >
+      *ngIf="!cargando && !errorCarga && veterinariosFiltrados.length > 0">
 
       <article
         class="veterinario-card"
         *ngFor="
           let veterinario of veterinariosFiltrados;
           trackBy: trackByVeterinario
-        "
-      >
+        ">
 
-
-        <!-- ================================================
-             ENCABEZADO DE LA TARJETA
-             ================================================ -->
-
+        <!-- Identificación visual -->
         <div class="tarjeta-superior">
 
-          <div
-            class="veterinario-icono"
-            aria-hidden="true"
-          >
+          <div class="veterinario-icono" aria-hidden="true">
             👨‍⚕️
           </div>
 
           <span class="etiqueta-veterinario">
             Profesional veterinario
           </span>
-
         </div>
 
-
-        <!-- NOMBRE COMPLETO -->
+        <!-- Nombre original del profesional -->
         <h3 class="nombre-veterinario">
           {{ obtenerNombreCompleto(veterinario) }}
         </h3>
 
-
-        <!-- ESPECIALIDAD -->
+        <!-- Especialidad -->
         <div class="especialidad-box">
 
-          <span
-            class="especialidad-icono"
-            aria-hidden="true"
-          >
+          <span class="especialidad-icono" aria-hidden="true">
             🩺
           </span>
 
           <div>
-
-            <small>
-              Especialidad
-            </small>
-
+            <small>Especialidad</small>
             <strong>
-              {{
-                veterinario.especialidad ||
-                'No especificada'
-              }}
+              {{ veterinario.especialidad || 'No especificada' }}
             </strong>
-
           </div>
-
         </div>
 
-
-        <!-- ================================================
-             INFORMACIÓN DEL VETERINARIO
-             ================================================ -->
-
+        <!-- Información profesional -->
         <div class="veterinario-info">
 
-
-          <!-- CÉDULA: SI ESTÁ DISPONIBLE -->
+          <!-- Cédula, si el backend la proporciona -->
           <div
             class="info-fila"
-            *ngIf="veterinario.cedula"
-          >
+            *ngIf="veterinario.cedula">
 
-            <strong>
-              Cédula
-            </strong>
-
-            <span>
-              {{ veterinario.cedula }}
-            </span>
-
+            <strong>Cédula</strong>
+            <span>{{ veterinario.cedula }}</span>
           </div>
 
-
-          <!-- TELÉFONO -->
+          <!-- Teléfono -->
           <div
             class="info-fila"
-            *ngIf="veterinario.telefono"
-          >
+            *ngIf="veterinario.telefono">
 
-            <strong>
-              Teléfono
-            </strong>
+            <strong>Teléfono</strong>
 
             <a
               [href]="'tel:' + veterinario.telefono"
               [attr.aria-label]="
                 'Llamar al veterinario ' +
                 obtenerNombreCompleto(veterinario)
-              "
-            >
+              ">
               {{ veterinario.telefono }}
             </a>
-
           </div>
 
-
-          <!-- CORREO ELECTRÓNICO -->
+          <!-- Correo -->
           <div
             class="info-fila"
-            *ngIf="veterinario.email"
-          >
+            *ngIf="veterinario.email">
 
-            <strong>
-              Correo
-            </strong>
+            <strong>Correo</strong>
 
             <a
               [href]="'mailto:' + veterinario.email"
               [attr.aria-label]="
                 'Enviar correo al veterinario ' +
                 obtenerNombreCompleto(veterinario)
-              "
-            >
+              ">
               {{ veterinario.email }}
             </a>
-
           </div>
-
         </div>
 
-
-        <!-- ================================================
-             ACCIÓN PRINCIPAL
-             ================================================ -->
-
-        <!--
-          El botón abre Mis Citas.
-
-          El usuario elegirá allí el veterinario
-          y los demás datos para agendar.
-        -->
-
+        <!-- Acción de agendamiento -->
         <button
           type="button"
           class="btn-cita"
@@ -556,32 +323,18 @@
           [attr.aria-label]="
             'Ir a Mis Citas para solicitar atención con ' +
             obtenerNombreCompleto(veterinario)
-          "
-        >
+          ">
           📅 Ir a agendar cita
         </button>
-
       </article>
-
     </div>
 
-
-    <!-- ======================================================
-         10. INFORMACIÓN FINAL
-         ====================================================== -->
-
+    <!-- 11. AYUDA AL CLIENTE -->
     <div
       class="ayuda-veterinarios"
-      *ngIf="
-        !cargando &&
-        !errorCarga &&
-        veterinarios.length > 0
-      "
-    >
+      *ngIf="!cargando && !errorCarga && veterinarios.length > 0">
 
-      <span aria-hidden="true">
-        💡
-      </span>
+      <span aria-hidden="true">💡</span>
 
       <p>
         Para solicitar una atención veterinaria,
@@ -589,9 +342,6 @@
         Allí podrás elegir tu mascota, el servicio,
         el veterinario y la fecha deseada.
       </p>
-
     </div>
-
   </section>
-
 </div>
